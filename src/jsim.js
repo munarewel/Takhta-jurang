@@ -117,7 +117,7 @@ function lordGainExp(n){ const L=G.lord; L.exp+=n; let up=0; while(L.exp>=Math.r
 /* ---------- petualang ---------- */
 function fameLv(){ return 1+Math.sqrt(G.pop)*1.45+G.floors*.85+Math.min(30,(G.t-G.lordSince)/DAY_LEN*.6); }
 function newPerson(lv,job,race){
-  race=race||pick(ADV_RACES); const {n,sx}=advName(race); const R=RACE[race];
+  race=race||(job&&JOBS[job]&&JOBS[job].races&&rnd()<.5?pick(JOBS[job].races):pick(ADV_RACES)); const {n,sx}=advName(race); const R=RACE[race];
   const jb=job||pick(JOB_KEYS); const p={id:nid(),name:n,race,sx,job:jb,el:JOB_EL[jb]?pick(JOB_EL[jb]):'',lv:Math.max(1,Math.round(lv)),exp:0,eq:{hp:0,atk:0,def:0},gold:20+Math.round(lv*8),kills:0,alive:true,party:null,title:null,visits:0,
     app:{skin:pick(R.skin),hair:pick(R.hair),eye:pick(R.eye),cloth:pick(CLOTH),cloth2:pick(CLOTH),outfit:sx==='f'&&rnd()<.3?'gaun':pick(OUTFITS),style:sx==='f'&&rnd()<.7?pick(['long','tail','bun','braid']):pick(HAIRSTYLES)}};
   G.people[p.id]=p; return p;
@@ -160,7 +160,7 @@ function enterDungeon(pa){
   const lead=G.advs.find(a=>a.party===pa.id);
   say(lead.x,f,`"${pa.quote}"`,famous?'#ffd36a':'#ffe8c0',3.2);
   const talkers=G.advs.filter(a=>a.party===pa.id).sort(()=>rnd()-.5).slice(0,famous?2:1);
-  talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
+  talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=(typeof RACE_LINES!=='undefined'&&RACE_LINES[p.race]&&rnd()<.3)?RACE_LINES[p.race]:JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
   log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${p.isekai?'🌀':''}${jobTag(p.job)} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
 }
 function heroTick(){
@@ -215,6 +215,7 @@ function hitAdv(a,amt,src,opts){
   let em=1; { const el=opts.el!=null?opts.el:(src&&src.kind==='m'?monAtkEl(src.u):''); em=elemMult(el,p.el); if(em>1&&rnd()<.35) say(a.x,a.floor-0,'Efektif!','#ffb040',.9); }
   let d=dmgCalc(amt,st.def*(a.fx.guard>G.t?2:1)*(a.fx.brk>G.t?.6:1),(opts.mult||1)*em);
   if(src&&src.kind==='m'){ const X=monX(src.u); let eb=0; for(const e in X.elDmg) eb+=X.elDmg[e]*elemMult(e,p.el); d*=1+eb; if(G._abil===src.u) d*=1+X.mag; }
+  if(a.fx.shieldP>G.t) d*=.55;
   if(a.fx.sleep>G.t){ d*=2; a.fx.sleep=0; say(a.x,a.floor,'KOMBO!','#ff9ad0',1.2); }
   if(opts.crit){ d*=(src&&src.kind==='m'&&src.u.abil.includes('tajam')?2.4:1.8)+(src&&src.kind==='m'?monX(src.u).critD:0); }
   d=Math.round(d); a.hp-=d; a.lastHit=G.t;

@@ -76,6 +76,20 @@ const PARTY_THEME=[
   {id:'tax',j:['knight','priest','thief'],sz:[2,4],n:['Royal Tax Office','Auditors of {P}','Receipt Required'],q:['Kastil ini belum bayar pajak tanah selama 300 tahun!','Semua harta di peti akan kami catat.']},
   {id:'storm',j:['stormLord','aeromancer','iceQueen','mage'],sz:[3,4],tier:'elite',n:['Eye of the Storm','Tempest Court','Thunderhead'],q:['Langit sudah memihak kami.','Petir akan meruntuhkan menaramu.']},
   {id:'kings',j:['swordmaster','arrowQueen','sage','fistKing','spearGod'],sz:[3,5],tier:'elite',lvMul:1.15,n:['Council of Crowns','The Five Sovereigns','Legends Reunited'],q:['Hanya legenda yang pantas menantangmu.','Kami bukan party biasa, Raja Iblis.'],lead:'Legend'},
+  {id:'goblinRep',raceAll:1,j:['priest','cleric','farmer','cook','knight','medic'],sz:[3,5],race:'goblin',n:['Goblins Anonymous','The Repentant Fangs','Second Chance Goblins','Green Hearts Society','Goblins Against Goblinry'],q:['Dulu kami menjarah desa… sekarang kami membasmi monster. Maaf ya.','Ini cara kami menebus dosa.','Jangan lihat kami begitu. Kami sudah tobat!','Hukum alam bilang goblin itu jahat. Kami menentangnya.','Kerja yang baik, hidup yang baik. Itu janji kami.']},
+  {id:'oldDwarf',raceAll:1,old:1,j:['axeman','miner','knight','weaponMaster','juggernaut','cannoneer'],sz:[3,5],race:'dwarf',tier:'veteran',lvMul:1.35,n:['The Ale Fund','Beards for Beer','Thirsty Old Hammers','Last Round Club','Grandfathers of the Keg'],q:['Satu peti emas = satu tong bir.','Lututku sakit, tapi tenggorokanku lebih kering.','Kedai tutup jam sepuluh. Cepat selesaikan!','Waktu aku muda, Raja Iblis lebih tinggi dari ini.','Siapa yang mati duluan, bayar minuman!']},
+  {id:'trash',j:['swordmaster','arrowQueen','stormLord','bladeDancer','darkKnight','reaper','warlord','chronomancer'],sz:[3,4],tier:'elite',lvMul:1.2,n:['Trash Game'],q:['Trash game. Mana tantangannya?','Dungeon ini level tutorial.','Kalau tidak bikin kami hampir mati, buat apa?','Boring. Lantai berikutnya.','Raja Iblisnya cuma segini? Uninstall.']},
+  {id:'shieldHero',slots:[['shieldHero'],['dualblade','bladeDancer','lancer','valkyrie'],['berserker','brawler','monk','fistKing'],['hunter','ranger','spiritArcher','assassin']],races:['manusia','beastkin','beastkin','beastkin'],isekaiLead:1,n:['Shield Hero'],q:['Aku cuma punya perisai. Tapi tak satu pun temanku akan jatuh.','Kalian menyerang, aku menahan. Seperti biasa.','Perisaiku tidak pernah retak.']},
+  {id:'rolling',slots:[['priest','cleric','bishop','oracle','saint'],['ranger','archer','sniper','spiritArcher','gunslinger'],['guardian','knight','templar','paladin'],['swordmaster','samurai','darkKnight','berserker','gladiator','slayer']],n:['Rolling Thunder'],q:['Formasi standar. Tank depan, healer belakang.','Keseimbangan adalah kekuatan.','Tank tarik, attacker habisi, ranger tutup, healer jaga. Jalan!']},
+  {id:'hellborn',j:['darkKnight','demonic','warlock','bloodMage','demonologist','reaper'],sz:[3,4],race:'iblis',n:['Hellborn Exiles','The Fallen Horns','Ashen Court','Rival Throne'],q:['Takhta itu seharusnya milik kami.','Sesama iblis, mari bicara… dengan pedang.','Raja Iblis yang lemah harus turun takhta.']},
+  {id:'orcClan',j:['barbarian','juggernaut','shaman','gladiator','warlord','berserker'],sz:[3,5],race:'orc',n:['Green Tusk Clan','Blood Moon Orcs','Honor Tusks'],q:['Orc juga punya kehormatan!','WAAAGH! Untuk klan!','Kami datang bukan untuk menjarah. Kami datang untuk menang.']},
+  {id:'lizard',j:['hunter','shaman','lancer','assassin'],sz:[3,4],race:'lizard',n:['Swamp Scales','Cold Blood Company','Marsh Fangs'],q:['Ssss… kastil yang lembap.','Kami datang dari rawa jauh.']},
+  {id:'kobold',j:['miner','bomber','engineer','trickster','thief'],sz:[3,5],race:'kobold',n:['Tunnel Yappers','Shiny Seekers','Yip Yip Brigade'],q:['Yip! Ada yang berkilau!','Gali! Ledakkan! Ambil!','Kami kecil tapi banyak!']},
+  {id:'ironWall',j:['guardian','templar','juggernaut','knight','paladin'],sz:[3,5],n:['The Iron Wall','Unbreakable','Shield Wall of {P}'],q:['Tak ada yang lewat.','Pukul saja. Kami tidak akan bergeming.']},
+  {id:'guns',j:['gunslinger','musketeer','cannoneer','engineer','demonHunter'],sz:[3,4],n:['Gun & Glory','Powder Kings','Smoke & Lead'],q:['Bawa peluru lebih banyak!','Sihir terlalu lambat.','Telinga monster akan berdenging.']},
+  {id:'darkCov',j:['darkKnight','warlock','demonologist','bloodMage','reaper'],sz:[3,4],n:['The Dark Covenant','Pact of Shadows','Midnight Contract'],q:['Kontrak kami dengan kegelapan menuntut jiwamu.','Bayaran kami: jiwa Raja Iblis.']},
+  {id:'valhalla',j:['valkyrie','valkyrie','warlord','spiritArcher'],sz:[3,4],sx:'f',n:["Valhalla's Chosen",'Shieldmaidens','Winged Vanguard'],q:['Hari ini hari yang baik untuk mati.','Aula abadi menunggu yang berani.']},
+  {id:'oddFriends',slots:[[null],[null],[null],[null]],races:['goblin','elf','dwarf','orc'],n:['Unlikely Friends','The Odd Fellowship','Four Races, One Pot'],q:['Goblin, elf, dwarf, dan orc masuk ke dungeon… ini bukan awal lelucon.','Kami beda ras tapi satu tujuan!']},
 ];
 const PARTY_THEME_BY={}; for(const t of PARTY_THEME) PARTY_THEME_BY[t.id]=t;
 const P_COLOR=['Red','Black','White','Blue','Grey','Green','Golden','Silver','Crimson','Iron'];
@@ -87,7 +101,7 @@ const ISE_CHEAT=['Status Window','Appraisal','Infinite Item Box','Auto-Dodge','M
 const ISE_Q=['Status window, open! …Eh, beneran muncul!','Di duniaku, dungeon cuma ada di game. Sekarang beneran…','Kalau kukalahkan Raja Iblis, aku bisa pulang, kan?','Ini isekai beneran. Oke, tenang. Aku main game ini ribuan jam.','Truk itu… ah, sudahlah. Ayo naik level.','Aku dipanggil ke dunia ini cuma buat ini?'];
 function makeIsekai(p,starMin){ p.isekai=1; p.race='manusia'; const sx=rnd()<.55?'m':'f'; p.sx=sx; p.name=`${pick(ISE_F)} ${pick(ISE_L)}`; p.cheat=pick(ISE_CHEAT); p.title='the Otherworlder';
   p.app.hair=pick(['#1a1a22','#2a1a14','#3a2a1a']); p.app.skin=pick(['#f1d2b4','#f0c8a0','#e8c098']); p.app.cloth='#2a3550'; p.app.cloth2='#e8e8f0'; p.app.style=sx==='f'?pick(['long','tail']):'short';
-  if(starMin){ const pool=JOB_KEYS.filter(k=>JOBS[k].star>=starMin&&k!=='hero'&&k!=='farmer'&&k!=='cook'); p.job=pick(pool); p.el=JOB_EL[p.job]?pick(JOB_EL[p.job]):''; }
+  if(starMin){ const pool=JOB_KEYS.filter(k=>JOBS[k].star>=starMin&&k!=='hero'&&!JOBS[k].special&&k!=='farmer'&&k!=='cook'); p.job=pick(pool); p.el=JOB_EL[p.job]?pick(JOB_EL[p.job]):''; }
   p.lv=Math.round(p.lv*1.1)+2; return p; }
 function newParty(){
   const L=fameLv(); const r=rnd();
@@ -101,20 +115,31 @@ function newParty(){
   const pa={id:nid(),tier,members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:'',quote:''};
   let th=null;
   if(tier!=='solo'&&rnd()<.55){ const cand=PARTY_THEME.filter(t=>!t.tier||t.tier===tier||(t.tier==='baru')===(tier==='baru')&&rnd()<.3); th=pick(cand.length?cand:PARTY_THEME); }
-  if(th){ pa.th=th.id; if(th.tier&&th.tier!==tier){ tier=pa.tier=th.tier; lv=th.tier==='baru'?ri(1,8)+L*.15:th.tier==='elite'?L*rand(1.5,1.9):L*rand(1.15,1.5); } size=ri(th.sz[0],th.sz[1]); if(th.lvMul) lv*=th.lvMul; }
+  if(th){ pa.th=th.id; if(th.tier&&th.tier!==tier){ tier=pa.tier=th.tier; lv=th.tier==='baru'?ri(1,8)+L*.15:th.tier==='elite'?L*rand(1.5,1.9):L*rand(1.15,1.5); } size=th.slots?th.slots.length:ri(th.sz[0],th.sz[1]); if(th.lvMul) lv*=th.lvMul; }
   const jobs=[];
-  if(th&&th.j){ for(let i=0;i<size;i++) jobs.push(th.fixed?th.j[i%th.j.length]:pick(th.j)); }
+  if(th&&th.slots){ for(const sl of th.slots){ const j=pick(sl); jobs.push(j||pickJobStar(tier)); } }
+  else if(th&&th.j){ for(let i=0;i<size;i++) jobs.push(th.fixed?th.j[i%th.j.length]:pick(th.j)); }
   else { const core=size>=3&&rnd()<.5?['knight','priest',pick(['mage','archer'])]:[]; for(let i=0;i<size;i++) jobs.push(core[i]||pickJobStar(tier)); }
-  for(const j of jobs){ const race=th&&th.race?(rnd()<.85?th.race:null):null; const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pickJobStar('solo'):j,race||undefined); p.party=pa.id; pa.members.push(p.id);
+  for(const [ji,j] of jobs.entries()){ const race=th&&th.races?th.races[ji]:th&&th.race?(th.raceAll||rnd()<.85?th.race:null):null; const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pickJobStar('solo'):j,race||undefined); p.party=pa.id; pa.members.push(p.id);
+    if(th&&th.old){ p.app.hair=pick(['#c8c4c0','#e8e4e0','#a8a4a0']); p.sx='m'; }
     if(th&&th.sx&&p.sx!==th.sx){ for(let k=0;k<12;k++){ const a=advName(p.race); if(a.sx===th.sx){ p.name=a.n; p.sx=a.sx; break; } } } }
   // orang dunia lain di dalam party
   const isekaiP=tier==='solo'?.25:tier==='baru'?.05:.08;
-  if(rnd()<isekaiP){ const p=G.people[pick(pa.members)]; makeIsekai(p,th&&th.j?0:3); }
+  if(th&&th.isekaiLead){ const p=G.people[pa.members[0]]; const jb=p.job; makeIsekai(p,0); p.job=jb; p.title='the '+JOBS[jb].n; }
+  else if(rnd()<isekaiP&&!(th&&th.race)){ const p=G.people[pick(pa.members)]; makeIsekai(p,th&&th.j?0:3); }
   const lead=G.people[pa.members[0]];
   if(tier==='solo'){ const p=lead; if(!p.isekai) p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]||JOBS[p.job].n}`; else p.title=`the Wandering Otherworlder`; pa.name=`${p.name} ${p.title}`; }
-  else if(th){ pa.name=fillName(pick(th.n),lead); if(th.lead&&!lead.isekai) lead.title=th.lead; }
+  else if(th){ pa.name=fillName(pick(th.n),lead); if(th.lead&&!lead.isekai) lead.title=th.lead; if(th.id==='trash'&&G.parties.some(x=>x!==pa&&x.name==='Trash Game'&&x.state!=='gone')) pa.name='Trash Game II'; }
   else if(tier==='baru') pa.name=rnd()<.35?'Newcomer Party':genPartyName();
   else pa.name=genPartyName();
   G.parties.push(pa); return pa;
 }
 function partyQuote(pa){ const iso=partyMembers(pa).find(p=>p.isekai); if(iso&&rnd()<.4) return pick(ISE_Q); const T=pa.th&&PARTY_THEME_BY[pa.th]; return pick(T?T.q:QUOTES[pa.tier]); }
+/* skill kelas baru: perisai party, provokasi, serap nyawa */
+const _useSkill=useSkill;
+useSkill=function(a,p,J,tgt,st,pa){ const S=J.skill; if(S.k!=='shield'&&S.k!=='taunt'&&S.k!=='drain') return _useSkill(a,p,J,tgt,st,pa);
+  const f=a.floor; say(a.x,f,S.n,'#9fe0ff',1.1); a.atkT=G.t; a.atkK='skill';
+  if(S.k==='shield'){ for(const x of G.advs) if(x.party===a.party&&x.floor===f){ x.fx.shieldP=G.t+6; const xs=advStats(G.people[x.pid]); x.hp=Math.min(xs.hp,x.hp+xs.hp*.08); fxAt('shield',x.x,f,'#9fe0ff',.9); } }
+  else if(S.k==='taunt'){ a.fx.guard=G.t+6; for(const m of G.mons) if(!m.dead&&m.floor===f&&Math.abs(m.x-a.x)<80){ m.aggro=a.pid; m.aggroT=G.t; } fxAt('roar',a.x,f,'#ffd36a',.7); }
+  else if(S.k==='drain'&&tgt){ const d=tgt.k==='m'?hitMon(tgt.u,st.atk,a,{mult:S.m,magic:J.magic}):hitLord(st.atk,a,{mult:S.m}); a.hp=Math.min(st.hp,a.hp+(d||0)*.6); fxAt('curse',tgt.u.x,f,'#c8203a',.6); }
+};

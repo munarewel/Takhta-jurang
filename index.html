@@ -1069,6 +1069,89 @@ const JOB_GEAR_EN={knight:[['Knight Sword','Longsword'],['Knight Armor','Tower S
 for(const k in JOB_GEAR_EN) JOB_GEAR[k]=JOB_GEAR_EN[k];
 
 /* =====================================================================
+   TAKHTA JURANG — ras petualang tambahan & banyak kelas baru
+   ===================================================================== */
+Object.assign(RACE,{
+  goblin:{nama:'Goblin',leg:3,tor:4,tw:6,skin:['#7fae4a','#6a9a3a','#8ab85a'],hair:['#2a2a1a','#4a3a1a'],eye:['#ffd040','#ff8a3a'],
+    syl:[['Grik','Snag','Zug','Mok','Rat','Gob','Nix','Skab','Vrek','Bok','Pip','Krot'],['ka','nik','zit','gle','bo','rot','snit','lo']],fsyl:['ka','ra','li','na','bi']},
+  orc:{nama:'Orc',leg:5,tor:7,tw:8,skin:['#7a8a4a','#6a7a3a','#8a9a5a'],hair:['#1a1a14','#3a2a1a'],eye:['#ff6a3a','#ffd040'],
+    syl:[['Gor','Thra','Mug','Urz','Kra','Dur','Brak','Grom','Zog','Hruk'],['ash','nak','gul','tor','mok','dush','gar']],fsyl:['sha','ga','ra','ka']},
+  lizard:{nama:'Lizardman',leg:5,tor:6,tw:6,skin:['#4a8a6a','#5a9a5a','#3a7a7a'],hair:['#3a6a4a'],eye:['#ffd040'],
+    syl:[['Ss','Kss','Zha','Thes','Ixs','Sor','Vess'],['ith','ara','ess','ix','ash','oth']],fsyl:['ssa','ira','eth']},
+  kobold:{nama:'Kobold',leg:3,tor:4,tw:5,skin:['#b87a4a','#a86a3a'],hair:['#8a5a3a'],eye:['#ffd040'],
+    syl:[['Yip','Kib','Rux','Tik','Dob','Mip'],['pip','o','ik','by','ret']],fsyl:['pi','ya','ki']},
+});
+const RACE_EN={manusia:'Human',elf:'Elf',dwarf:'Dwarf',beastkin:'Beastkin',iblis:'Demon',halfelf:'Half-Elf',goblin:'Goblin',orc:'Orc',lizard:'Lizardman',kobold:'Kobold'};
+function raceName(r){ return RACE_EN[r]||(RACE[r]&&RACE[r].nama)||r; }
+ADV_RACES.length=0; for(const [r,w] of [['manusia',40],['elf',10],['dwarf',10],['beastkin',12],['halfelf',6],['iblis',6],['goblin',6],['orc',5],['lizard',3],['kobold',2]]) for(let i=0;i<w;i++) ADV_RACES.push(r);
+const RACE_LINES={goblin:['Maaf, saudara-saudara goblin di sini… aku sudah memilih jalan lain.','Dulu aku menjarah desa. Sekarang aku melindunginya.','Jangan lihat aku begitu! Aku goblin baik-baik!'],
+  orc:['Orc juga bisa jadi pahlawan!','Kapakku untuk kebaikan sekarang.'],iblis:['Takhta itu seharusnya milik bangsaku… bukan milikmu.','Sesama iblis, jangan tersinggung ya.'],
+  lizard:['Ssss… lembap sekali di sini. Aku suka.'],kobold:['Yip! Ada harta! Yip yip!'],dwarf:['Batu kastil ini jelek. Siapa tukangnya?'],elf:['Kastil ini tidak punya selera estetika.'],beastkin:['Aku mencium bau monster dari sini.']};
+/* ---------- kelas baru ---------- */
+const JT={tank:{hp:70,atk:7,def:10,eva:.03,rng:16,grow:[10,1.2,1.5],front:3},melee:{hp:56,atk:10,def:5,eva:.1,rng:16,grow:[8,1.8,.8],front:2},
+  heavy:{hp:66,atk:11,def:5,eva:.03,rng:16,grow:[9,1.9,.8],front:3},rogue:{hp:44,atk:9,def:3,eva:.2,rng:16,grow:[6,1.7,.5],front:2},
+  ranged:{hp:42,atk:9,def:3,eva:.1,rng:56,grow:[6,1.6,.5],front:1},caster:{hp:36,atk:10,def:2,eva:.05,rng:50,grow:[5,1.9,.4],front:0,magic:1},
+  healer:{hp:40,atk:5,def:3,eva:.05,rng:44,grow:[6,.8,.6],front:0,magic:1},support:{hp:44,atk:7,def:4,eva:.07,rng:40,grow:[6,1.1,.6],front:1}};
+// [key, nama, ★, tipe, skill, senjata, look, elemen, ucapan, perlengkapan, ras-bias, khusus]
+const NEWJOBS=[
+ ['guardian','Guardian',3,'tank',{n:'Provoke',cd:12,k:'taunt'},'shield',{base:'ksatria',cloth:'#5a6a7a',pants:'#3a4250'},'',['Semua monster, lihat ke sini!','Di belakangku, aman.'],[['Kite Shield','Iron Bulwark'],['Guardian Plate'],['Oath Medal']],['dwarf','manusia']],
+ ['templar','Templar',4,'tank',{n:'Holy Bulwark',cd:12,k:'shield'},'warhammer',{base:'paladin',cloth:'#e8e0d0',trim:'#c83a3a'},'suci',['Iman adalah perisai terkuat.','Demi kuil suci!'],[['Templar Hammer'],['Templar Plate'],['Red Cross Tabard']]],
+ ['crusader','Crusader',3,'melee',{n:'Crusader Strike',cd:7,k:'crit',m:2.1},'sword',{base:'ksatria',cloth:'#c8c0b0',trim:'#c83a3a'},'cahaya',['Perang suci dimulai!','Deus vult!'],[['Crusader Blade'],['Crusader Mail'],['Pilgrim Badge']]],
+ ['shieldHero','Shield Hero',5,'tank',{n:'Guardian Barrier',cd:9,k:'shield'},'shield',{base:'ksatria',cloth:'#3a5a3a',pants:'#2a3a2a'},'',['Aku cuma punya perisai. Tapi tak satu pun temanku akan jatuh.','Serang saja, aku yang menahan!'],[['Legendary Shield'],['Hero Cloak'],['Bond Pendant']],null,1],
+ ['vanguard','Vanguard',3,'melee',{n:'Breakthrough',cd:8,k:'pierce',m:1.8},'spear',{base:'kavaleri',cloth:'#4a5a8a'},'',['Barisan depan, maju!'],[['Vanguard Pike'],['Vanguard Armor'],['Signal Horn']]],
+ ['juggernaut','Juggernaut',4,'heavy',{n:'Earthshaker',cd:10,k:'aoe',m:1.7},'warhammer',{base:'berserker',cloth:'#3a3a3a',pants:'#2a2a2a'},'batu',['Tidak ada yang bisa menghentikanku.','BOOM.'],[['Siege Hammer'],['Juggernaut Plate'],['Iron Collar']],['orc','dwarf']],
+ ['darkKnight','Dark Knight',4,'heavy',{n:'Soul Eater',cd:8,k:'drain',m:1.9},'darkblade',{base:'ksatria',cloth:'#2a2030',pants:'#1a1420',trim:'#8a1a3a'},'bayang',['Kegelapan ini adalah kekuatanku.','Jiwamu akan memberiku makan.'],[['Abyssal Blade'],['Dark Plate'],['Cursed Sigil']],['iblis','manusia']],
+ ['demonic','Demonic',4,'heavy',{n:'Demon Form',cd:14,k:'rage'},'scythe',{base:'penyihirHitam',cloth:'#5a0f1e',pants:'#2a0a14'},'neraka',['Darah iblisku mendidih!','Kau pikir hanya kau iblis di sini?'],[['Hellfire Scythe'],['Demonic Hide'],['Horned Circlet']],['iblis']],
+ ['demonHunter','Demon Hunter',4,'ranged',{n:"Hunter's Volley",cd:7,k:'multi',hits:4,m:.75},'gun',{base:'pemburu',cloth:'#3a2a2a',pants:'#1a1a1a'},'suci',['Iblis adalah buruanku.','Raja Iblis, kepalamu ada harganya.'],[['Silver Pistol'],['Hunter Longcoat'],['Holy Bullet Pouch']]],
+ ['reaper','Reaper',4,'rogue',{n:'Grim Harvest',cd:9,k:'aoe',m:1.6},'scythe',{base:'assassin',cloth:'#1a1a22',pants:'#101014'},'bayang',['Waktumu sudah habis.','Aku datang menjemput.'],[['Reaper Scythe'],['Shroud of Night'],['Hourglass Charm']],['iblis','manusia']],
+ ['gladiator','Gladiator',3,'melee',{n:'Arena Finisher',cd:7,k:'crit',m:2.3},'sword',{base:'petarung',cloth:'#a8452c',pants:'#6a2a1a'},'',['Penonton! Lihat ini!','Arena atau dungeon, sama saja.'],[['Gladius'],['Gladiator Harness'],['Champion Laurel']],['orc','manusia']],
+ ['barbarian','Barbarian',2,'heavy',{n:'War Frenzy',cd:14,k:'rage'},'bigaxe',{base:'berserker',cloth:'#7a5a3a'},'',['GRAAAH!','Aku tidak butuh rencana!'],[['Bone Axe'],['Fur Loincloth'],['Tooth Necklace']],['orc','beastkin']],
+ ['brawler','Brawler',2,'melee',{n:'Combo Rush',cd:7,k:'multi',hits:5,m:.5},'claw',{base:'petarung',cloth:'#4a6a8a'},'',['Ayo adu jotos!','Tinjuku sudah gatal.'],[['Brass Knuckles'],['Brawler Vest'],['Fight Tape']],['beastkin','orc']],
+ ['bladeDancer','Blade Dancer',4,'rogue',{n:'Crimson Waltz',cd:7,k:'multi',hits:5,m:.65},'twin',{base:'assassin',cloth:'#c83a7a',pants:'#5a1a3a'},'angin',['Mari menari, monster.','Satu, dua, tiga… tebas!'],[['Dancing Blades'],['Silk Garb'],['Bell Anklet']],['elf','manusia']],
+ ['assassin','Assassin',3,'rogue',{n:'Backstab',cd:7,k:'crit',m:2.6},'dagger',{base:'assassin',cloth:'#2a2a3a'},'bayang',['…','Tidak ada yang melihatku datang.'],[['Assassin Blade'],['Shadow Cloak'],['Poison Vial']],['halfelf','goblin']],
+ ['spellblade','Spellblade',4,'melee',{n:'Arcane Edge',cd:8,k:'aoe',m:1.6},'runeblade',{base:'ksatria',cloth:'#4a3a8a',pants:'#2a2a4a'},'petir',['Pedang dan sihir, satu napas.'],[['Arcane Saber'],['Runed Coat'],['Mana Gem']],['elf','halfelf']],
+ ['warlord','Warlord',5,'heavy',{n:"Conqueror's Roar",cd:12,k:'buff'},'greatsword',{base:'ksatriaNaga',cloth:'#6a1a1a',pants:'#3a0a0a'},'',['Pasukanku, serbu!','Kastil ini akan jadi bentengku.'],[['Warlord Greatsword'],['Warlord Plate'],['Conqueror Crown']],['orc','manusia']],
+ ['valkyrie','Valkyrie',4,'melee',{n:'Valhalla Dive',cd:8,k:'pierce',m:2.2},'spearGold',{base:'kavaleri',cloth:'#c8d0e0',pants:'#8a9ab8'},'cahaya',['Para pemberani akan diantar ke aula abadi.'],[['Valkyrie Spear'],['Winged Mail'],['Feather Helm']]],
+ ['slayer','Slayer',3,'heavy',{n:'Execute',cd:8,k:'crit',m:2.5},'greatsword',{base:'hunterHV',cloth:'#4a3a2a'},'',['Monster besar? Bagus.'],[['Slayer Blade'],['Scarred Leather'],['Kill Tally']]],
+ ['gunslinger','Gunslinger',3,'ranged',{n:'Fan the Hammer',cd:6,k:'multi',hits:6,m:.4},'gun',{base:'pemburu',cloth:'#6a4a2a',pants:'#3a2a1a'},'',['Tangan lebih cepat dari mantra.','Dor dor dor!'],[['Six-Shooter'],['Duster Coat'],['Lucky Bullet']]],
+ ['musketeer','Musketeer',3,'ranged',{n:'Aimed Shot',cd:8,k:'snipe',m:2.6},'gun',{base:'bangsawan',cloth:'#3a4a8a'},'',['Satu untuk semua!','Isi peluru… tembak!'],[['Long Musket'],['Musketeer Tabard'],['Plumed Hat']]],
+ ['engineer','Engineer',3,'support',{n:'Turret Barrage',cd:9,k:'multi',hits:4,m:.7},'bomb',{base:'penempa',cloth:'#8a6a3a'},'baja',['Mesin ini akan meratakan lantai!','Jangan sentuh kabel merahnya.'],[['Wrench Cannon'],['Work Overalls'],['Gear Kit']],['dwarf','kobold','goblin']],
+ ['bomber','Bomber',2,'support',{n:'Big Boom',cd:9,k:'aoe',m:1.6},'bomb',{base:'pencuri',cloth:'#5a3a2a'},'api',['Hihihi… BOOM!','Ada yang lihat korekku?'],[['Satchel Bomb'],['Blast Apron'],['Fuse Kit']],['goblin','kobold']],
+ ['cannoneer','Cannoneer',4,'ranged',{n:'Cannon Volley',cd:9,k:'aoe',m:1.9},'gun',{base:'pendekarKapak',cloth:'#2a3a5a'},'api',['Meriam siap! TEMBAK!'],[['Hand Cannon'],['Gunner Coat'],['Powder Keg']],['dwarf','orc']],
+ ['spiritArcher','Spirit Archer',4,'ranged',{n:'Spirit Arrows',cd:7,k:'multi',hits:3,m:1},'bowGold',{base:'ksatriaPemanah',cloth:'#5a8ab8'},'bulan',['Roh hutan mengarahkan panahku.'],[['Spirit Bow'],['Moonweave Cloak'],['Spirit Quiver']],['elf']],
+ ['warlock','Warlock',3,'caster',{n:'Life Siphon',cd:8,k:'drain',m:1.6},'tome',{base:'penyihirHitam',cloth:'#3a1a4a'},'bayang',['Perjanjianku dengan kegelapan menuntut korban.'],[['Pact Grimoire'],['Warlock Robe'],['Eldritch Eye']],['iblis','halfelf']],
+ ['shaman','Shaman',2,'healer',{n:'Spirit Totem',cd:8,k:'heal',m:.3},'staffSkull',{base:'druid',cloth:'#6a4a2a'},'petir',['Roh leluhur, lindungi kami.'],[['Totem Staff'],['Shaman Hide'],['Spirit Feather']],['orc','goblin','beastkin']],
+ ['pyromancer','Pyromancer',3,'caster',{n:'Inferno',cd:9,k:'aoe',m:1.8},'staff',{base:'penyihirApi',cloth:'#c83a1a'},'api',['Semuanya akan terbakar!','Hangat, ya?'],[['Ember Rod'],['Flame Robe'],['Fire Opal']]],
+ ['cryomancer','Cryomancer',3,'caster',{n:'Blizzard',cd:9,k:'aoe',m:1.7},'staffIce',{base:'penyihirAir',cloth:'#a8c8e8'},'es',['Dinginnya sampai ke tulang.'],[['Frost Wand'],['Snowweave Robe'],['Ice Crystal']]],
+ ['elementalist','Elementalist',4,'caster',{n:'Prismatic Storm',cd:10,k:'aoe',m:2},'staffStorm',{base:'sageAgung',cloth:'#4a8a6a'},'angin',['Empat elemen tunduk padaku.'],[['Prism Staff'],['Elemental Robe'],['Four-Stone Ring']],['elf']],
+ ['chronomancer','Chronomancer',5,'caster',{n:'Time Warp',cd:12,k:'buff'},'tome',{base:'sageAgung',cloth:'#c8a050',pants:'#6a5a2a'},'',['Aku sudah melihat akhir pertarungan ini.','Waktu adalah sungai. Aku perahunya.'],[['Clockwork Tome'],['Timeless Robe'],['Golden Hourglass']]],
+ ['illusionist','Illusionist',3,'caster',{n:'Mirror Image',cd:8,k:'multi',hits:3,m:.9},'tome',{base:'enchanter',cloth:'#c86aa8'},'mimpi',['Yang kau lihat… bukan aku.'],[['Mirage Book'],['Shimmer Robe'],['Mirror Charm']],['halfelf','elf']],
+ ['bloodMage','Blood Mage',4,'caster',{n:'Blood Pact',cd:8,k:'drain',m:2},'tome',{base:'penyihirHitam',cloth:'#8a1a2a'},'darah',['Darahku… darahmu… sama saja.'],[['Blood Codex'],['Crimson Robe'],['Vein Ring']],['iblis']],
+ ['demonologist','Demonologist',4,'caster',{n:'Imp Swarm',cd:9,k:'multi',hits:4,m:.8},'tome',{base:'necromancer',cloth:'#6a1a1a'},'neraka',['Keluarlah, imp-imp kecilku!'],[['Infernal Codex'],['Summoner Robe'],['Pentagram Amulet']],['iblis']],
+ ['puppeteer','Puppeteer',3,'support',{n:'Marionette',cd:8,k:'multi',hits:4,m:.7},'whip',{base:'bard',cloth:'#5a3a6a'},'',['Menarilah untukku, bonekaku.'],[['Puppet Strings'],['Theater Coat'],['Doll Head']]],
+ ['witch','Witch',3,'caster',{n:'Hex',cd:9,k:'aoe',m:1.6},'staffLeaf',{base:'penyihir',cloth:'#2a2a3a'},'racun',['Hihihi… satu kutukan kecil.'],[['Crooked Wand'],['Witch Dress'],['Black Cat Charm']]],
+ ['oracle','Oracle',4,'healer',{n:'Foresight',cd:9,k:'heal',m:.45},'staffGold',{base:'pendeta',cloth:'#f0e8c8'},'cahaya',['Aku sudah melihat masa depan. Kita menang.'],[['Seer Staff'],['Oracle Veil'],['Crystal Eye']]],
+ ['bishop','Bishop',4,'healer',{n:'Grand Heal',cd:8,k:'heal',m:.5},'staffCross',{base:'pendeta',cloth:'#e8e0f0',trim:'#c8a050'},'suci',['Berkat untuk semua.'],[['Bishop Crosier'],['Bishop Vestment'],['Holy Mitre']]],
+ ['medic','Medic',2,'healer',{n:'First Aid',cd:6,k:'heal',m:.25},'flask',{base:'tabib',cloth:'#e8e8e8'},'',['Tahan, kubalut dulu!','Jangan mati di depanku!'],[['Bandage Kit'],['Medic Coat'],['Herb Pouch']]],
+ ['exorcist','Exorcist',3,'caster',{n:'Banish',cd:9,k:'aoe',m:1.6},'tome',{base:'pendeta',cloth:'#2a2a3a'},'suci',['Kembalilah ke neraka!'],[['Rite Book'],['Exorcist Coat'],['Salt Charm']]],
+ ['inquisitor','Inquisitor',4,'melee',{n:'Judgment',cd:8,k:'crit',m:2.3},'mace',{base:'paladin',cloth:'#1a1a1a',trim:'#c83a3a'},'suci',['Kau dituduh menjadi iblis. Hukumannya mati.'],[['Judgment Mace'],['Inquisitor Coat'],['Brand Iron']]],
+ ['dancer','Dancer',2,'support',{n:'War Dance',cd:12,k:'buff'},'twin',{base:'bard',cloth:'#e86a9a'},'',['Ikuti iramaku!'],[['Dancing Fans'],['Silk Costume'],['Ankle Bells']]],
+ ['trickster','Trickster',3,'rogue',{n:'Dirty Trick',cd:7,k:'crit',m:2.2},'dagger',{base:'pencuri',cloth:'#5a8a3a'},'',['Hehe, kena kau!'],[['Trick Dagger'],['Patchwork Coat'],['Loaded Dice']],['goblin','kobold','halfelf']],
+ ['pirate','Pirate',2,'melee',{n:'Cutlass Flurry',cd:7,k:'multi',hits:3,m:.8},'sword',{base:'pencuri',cloth:'#a83a3a'},'air',['Yo-ho! Mana hartanya?'],[['Cutlass'],['Pirate Coat'],['Gold Earring']]],
+ ['battleMage','Battle Mage',3,'melee',{n:'Arcane Smash',cd:8,k:'aoe',m:1.5},'warhammer',{base:'penyihir',cloth:'#3a5a8a'},'petir',['Kenapa tidak keduanya: sihir DAN palu?'],[['Rune Hammer'],['Battle Robe'],['Spark Ring']],['dwarf']],
+];
+const JOB_WPN_NEW={};
+for(const [k,n,star,ty,skill,wpn,look,el,lines,gear,races,special] of NEWJOBS){
+  JOBS[k]=Object.assign({n,spr:look.base,look,skill,star},JSON.parse(JSON.stringify(JT[ty]))); if(special) JOBS[k].special=1; if(races) JOBS[k].races=races;
+  if(!JOB_KEYS.includes(k)) JOB_KEYS.push(k); JOB_LINES[k]=lines; if(el) JOB_EL[k]=[el]; JOB_GEAR[k]=gear; JOB_WPN_NEW[k]=wpn; }
+// bias ras untuk kelas lama
+Object.assign(JOBS.axeman,{races:['dwarf','orc']}); Object.assign(JOBS.miner,{races:['dwarf','kobold']}); Object.assign(JOBS.ranger,{races:['elf','halfelf']}); Object.assign(JOBS.archer,{races:['elf']});
+Object.assign(JOBS.monk,{races:['beastkin']}); Object.assign(JOBS.berserker,{races:['orc','beastkin']}); Object.assign(JOBS.thief,{races:['goblin','kobold','halfelf']}); Object.assign(JOBS.darkmage,{races:['iblis']});
+Object.assign(JOBS.necro,{races:['iblis']}); Object.assign(JOBS.druid,{races:['elf']}); Object.assign(JOBS.hunter,{races:['beastkin','lizard']}); Object.assign(JOBS.weaponMaster,{races:['dwarf']});
+function pickJobStar(tier){ const w=STAR_W[tier]||STAR_W.biasa; let r=rnd()*w.reduce((a,b)=>a+b,0), st=1; for(let i=0;i<5;i++){ r-=w[i]; if(r<0){ st=i+1; break; } }
+  let pool=JOB_KEYS.filter(k=>JOBS[k].star===st&&k!=='hero'&&!JOBS[k].special); if(!pool.length) pool=JOB_KEYS.filter(k=>k!=='hero'&&!JOBS[k].special); return pick(pool); }
+
+/* =====================================================================
    TAKHTA JURANG — simulasi kastil
    ===================================================================== */
 const FW=200, FH=52, SLOTS=10, DT=1/30, DAY_LEN=120;
@@ -1187,7 +1270,7 @@ function lordGainExp(n){ const L=G.lord; L.exp+=n; let up=0; while(L.exp>=Math.r
 /* ---------- petualang ---------- */
 function fameLv(){ return 1+Math.sqrt(G.pop)*1.45+G.floors*.85+Math.min(30,(G.t-G.lordSince)/DAY_LEN*.6); }
 function newPerson(lv,job,race){
-  race=race||pick(ADV_RACES); const {n,sx}=advName(race); const R=RACE[race];
+  race=race||(job&&JOBS[job]&&JOBS[job].races&&rnd()<.5?pick(JOBS[job].races):pick(ADV_RACES)); const {n,sx}=advName(race); const R=RACE[race];
   const jb=job||pick(JOB_KEYS); const p={id:nid(),name:n,race,sx,job:jb,el:JOB_EL[jb]?pick(JOB_EL[jb]):'',lv:Math.max(1,Math.round(lv)),exp:0,eq:{hp:0,atk:0,def:0},gold:20+Math.round(lv*8),kills:0,alive:true,party:null,title:null,visits:0,
     app:{skin:pick(R.skin),hair:pick(R.hair),eye:pick(R.eye),cloth:pick(CLOTH),cloth2:pick(CLOTH),outfit:sx==='f'&&rnd()<.3?'gaun':pick(OUTFITS),style:sx==='f'&&rnd()<.7?pick(['long','tail','bun','braid']):pick(HAIRSTYLES)}};
   G.people[p.id]=p; return p;
@@ -1230,7 +1313,7 @@ function enterDungeon(pa){
   const lead=G.advs.find(a=>a.party===pa.id);
   say(lead.x,f,`"${pa.quote}"`,famous?'#ffd36a':'#ffe8c0',3.2);
   const talkers=G.advs.filter(a=>a.party===pa.id).sort(()=>rnd()-.5).slice(0,famous?2:1);
-  talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
+  talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=(typeof RACE_LINES!=='undefined'&&RACE_LINES[p.race]&&rnd()<.3)?RACE_LINES[p.race]:JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
   log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${p.isekai?'🌀':''}${jobTag(p.job)} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
 }
 function heroTick(){
@@ -1285,6 +1368,7 @@ function hitAdv(a,amt,src,opts){
   let em=1; { const el=opts.el!=null?opts.el:(src&&src.kind==='m'?monAtkEl(src.u):''); em=elemMult(el,p.el); if(em>1&&rnd()<.35) say(a.x,a.floor-0,'Efektif!','#ffb040',.9); }
   let d=dmgCalc(amt,st.def*(a.fx.guard>G.t?2:1)*(a.fx.brk>G.t?.6:1),(opts.mult||1)*em);
   if(src&&src.kind==='m'){ const X=monX(src.u); let eb=0; for(const e in X.elDmg) eb+=X.elDmg[e]*elemMult(e,p.el); d*=1+eb; if(G._abil===src.u) d*=1+X.mag; }
+  if(a.fx.shieldP>G.t) d*=.55;
   if(a.fx.sleep>G.t){ d*=2; a.fx.sleep=0; say(a.x,a.floor,'KOMBO!','#ff9ad0',1.2); }
   if(opts.crit){ d*=(src&&src.kind==='m'&&src.u.abil.includes('tajam')?2.4:1.8)+(src&&src.kind==='m'?monX(src.u).critD:0); }
   d=Math.round(d); a.hp-=d; a.lastHit=G.t;
@@ -1919,6 +2003,20 @@ const PARTY_THEME=[
   {id:'tax',j:['knight','priest','thief'],sz:[2,4],n:['Royal Tax Office','Auditors of {P}','Receipt Required'],q:['Kastil ini belum bayar pajak tanah selama 300 tahun!','Semua harta di peti akan kami catat.']},
   {id:'storm',j:['stormLord','aeromancer','iceQueen','mage'],sz:[3,4],tier:'elite',n:['Eye of the Storm','Tempest Court','Thunderhead'],q:['Langit sudah memihak kami.','Petir akan meruntuhkan menaramu.']},
   {id:'kings',j:['swordmaster','arrowQueen','sage','fistKing','spearGod'],sz:[3,5],tier:'elite',lvMul:1.15,n:['Council of Crowns','The Five Sovereigns','Legends Reunited'],q:['Hanya legenda yang pantas menantangmu.','Kami bukan party biasa, Raja Iblis.'],lead:'Legend'},
+  {id:'goblinRep',raceAll:1,j:['priest','cleric','farmer','cook','knight','medic'],sz:[3,5],race:'goblin',n:['Goblins Anonymous','The Repentant Fangs','Second Chance Goblins','Green Hearts Society','Goblins Against Goblinry'],q:['Dulu kami menjarah desa… sekarang kami membasmi monster. Maaf ya.','Ini cara kami menebus dosa.','Jangan lihat kami begitu. Kami sudah tobat!','Hukum alam bilang goblin itu jahat. Kami menentangnya.','Kerja yang baik, hidup yang baik. Itu janji kami.']},
+  {id:'oldDwarf',raceAll:1,old:1,j:['axeman','miner','knight','weaponMaster','juggernaut','cannoneer'],sz:[3,5],race:'dwarf',tier:'veteran',lvMul:1.35,n:['The Ale Fund','Beards for Beer','Thirsty Old Hammers','Last Round Club','Grandfathers of the Keg'],q:['Satu peti emas = satu tong bir.','Lututku sakit, tapi tenggorokanku lebih kering.','Kedai tutup jam sepuluh. Cepat selesaikan!','Waktu aku muda, Raja Iblis lebih tinggi dari ini.','Siapa yang mati duluan, bayar minuman!']},
+  {id:'trash',j:['swordmaster','arrowQueen','stormLord','bladeDancer','darkKnight','reaper','warlord','chronomancer'],sz:[3,4],tier:'elite',lvMul:1.2,n:['Trash Game'],q:['Trash game. Mana tantangannya?','Dungeon ini level tutorial.','Kalau tidak bikin kami hampir mati, buat apa?','Boring. Lantai berikutnya.','Raja Iblisnya cuma segini? Uninstall.']},
+  {id:'shieldHero',slots:[['shieldHero'],['dualblade','bladeDancer','lancer','valkyrie'],['berserker','brawler','monk','fistKing'],['hunter','ranger','spiritArcher','assassin']],races:['manusia','beastkin','beastkin','beastkin'],isekaiLead:1,n:['Shield Hero'],q:['Aku cuma punya perisai. Tapi tak satu pun temanku akan jatuh.','Kalian menyerang, aku menahan. Seperti biasa.','Perisaiku tidak pernah retak.']},
+  {id:'rolling',slots:[['priest','cleric','bishop','oracle','saint'],['ranger','archer','sniper','spiritArcher','gunslinger'],['guardian','knight','templar','paladin'],['swordmaster','samurai','darkKnight','berserker','gladiator','slayer']],n:['Rolling Thunder'],q:['Formasi standar. Tank depan, healer belakang.','Keseimbangan adalah kekuatan.','Tank tarik, attacker habisi, ranger tutup, healer jaga. Jalan!']},
+  {id:'hellborn',j:['darkKnight','demonic','warlock','bloodMage','demonologist','reaper'],sz:[3,4],race:'iblis',n:['Hellborn Exiles','The Fallen Horns','Ashen Court','Rival Throne'],q:['Takhta itu seharusnya milik kami.','Sesama iblis, mari bicara… dengan pedang.','Raja Iblis yang lemah harus turun takhta.']},
+  {id:'orcClan',j:['barbarian','juggernaut','shaman','gladiator','warlord','berserker'],sz:[3,5],race:'orc',n:['Green Tusk Clan','Blood Moon Orcs','Honor Tusks'],q:['Orc juga punya kehormatan!','WAAAGH! Untuk klan!','Kami datang bukan untuk menjarah. Kami datang untuk menang.']},
+  {id:'lizard',j:['hunter','shaman','lancer','assassin'],sz:[3,4],race:'lizard',n:['Swamp Scales','Cold Blood Company','Marsh Fangs'],q:['Ssss… kastil yang lembap.','Kami datang dari rawa jauh.']},
+  {id:'kobold',j:['miner','bomber','engineer','trickster','thief'],sz:[3,5],race:'kobold',n:['Tunnel Yappers','Shiny Seekers','Yip Yip Brigade'],q:['Yip! Ada yang berkilau!','Gali! Ledakkan! Ambil!','Kami kecil tapi banyak!']},
+  {id:'ironWall',j:['guardian','templar','juggernaut','knight','paladin'],sz:[3,5],n:['The Iron Wall','Unbreakable','Shield Wall of {P}'],q:['Tak ada yang lewat.','Pukul saja. Kami tidak akan bergeming.']},
+  {id:'guns',j:['gunslinger','musketeer','cannoneer','engineer','demonHunter'],sz:[3,4],n:['Gun & Glory','Powder Kings','Smoke & Lead'],q:['Bawa peluru lebih banyak!','Sihir terlalu lambat.','Telinga monster akan berdenging.']},
+  {id:'darkCov',j:['darkKnight','warlock','demonologist','bloodMage','reaper'],sz:[3,4],n:['The Dark Covenant','Pact of Shadows','Midnight Contract'],q:['Kontrak kami dengan kegelapan menuntut jiwamu.','Bayaran kami: jiwa Raja Iblis.']},
+  {id:'valhalla',j:['valkyrie','valkyrie','warlord','spiritArcher'],sz:[3,4],sx:'f',n:["Valhalla's Chosen",'Shieldmaidens','Winged Vanguard'],q:['Hari ini hari yang baik untuk mati.','Aula abadi menunggu yang berani.']},
+  {id:'oddFriends',slots:[[null],[null],[null],[null]],races:['goblin','elf','dwarf','orc'],n:['Unlikely Friends','The Odd Fellowship','Four Races, One Pot'],q:['Goblin, elf, dwarf, dan orc masuk ke dungeon… ini bukan awal lelucon.','Kami beda ras tapi satu tujuan!']},
 ];
 const PARTY_THEME_BY={}; for(const t of PARTY_THEME) PARTY_THEME_BY[t.id]=t;
 const P_COLOR=['Red','Black','White','Blue','Grey','Green','Golden','Silver','Crimson','Iron'];
@@ -1930,7 +2028,7 @@ const ISE_CHEAT=['Status Window','Appraisal','Infinite Item Box','Auto-Dodge','M
 const ISE_Q=['Status window, open! …Eh, beneran muncul!','Di duniaku, dungeon cuma ada di game. Sekarang beneran…','Kalau kukalahkan Raja Iblis, aku bisa pulang, kan?','Ini isekai beneran. Oke, tenang. Aku main game ini ribuan jam.','Truk itu… ah, sudahlah. Ayo naik level.','Aku dipanggil ke dunia ini cuma buat ini?'];
 function makeIsekai(p,starMin){ p.isekai=1; p.race='manusia'; const sx=rnd()<.55?'m':'f'; p.sx=sx; p.name=`${pick(ISE_F)} ${pick(ISE_L)}`; p.cheat=pick(ISE_CHEAT); p.title='the Otherworlder';
   p.app.hair=pick(['#1a1a22','#2a1a14','#3a2a1a']); p.app.skin=pick(['#f1d2b4','#f0c8a0','#e8c098']); p.app.cloth='#2a3550'; p.app.cloth2='#e8e8f0'; p.app.style=sx==='f'?pick(['long','tail']):'short';
-  if(starMin){ const pool=JOB_KEYS.filter(k=>JOBS[k].star>=starMin&&k!=='hero'&&k!=='farmer'&&k!=='cook'); p.job=pick(pool); p.el=JOB_EL[p.job]?pick(JOB_EL[p.job]):''; }
+  if(starMin){ const pool=JOB_KEYS.filter(k=>JOBS[k].star>=starMin&&k!=='hero'&&!JOBS[k].special&&k!=='farmer'&&k!=='cook'); p.job=pick(pool); p.el=JOB_EL[p.job]?pick(JOB_EL[p.job]):''; }
   p.lv=Math.round(p.lv*1.1)+2; return p; }
 function newParty(){
   const L=fameLv(); const r=rnd();
@@ -1944,23 +2042,34 @@ function newParty(){
   const pa={id:nid(),tier,members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:'',quote:''};
   let th=null;
   if(tier!=='solo'&&rnd()<.55){ const cand=PARTY_THEME.filter(t=>!t.tier||t.tier===tier||(t.tier==='baru')===(tier==='baru')&&rnd()<.3); th=pick(cand.length?cand:PARTY_THEME); }
-  if(th){ pa.th=th.id; if(th.tier&&th.tier!==tier){ tier=pa.tier=th.tier; lv=th.tier==='baru'?ri(1,8)+L*.15:th.tier==='elite'?L*rand(1.5,1.9):L*rand(1.15,1.5); } size=ri(th.sz[0],th.sz[1]); if(th.lvMul) lv*=th.lvMul; }
+  if(th){ pa.th=th.id; if(th.tier&&th.tier!==tier){ tier=pa.tier=th.tier; lv=th.tier==='baru'?ri(1,8)+L*.15:th.tier==='elite'?L*rand(1.5,1.9):L*rand(1.15,1.5); } size=th.slots?th.slots.length:ri(th.sz[0],th.sz[1]); if(th.lvMul) lv*=th.lvMul; }
   const jobs=[];
-  if(th&&th.j){ for(let i=0;i<size;i++) jobs.push(th.fixed?th.j[i%th.j.length]:pick(th.j)); }
+  if(th&&th.slots){ for(const sl of th.slots){ const j=pick(sl); jobs.push(j||pickJobStar(tier)); } }
+  else if(th&&th.j){ for(let i=0;i<size;i++) jobs.push(th.fixed?th.j[i%th.j.length]:pick(th.j)); }
   else { const core=size>=3&&rnd()<.5?['knight','priest',pick(['mage','archer'])]:[]; for(let i=0;i<size;i++) jobs.push(core[i]||pickJobStar(tier)); }
-  for(const j of jobs){ const race=th&&th.race?(rnd()<.85?th.race:null):null; const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pickJobStar('solo'):j,race||undefined); p.party=pa.id; pa.members.push(p.id);
+  for(const [ji,j] of jobs.entries()){ const race=th&&th.races?th.races[ji]:th&&th.race?(th.raceAll||rnd()<.85?th.race:null):null; const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pickJobStar('solo'):j,race||undefined); p.party=pa.id; pa.members.push(p.id);
+    if(th&&th.old){ p.app.hair=pick(['#c8c4c0','#e8e4e0','#a8a4a0']); p.sx='m'; }
     if(th&&th.sx&&p.sx!==th.sx){ for(let k=0;k<12;k++){ const a=advName(p.race); if(a.sx===th.sx){ p.name=a.n; p.sx=a.sx; break; } } } }
   // orang dunia lain di dalam party
   const isekaiP=tier==='solo'?.25:tier==='baru'?.05:.08;
-  if(rnd()<isekaiP){ const p=G.people[pick(pa.members)]; makeIsekai(p,th&&th.j?0:3); }
+  if(th&&th.isekaiLead){ const p=G.people[pa.members[0]]; const jb=p.job; makeIsekai(p,0); p.job=jb; p.title='the '+JOBS[jb].n; }
+  else if(rnd()<isekaiP&&!(th&&th.race)){ const p=G.people[pick(pa.members)]; makeIsekai(p,th&&th.j?0:3); }
   const lead=G.people[pa.members[0]];
   if(tier==='solo'){ const p=lead; if(!p.isekai) p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]||JOBS[p.job].n}`; else p.title=`the Wandering Otherworlder`; pa.name=`${p.name} ${p.title}`; }
-  else if(th){ pa.name=fillName(pick(th.n),lead); if(th.lead&&!lead.isekai) lead.title=th.lead; }
+  else if(th){ pa.name=fillName(pick(th.n),lead); if(th.lead&&!lead.isekai) lead.title=th.lead; if(th.id==='trash'&&G.parties.some(x=>x!==pa&&x.name==='Trash Game'&&x.state!=='gone')) pa.name='Trash Game II'; }
   else if(tier==='baru') pa.name=rnd()<.35?'Newcomer Party':genPartyName();
   else pa.name=genPartyName();
   G.parties.push(pa); return pa;
 }
 function partyQuote(pa){ const iso=partyMembers(pa).find(p=>p.isekai); if(iso&&rnd()<.4) return pick(ISE_Q); const T=pa.th&&PARTY_THEME_BY[pa.th]; return pick(T?T.q:QUOTES[pa.tier]); }
+/* skill kelas baru: perisai party, provokasi, serap nyawa */
+const _useSkill=useSkill;
+useSkill=function(a,p,J,tgt,st,pa){ const S=J.skill; if(S.k!=='shield'&&S.k!=='taunt'&&S.k!=='drain') return _useSkill(a,p,J,tgt,st,pa);
+  const f=a.floor; say(a.x,f,S.n,'#9fe0ff',1.1); a.atkT=G.t; a.atkK='skill';
+  if(S.k==='shield'){ for(const x of G.advs) if(x.party===a.party&&x.floor===f){ x.fx.shieldP=G.t+6; const xs=advStats(G.people[x.pid]); x.hp=Math.min(xs.hp,x.hp+xs.hp*.08); fxAt('shield',x.x,f,'#9fe0ff',.9); } }
+  else if(S.k==='taunt'){ a.fx.guard=G.t+6; for(const m of G.mons) if(!m.dead&&m.floor===f&&Math.abs(m.x-a.x)<80){ m.aggro=a.pid; m.aggroT=G.t; } fxAt('roar',a.x,f,'#ffd36a',.7); }
+  else if(S.k==='drain'&&tgt){ const d=tgt.k==='m'?hitMon(tgt.u,st.atk,a,{mult:S.m,magic:J.magic}):hitLord(st.atk,a,{mult:S.m}); a.hp=Math.min(st.hp,a.hp+(d||0)*.6); fxAt('curse',tgt.u.x,f,'#c8203a',.6); }
+};
 
 /* ================= SPRITE PIKSEL ================= */
 
@@ -3185,7 +3294,7 @@ const JOB_WPN={knight:'sword',mage:'staff',priest:'staffGold',archer:'bow',thief
   monsterHunter:'greatsword',tamer:'whip',fistKing:'fist',spearGod:'spearGold',iceQueen:'staffIce',arrowQueen:'bowGold',stormLord:'staffStorm'};
 // cara menyerang per jenis senjata
 const WPN_ANIM={sword:'slash',greatsword:'slash',katana:'slash',holy:'slash',runeblade:'slash',bigaxe:'slash',mace:'slash',pick:'slash',hoe:'slash',pan:'slash',darkstaff:'cast',
-  dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
+  shield:'bash',gun:'gunshot',scythe:'slash',warhammer:'slash',claw:'punch',tome:'cast',bomb:'throw',dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
   bow:'shoot',bowGold:'shoot',staff:'cast',staffGold:'cast',staffSkull:'cast',staffLeaf:'cast',staffCross:'cast',staffIce:'cast',staffStorm:'cast'};
 const WC=new Map();
 function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return c; c=document.createElement('canvas'); c.width=24; c.height=26; const g=c.getContext('2d');
@@ -3218,9 +3327,18 @@ function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return 
     case 'staffCross': Q(0,-14,1,17,'#e8e0d0'); Q(-2,-16,5,1,gold); Q(0,-18,1,5,gold); break;
     case 'staffIce': Q(0,-14,1,17,'#a8d8f0'); Q(-1,-19,3,5,'#bff0ff'); Q(0,-20,1,1,'#ffffff'); Q(-2,-16,1,2,'#7fd8ff'); Q(2,-16,1,2,'#7fd8ff'); break;
     case 'staffStorm': Q(0,-14,1,17,'#4a4a6a'); Q(-1,-18,3,3,'#ffe040'); Q(1,-20,1,2,'#ffe040'); Q(-1,-21,1,2,'#ffe040'); break;
+    case 'shield': Q(-3,-8,7,9,'#6a7a8a'); Q(-2,-7,5,7,'#9aa8b8'); Q(0,-6,1,5,'#e3b75e'); Q(-1,-4,3,1,'#e3b75e'); Q(-2,1,5,1,'#6a7a8a'); Q(-1,2,3,1,'#6a7a8a'); break;
+    case 'gun': Q(-1,-1,2,4,'#5a3a1a'); Q(0,-10,1,10,'#4a4a52'); Q(1,-9,1,8,'#6a6a72'); Q(0,-11,2,1,'#2a2a2a'); Q(1,0,1,1,gold); break;
+    case 'scythe': Q(0,-15,1,19,'#3a2a2a'); Q(1,-16,6,1,'#c8d0d8'); Q(5,-15,2,1,'#c8d0d8'); Q(6,-14,1,2,'#c8d0d8'); Q(1,-15,4,1,'#8a9098'); break;
+    case 'warhammer': Q(0,-10,1,14,wood); Q(-3,-14,7,5,'#7a8088'); Q(-3,-14,7,1,'#c8d0d8'); Q(0,-15,1,1,'#c8d0d8'); break;
+    case 'claw': Q(-1,-2,3,3,'#7a7a82'); Q(-1,-5,1,3,'#e8eef6'); Q(1,-5,1,3,'#e8eef6'); Q(0,-6,1,4,'#ffffff'); break;
+    case 'tome': Q(-2,-4,5,6,gem||'#5a3a8a'); Q(-1,-3,3,4,'#e8e0c8'); Q(0,-3,1,4,'#8a7a6a'); break;
+    case 'bomb': Q(-2,-4,4,4,'#2a2a2e'); Q(-1,-3,1,1,'#6a6a72'); Q(1,-6,1,2,'#8a6a3a'); Q(2,-7,1,1,'#ffb040'); break;
     case 'darkstaff': Q(0,-14,1,17,'#2a1a2a'); Q(-1,-18,3,3,'#a01a3a'); Q(-2,-19,1,2,'#3a1a2a'); Q(2,-19,1,2,'#3a1a2a'); Q(0,-17,1,1,'#ff4a6a'); break;
   }
   WC.set(key,c); return c; }
+Object.assign(JOB_WPN,JOB_WPN_NEW);
+for(const k of JOB_KEYS){ const J=JOBS[k]; if(J.look&&JOBDEF[J.look.base]){ const nk='L_'+k; JOBDEF[nk]=Object.assign({},JOBDEF[J.look.base],J.look); delete JOBDEF[nk].base; J.spr=nk; } }
 // tubuh petualang tanpa alat bawaan (senjata digambar terpisah agar bisa diayun)
 for(const k of JOB_KEYS){ const s=JOBS[k].spr; if(JOBDEF[s]&&!JOBDEF[s+'_nt']) JOBDEF[s+'_nt']=Object.assign({},JOBDEF[s],{tool:null}); }
 advSpr=function(p,f){ const s=JOBS[p.job].spr; const sp=JOBDEF[s+'_nt']?s+'_nt':s;
@@ -3229,14 +3347,16 @@ const ease=t=>t<0?0:t>1?1:1-(1-t)*(1-t);
 /* pose senjata & tubuh berdasarkan waktu sejak serangan */
 function fightPose(u,kind){ const t=G.t-(u.atkT||-9); const D=u.atkK==='skill'?.45:.3; const p=t/D;
   const o={ang:20,dx:0,dy:0,wx:0,wy:0,glow:0,ang2:null};
-  if(p>=1||p<0){ o.ang=kind==='shoot'?0:kind==='stab'?60:kind==='cast'?-8:kind==='punch'||kind==='throw'?40:20; o.dy=Math.round(Math.sin(G.t*4+(u.pid||u.id||0))*.6); return o; }
+  if(p>=1||p<0){ o.ang=kind==='gunshot'?80:kind==='shoot'||kind==='bash'?0:kind==='stab'?60:kind==='cast'?-8:kind==='punch'||kind==='throw'?40:20; o.dy=Math.round(Math.sin(G.t*4+(u.pid||u.id||0))*.6); return o; }
   if(u.atkK==='skill'&&kind!=='shoot'&&kind!=='cast'){ o.ang=20+p*360; o.dx=Math.sin(p*Math.PI)*4; o.dy=-Math.sin(p*Math.PI)*3; o.glow=1-p; return o; }
   switch(kind){
     case 'slash': if(p<.35){ const q=p/.35; o.ang=20-110*ease(q); o.dx=-q; } else { const q=(p-.35)/.65; o.ang=-90+220*ease(Math.min(1,q*1.6)); o.dx=Math.sin(Math.min(1,q)*Math.PI)*5; o.glow=q<.5?1:0; } break;
+    case 'bash': { const q=Math.sin(p*Math.PI); o.ang=0; o.wx=q*3; o.dx=q*4; break; }
     case 'stab': { const q=Math.sin(p*Math.PI); o.ang=90; o.wx=q*2.5; o.dx=q*4.5; break; }
     case 'punch': { const q=Math.sin(p*Math.PI); o.ang=90; o.wx=q*2; o.dx=q*5; o.dy=-q*2; break; }
     case 'whip': o.ang=-60+200*ease(p); o.dx=Math.sin(p*Math.PI)*2; break;
     case 'throw': o.ang=-100+200*ease(p); o.dx=Math.sin(p*Math.PI)*2; break;
+    case 'gunshot': o.ang=90-Math.sin(p*Math.PI)*20; o.dx=-Math.sin(p*Math.PI)*2; o.glow=p<.25?1:0; break;
     case 'shoot': o.ang=0; o.dx=-Math.sin(p*Math.PI)*1.5; o.glow=p<.3?1:0; break;
     case 'cast': o.ang=-8-Math.sin(p*Math.PI)*25; o.dy=-Math.sin(p*Math.PI)*1.5; o.glow=1-p; break;
     case 'strum': o.ang=10+Math.sin(p*20)*10; o.dy=-Math.abs(Math.sin(p*Math.PI*3)); break;
@@ -3244,7 +3364,7 @@ function fightPose(u,kind){ const t=G.t-(u.atkT||-9); const D=u.atkK==='skill'?.
 function bodyOff(u){ // knockback saat terkena pukulan
   const t=G.t-(u.hitT||-9); if(t<0||t>.22) return {x:0,flash:0}; const q=1-t/.22; return {x:(u.hitDir||1)*q*3,flash:q}; }
 function drawWeapon(g,p,a,x,base,face,pose){ const wk=JOB_WPN[p.job]||'sword'; const gem=p.el?(ELEM_BY[p.el]||{}).c:null; const wc=wpnCanvas(wk,gem);
-  const kind=WPN_ANIM[wk]||'slash'; const hx=x+face*(2+pose.wx), hy=base-7+pose.wy+pose.dy;
+  const kind=WPN_ANIM[wk]||'slash'; const RR=SPR(p.race)||{}; const hx=x+face*(2+pose.wx), hy=base-((RR.leg||5)+2)+pose.wy+pose.dy;
   const draw=(dx,ang,alpha)=>{ g.save(); g.translate(Math.round(hx+dx*face),Math.round(hy)); g.scale(face,1); g.rotate(ang*Math.PI/180); if(alpha!=null) g.globalAlpha=alpha; g.drawImage(wc,-12,-18); g.restore(); };
   if(pose.glow&&kind==='slash'){ g.save(); g.translate(hx,hy); g.scale(face,1); g.globalAlpha=.4*pose.glow; g.strokeStyle=wk==='holy'?'#bff0ff':wk==='runeblade'?'#9fffff':wk==='bigaxe'?'#ffd0a0':'#ffffff'; g.lineWidth=2; g.beginPath(); const r=wk==='greatsword'?15:12; g.arc(0,0,r,-Math.PI,(pose.ang-90)*Math.PI/180); g.stroke(); g.restore(); }
   if(wk==='twin'||wk==='ninja'){ draw(-3,pose.ang+30,.85); }
@@ -3259,9 +3379,10 @@ function drawProj(g,e,base,p){ const x=e.x0+(e.x1-e.x0)*p, dir=Math.sign(e.x1-e.
     case 'orb': { g.fillStyle=e.c; g.globalAlpha=.35; g.beginPath(); g.arc(x,y,4,0,6.3); g.fill(); g.globalAlpha=1; g.beginPath(); g.arc(x,y,2,0,6.3); g.fill(); g.fillStyle='#fff'; g.fillRect(x-.5,y-.5,1,1); for(let i=1;i<4;i++){ g.globalAlpha=.4-i*.1; g.fillStyle=e.c; g.fillRect(x-dir*i*3-1,y-1,2,2); } break; }
     case 'star': { y-=Math.sin(p*Math.PI)*3; g.fillStyle='#c8d0d8'; const r=G.t*30; g.save(); g.translate(x,y); g.rotate(r); g.fillRect(-2,-.5,4,1); g.fillRect(-.5,-2,1,4); g.restore(); break; }
     case 'flask': { y-=Math.sin(p*Math.PI)*12; g.fillStyle=e.c; g.fillRect(x-1,y-1,3,3); g.fillStyle='#fff'; g.fillRect(x,y-2,1,1); break; }
+    case 'bullet': g.fillStyle='#ffe080'; g.fillRect(x-3*dir,y-1,4,1); g.globalAlpha=.4; g.fillRect(x-7*dir,y-1,4,1); break;
     case 'spit': g.fillStyle=e.c; g.fillRect(x-1,y+2,3,2); g.globalAlpha=.4; g.fillRect(x-dir*3-1,y+2,2,2); break;
   } g.globalAlpha=1; }
-function projKindFor(job){ const w=JOB_WPN[job]; const k=WPN_ANIM[w]; if(k==='shoot') return 'arrow'; if(w==='ninja') return 'star'; if(w==='flask') return 'flask'; if(k==='cast'||k==='strum') return 'orb'; return null; }
+function projKindFor(job){ const w=JOB_WPN[job]; const k=WPN_ANIM[w]; if(k==='shoot') return 'arrow'; if(k==='gunshot') return 'bullet'; if(w==='ninja') return 'star'; if(w==='gun') return 'bullet'; if(w==='bomb') return 'flask'; if(w==='flask') return 'flask'; if(k==='cast'||k==='strum') return 'orb'; return null; }
 // flash putih saat terkena
 const FLASHC=new Map();
 function flashSpr(spr){ let c=FLASHC.get(spr); if(c) return c; c=document.createElement('canvas'); c.width=spr.width; c.height=spr.height; const g=c.getContext('2d'); g.drawImage(spr,0,0); g.globalCompositeOperation='source-in'; g.fillStyle='#ffffff'; g.fillRect(0,0,c.width,c.height); if(FLASHC.size>600) FLASHC.clear(); FLASHC.set(spr,c); return c; }
@@ -3430,7 +3551,7 @@ function pAdv(){
 function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
-  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${p.isekai?'🌀 Orang dunia lain':RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span>${p.isekai?`<span class="note" style="color:#9fd0ff">Skill curang: ${esc(p.cheat||'Status Window')} · stat +20%</span>`:''}</div></div>
+  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${p.isekai?'🌀 Orang dunia lain':raceName(p.race)}${pa?' · '+esc(pa.name):''}</span>${p.isekai?`<span class="note" style="color:#9fd0ff">Skill curang: ${esc(p.cheat||'Status Window')} · stat +20%</span>`:''}</div></div>
   <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Barang jarahan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
   return {t:'Petualang',h:h+dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, kita dapat emas, mana, dan jiwa. Kadang ia juga menjatuhkan perlengkapan khas kelasnya; kelas berbintang tinggi lebih sering dan lebih langka.')};
 }

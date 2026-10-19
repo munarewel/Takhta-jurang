@@ -8,7 +8,7 @@ const JOB_WPN={knight:'sword',mage:'staff',priest:'staffGold',archer:'bow',thief
   monsterHunter:'greatsword',tamer:'whip',fistKing:'fist',spearGod:'spearGold',iceQueen:'staffIce',arrowQueen:'bowGold',stormLord:'staffStorm'};
 // cara menyerang per jenis senjata
 const WPN_ANIM={sword:'slash',greatsword:'slash',katana:'slash',holy:'slash',runeblade:'slash',bigaxe:'slash',mace:'slash',pick:'slash',hoe:'slash',pan:'slash',darkstaff:'cast',
-  dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
+  shield:'bash',gun:'gunshot',scythe:'slash',warhammer:'slash',claw:'punch',tome:'cast',bomb:'throw',dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
   bow:'shoot',bowGold:'shoot',staff:'cast',staffGold:'cast',staffSkull:'cast',staffLeaf:'cast',staffCross:'cast',staffIce:'cast',staffStorm:'cast'};
 const WC=new Map();
 function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return c; c=document.createElement('canvas'); c.width=24; c.height=26; const g=c.getContext('2d');
@@ -41,9 +41,18 @@ function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return 
     case 'staffCross': Q(0,-14,1,17,'#e8e0d0'); Q(-2,-16,5,1,gold); Q(0,-18,1,5,gold); break;
     case 'staffIce': Q(0,-14,1,17,'#a8d8f0'); Q(-1,-19,3,5,'#bff0ff'); Q(0,-20,1,1,'#ffffff'); Q(-2,-16,1,2,'#7fd8ff'); Q(2,-16,1,2,'#7fd8ff'); break;
     case 'staffStorm': Q(0,-14,1,17,'#4a4a6a'); Q(-1,-18,3,3,'#ffe040'); Q(1,-20,1,2,'#ffe040'); Q(-1,-21,1,2,'#ffe040'); break;
+    case 'shield': Q(-3,-8,7,9,'#6a7a8a'); Q(-2,-7,5,7,'#9aa8b8'); Q(0,-6,1,5,'#e3b75e'); Q(-1,-4,3,1,'#e3b75e'); Q(-2,1,5,1,'#6a7a8a'); Q(-1,2,3,1,'#6a7a8a'); break;
+    case 'gun': Q(-1,-1,2,4,'#5a3a1a'); Q(0,-10,1,10,'#4a4a52'); Q(1,-9,1,8,'#6a6a72'); Q(0,-11,2,1,'#2a2a2a'); Q(1,0,1,1,gold); break;
+    case 'scythe': Q(0,-15,1,19,'#3a2a2a'); Q(1,-16,6,1,'#c8d0d8'); Q(5,-15,2,1,'#c8d0d8'); Q(6,-14,1,2,'#c8d0d8'); Q(1,-15,4,1,'#8a9098'); break;
+    case 'warhammer': Q(0,-10,1,14,wood); Q(-3,-14,7,5,'#7a8088'); Q(-3,-14,7,1,'#c8d0d8'); Q(0,-15,1,1,'#c8d0d8'); break;
+    case 'claw': Q(-1,-2,3,3,'#7a7a82'); Q(-1,-5,1,3,'#e8eef6'); Q(1,-5,1,3,'#e8eef6'); Q(0,-6,1,4,'#ffffff'); break;
+    case 'tome': Q(-2,-4,5,6,gem||'#5a3a8a'); Q(-1,-3,3,4,'#e8e0c8'); Q(0,-3,1,4,'#8a7a6a'); break;
+    case 'bomb': Q(-2,-4,4,4,'#2a2a2e'); Q(-1,-3,1,1,'#6a6a72'); Q(1,-6,1,2,'#8a6a3a'); Q(2,-7,1,1,'#ffb040'); break;
     case 'darkstaff': Q(0,-14,1,17,'#2a1a2a'); Q(-1,-18,3,3,'#a01a3a'); Q(-2,-19,1,2,'#3a1a2a'); Q(2,-19,1,2,'#3a1a2a'); Q(0,-17,1,1,'#ff4a6a'); break;
   }
   WC.set(key,c); return c; }
+Object.assign(JOB_WPN,JOB_WPN_NEW);
+for(const k of JOB_KEYS){ const J=JOBS[k]; if(J.look&&JOBDEF[J.look.base]){ const nk='L_'+k; JOBDEF[nk]=Object.assign({},JOBDEF[J.look.base],J.look); delete JOBDEF[nk].base; J.spr=nk; } }
 // tubuh petualang tanpa alat bawaan (senjata digambar terpisah agar bisa diayun)
 for(const k of JOB_KEYS){ const s=JOBS[k].spr; if(JOBDEF[s]&&!JOBDEF[s+'_nt']) JOBDEF[s+'_nt']=Object.assign({},JOBDEF[s],{tool:null}); }
 advSpr=function(p,f){ const s=JOBS[p.job].spr; const sp=JOBDEF[s+'_nt']?s+'_nt':s;
@@ -52,14 +61,16 @@ const ease=t=>t<0?0:t>1?1:1-(1-t)*(1-t);
 /* pose senjata & tubuh berdasarkan waktu sejak serangan */
 function fightPose(u,kind){ const t=G.t-(u.atkT||-9); const D=u.atkK==='skill'?.45:.3; const p=t/D;
   const o={ang:20,dx:0,dy:0,wx:0,wy:0,glow:0,ang2:null};
-  if(p>=1||p<0){ o.ang=kind==='shoot'?0:kind==='stab'?60:kind==='cast'?-8:kind==='punch'||kind==='throw'?40:20; o.dy=Math.round(Math.sin(G.t*4+(u.pid||u.id||0))*.6); return o; }
+  if(p>=1||p<0){ o.ang=kind==='gunshot'?80:kind==='shoot'||kind==='bash'?0:kind==='stab'?60:kind==='cast'?-8:kind==='punch'||kind==='throw'?40:20; o.dy=Math.round(Math.sin(G.t*4+(u.pid||u.id||0))*.6); return o; }
   if(u.atkK==='skill'&&kind!=='shoot'&&kind!=='cast'){ o.ang=20+p*360; o.dx=Math.sin(p*Math.PI)*4; o.dy=-Math.sin(p*Math.PI)*3; o.glow=1-p; return o; }
   switch(kind){
     case 'slash': if(p<.35){ const q=p/.35; o.ang=20-110*ease(q); o.dx=-q; } else { const q=(p-.35)/.65; o.ang=-90+220*ease(Math.min(1,q*1.6)); o.dx=Math.sin(Math.min(1,q)*Math.PI)*5; o.glow=q<.5?1:0; } break;
+    case 'bash': { const q=Math.sin(p*Math.PI); o.ang=0; o.wx=q*3; o.dx=q*4; break; }
     case 'stab': { const q=Math.sin(p*Math.PI); o.ang=90; o.wx=q*2.5; o.dx=q*4.5; break; }
     case 'punch': { const q=Math.sin(p*Math.PI); o.ang=90; o.wx=q*2; o.dx=q*5; o.dy=-q*2; break; }
     case 'whip': o.ang=-60+200*ease(p); o.dx=Math.sin(p*Math.PI)*2; break;
     case 'throw': o.ang=-100+200*ease(p); o.dx=Math.sin(p*Math.PI)*2; break;
+    case 'gunshot': o.ang=90-Math.sin(p*Math.PI)*20; o.dx=-Math.sin(p*Math.PI)*2; o.glow=p<.25?1:0; break;
     case 'shoot': o.ang=0; o.dx=-Math.sin(p*Math.PI)*1.5; o.glow=p<.3?1:0; break;
     case 'cast': o.ang=-8-Math.sin(p*Math.PI)*25; o.dy=-Math.sin(p*Math.PI)*1.5; o.glow=1-p; break;
     case 'strum': o.ang=10+Math.sin(p*20)*10; o.dy=-Math.abs(Math.sin(p*Math.PI*3)); break;
@@ -67,7 +78,7 @@ function fightPose(u,kind){ const t=G.t-(u.atkT||-9); const D=u.atkK==='skill'?.
 function bodyOff(u){ // knockback saat terkena pukulan
   const t=G.t-(u.hitT||-9); if(t<0||t>.22) return {x:0,flash:0}; const q=1-t/.22; return {x:(u.hitDir||1)*q*3,flash:q}; }
 function drawWeapon(g,p,a,x,base,face,pose){ const wk=JOB_WPN[p.job]||'sword'; const gem=p.el?(ELEM_BY[p.el]||{}).c:null; const wc=wpnCanvas(wk,gem);
-  const kind=WPN_ANIM[wk]||'slash'; const hx=x+face*(2+pose.wx), hy=base-7+pose.wy+pose.dy;
+  const kind=WPN_ANIM[wk]||'slash'; const RR=SPR(p.race)||{}; const hx=x+face*(2+pose.wx), hy=base-((RR.leg||5)+2)+pose.wy+pose.dy;
   const draw=(dx,ang,alpha)=>{ g.save(); g.translate(Math.round(hx+dx*face),Math.round(hy)); g.scale(face,1); g.rotate(ang*Math.PI/180); if(alpha!=null) g.globalAlpha=alpha; g.drawImage(wc,-12,-18); g.restore(); };
   if(pose.glow&&kind==='slash'){ g.save(); g.translate(hx,hy); g.scale(face,1); g.globalAlpha=.4*pose.glow; g.strokeStyle=wk==='holy'?'#bff0ff':wk==='runeblade'?'#9fffff':wk==='bigaxe'?'#ffd0a0':'#ffffff'; g.lineWidth=2; g.beginPath(); const r=wk==='greatsword'?15:12; g.arc(0,0,r,-Math.PI,(pose.ang-90)*Math.PI/180); g.stroke(); g.restore(); }
   if(wk==='twin'||wk==='ninja'){ draw(-3,pose.ang+30,.85); }
@@ -82,9 +93,10 @@ function drawProj(g,e,base,p){ const x=e.x0+(e.x1-e.x0)*p, dir=Math.sign(e.x1-e.
     case 'orb': { g.fillStyle=e.c; g.globalAlpha=.35; g.beginPath(); g.arc(x,y,4,0,6.3); g.fill(); g.globalAlpha=1; g.beginPath(); g.arc(x,y,2,0,6.3); g.fill(); g.fillStyle='#fff'; g.fillRect(x-.5,y-.5,1,1); for(let i=1;i<4;i++){ g.globalAlpha=.4-i*.1; g.fillStyle=e.c; g.fillRect(x-dir*i*3-1,y-1,2,2); } break; }
     case 'star': { y-=Math.sin(p*Math.PI)*3; g.fillStyle='#c8d0d8'; const r=G.t*30; g.save(); g.translate(x,y); g.rotate(r); g.fillRect(-2,-.5,4,1); g.fillRect(-.5,-2,1,4); g.restore(); break; }
     case 'flask': { y-=Math.sin(p*Math.PI)*12; g.fillStyle=e.c; g.fillRect(x-1,y-1,3,3); g.fillStyle='#fff'; g.fillRect(x,y-2,1,1); break; }
+    case 'bullet': g.fillStyle='#ffe080'; g.fillRect(x-3*dir,y-1,4,1); g.globalAlpha=.4; g.fillRect(x-7*dir,y-1,4,1); break;
     case 'spit': g.fillStyle=e.c; g.fillRect(x-1,y+2,3,2); g.globalAlpha=.4; g.fillRect(x-dir*3-1,y+2,2,2); break;
   } g.globalAlpha=1; }
-function projKindFor(job){ const w=JOB_WPN[job]; const k=WPN_ANIM[w]; if(k==='shoot') return 'arrow'; if(w==='ninja') return 'star'; if(w==='flask') return 'flask'; if(k==='cast'||k==='strum') return 'orb'; return null; }
+function projKindFor(job){ const w=JOB_WPN[job]; const k=WPN_ANIM[w]; if(k==='shoot') return 'arrow'; if(k==='gunshot') return 'bullet'; if(w==='ninja') return 'star'; if(w==='gun') return 'bullet'; if(w==='bomb') return 'flask'; if(w==='flask') return 'flask'; if(k==='cast'||k==='strum') return 'orb'; return null; }
 // flash putih saat terkena
 const FLASHC=new Map();
 function flashSpr(spr){ let c=FLASHC.get(spr); if(c) return c; c=document.createElement('canvas'); c.width=spr.width; c.height=spr.height; const g=c.getContext('2d'); g.drawImage(spr,0,0); g.globalCompositeOperation='source-in'; g.fillStyle='#ffffff'; g.fillRect(0,0,c.width,c.height); if(FLASHC.size>600) FLASHC.clear(); FLASHC.set(spr,c); return c; }
