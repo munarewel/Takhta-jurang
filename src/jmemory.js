@@ -62,16 +62,21 @@ advDie=function(a,src){ if(tryPhoenix(a)) return; const p=G.people[a.pid]; const
 const _partyTick=partyTick;
 partyTick=function(pa){
   if(pa.walkBack){ const mem=G.advs.filter(a=>a.party===pa.id); if(!mem.length){ pa.walkBack=0; leaveDungeon(pa,'jalan'); } return; }
+  if(pa.state==='in'&&!pa.retreat&&partyStyle(pa)==='hati'&&G.advs.some(a=>a.party===pa.id)){ const r=partyRatio(pa); const lost=pa.members.length<(pa.size0||pa.members.length); if(r<.55||lost&&r<.75){ pa.retreat=G.t+1; for(const a of G.advs) if(a.party===pa.id) say(a.x,a.floor,'Sudah cukup, mundur!','#9fe0ff',1); } }
   _partyTick(pa);
+  if(pa.retreat&&!pa.retreatSet&&pa.state==='in'&&retreatVeto(pa)) return;
   if(pa.retreat&&!pa.retreatSet&&pa.state==='in'){ pa.retreatSet=1; const h=partyHas(pa,'scroll');
     if(h){ h.items.scroll--; pa.how='scroll'; const a=G.advs.find(x=>x.pid===h.id); if(a) say(a.x,a.floor,'Return Scroll!','#9fe0ff',1.4); }
     else { pa.retreat=0; pa.walkBack=1; const a=G.advs.find(x=>x.party===pa.id); if(a) say(a.x,a.floor,'Tidak ada Return Scroll… jalan kaki!','#cfd8e8',1.6);
       log(`${pa.name} tidak punya Return Scroll dan harus berjalan pulang dari lantai ${(a?a.floor:0)+1}. Kesempatan untuk para monster!`,'adv'); } } };
 const _leaveDungeon=leaveDungeon;
-leaveDungeon=function(pa,how){ const before=partyMembers(pa).length; const why=pa.why; pa.retreatSet=0; pa.why=null; pa.walkBack=0;
+leaveDungeon=function(pa,how){ pa.pushOn=0; pa.argued=0; const before=partyMembers(pa).length; const why=pa.why; pa.retreatSet=0; pa.why=null; pa.walkBack=0;
   const h=how==='jalan'?'jalan':how;
   _leaveDungeon(pa,h==='jalan'?'pulang':h==='kabur'&&why==='puas'?'puas':h);
   if(how==='jalan'){ G.pop+=1+pa.loot*.04; log(`${pa.name} akhirnya keluar lewat pintu masuk dengan berjalan kaki${pa.loot?`, membawa ${pa.loot} emas harta`:''}.${why==='puas'?' Mereka pulang dengan puas.':''}`,'adv'); }
+  if(pa.state==='town'&&pa.rejoin){ const o=G.parties.find(x=>x.id===pa.rejoin); const p=partyMembers(pa)[0];
+    if(o&&o.state!=='gone'&&p&&partyMembers(o).length){ p.party=o.id; o.members.push(p.id); pa.members=[]; pa.state='gone'; log(`${p.name} selamat keluar dan kembali bergabung dengan ${o.name}.`,'adv'); return; }
+    pa.rejoin=null; if(p) pa.name=`${p.name} the Stubborn`; }
   if(pa.state!=='town') return;
   pa.mem=pa.mem||{fallen:[]}; pa.mem.last=how; pa.mem.size=pa.mem.size||pa.size0||pa.members.length;
   // isi kekosongan: rekrut anggota baru menggantikan yang gugur (kadang ada juga yang keluar)
@@ -122,3 +127,31 @@ enterDungeon=function(pa){ const mem=partyMembers(pa); pa._mq=null; pa._extra=[]
     if(changed.length) log(`${pa.name} datang dengan anggota baru: ${changed.map(p=>`${p.name} (${jobTag(p.job)})${p.replaces?` menggantikan ${p.replaces} yang gugur`:''}`).join(', ')}.`,'adv');
     pa._extra.forEach(([nb,l],i)=>{ const a=G.advs.find(x=>x.pid===nb.id); setTimeout0(()=>{ if(a&&G.advs.includes(a)) say(a.x,a.floor,`${nb.name}: "${l}"`,'#c8f0c8',2.8); },3.5+i*2); if(i===0) log(`${nb.name} (anggota baru): "${l}"`,'adv'); }); }
 };
+/* ---------- gaya party & perdebatan saat mundur ---------- */
+const PSTYLE_N={hati:'Hati-hati',normal:'Normal',nekat:'Nekat'};
+const NEKAT_TH=new Set(['trash','horde','revenge','debt','hellborn','orcClan','kings']), HATI_TH=new Set(['academy','tourist','kids','exam','family','scholar','plague','couple']);
+function partyStyle(pa){ if(pa.style) return pa.style; const th=pa.th; pa.style=NEKAT_TH.has(th)?'nekat':HATI_TH.has(th)?'hati':rnd()<.22?'hati':rnd()<.1?'nekat':'normal'; return pa.style; }
+const DISSENT={berani:['Mundur? Kita sudah sejauh ini! Aku lanjut!','Tidak ada kata mundur hari ini!'],pemarah:['Pengecut! Aku tidak pulang sebelum monster itu mati!','Kalian mau kabur? Silakan! Aku tidak!'],
+  sombong:['Kalian saja yang pulang. Aku cukup kuat sendirian.','Mundur itu untuk orang lemah.'],serakah:['Peti di lantai atas belum dibuka! Aku tidak mau pulang!','Pulang dengan tangan kosong? Tidak mungkin!'],
+  dingin:['…Aku tidak ikut mundur.']};
+function partyRatio(pa){ let hp=0,mx=0; for(const a of G.advs) if(a.party===pa.id){ hp+=Math.max(0,a.hp); mx+=advStats(G.people[a.pid]).hp; } return mx?hp/mx:1; }
+function shout(p,s,c,d){ const a=G.advs.find(x=>x.pid===p.id); if(!a) return; if(d) setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${s}"`,c||'#ffd0a0',2.6); },d); else say(a.x,a.floor,`${p.name}: "${s}"`,c||'#ffd0a0',2.6); }
+// dipanggil saat party baru memutuskan mundur; true = mundur dibatalkan
+function retreatVeto(pa){ const r=partyRatio(pa); const st=partyStyle(pa);
+  if(pa.pushOn){ if(r>.1&&G.t-pa.entered<420){ pa.retreat=0; return true; } return false; }
+  if(st==='nekat'&&r>.15&&G.t-pa.entered<420){ pa.retreat=0; if(rnd()<.3){ const a=G.advs.find(x=>x.party===pa.id); if(a) say(a.x,a.floor,'Mundur? Tidak ada di kamus kami!','#ff9a7a',1.4); } return true; }
+  if(pa.argued) return false;
+  const inside=partyMembers(pa).filter(p=>G.advs.some(a=>a.pid===p.id)); if(inside.length<2) return false;
+  const rebels=inside.filter(p=>DISSENT[traitOf(p)]); if(!rebels.length||rnd()>.07) return false;
+  pa.argued=1; const reb=pick(rebels); const other=pick(inside.filter(p=>p!==reb));
+  shout(reb,pick(DISSENT[reb.trait]),'#ffb07a'); const o=rnd();
+  if(o<.45){ // semua ikut nekat
+    pa.pushOn=1; pa.retreat=0; shout(other,pick(['…Baiklah. Sampai mati kalau perlu!','Dasar keras kepala… ayo, kita lanjut!','Kalau kau mati, aku yang gali kuburmu. Maju!']),'#ffe0a0',1.6);
+    log(`${pa.name} hampir mundur, tapi ${reb.name} (${TRAIT_N[reb.trait]}) menolak. Mereka memutuskan terus naik sampai titik darah penghabisan!`,'warn'); return true; }
+  if(o<.8){ // berpisah: si pembangkang lanjut sendirian
+    shout(other,pick(['Terserah kau! Kami pulang!','Jangan mati, bodoh!','Kau gila… semoga berhasil.']),'#cfd8e8',1.6);
+    const a=G.advs.find(x=>x.pid===reb.id); pa.members=pa.members.filter(id=>id!==reb.id);
+    const pa2={id:nid(),tier:'solo',members:[reb.id],state:'in',saveFloor:pa.saveFloor,nextVisit:0,visits:pa.visits,wins:0,name:`${reb.name} si Keras Kepala`,quote:'',style:'nekat',rejoin:pa.id,entered:G.t,loot:0,disarm:{},size0:1,mem:{fallen:[]},deepest:pa.deepest};
+    reb.party=pa2.id; if(a) a.party=pa2.id; G.parties.push(pa2);
+    log(`${pa.name} memutuskan mundur, tapi ${reb.name} (${TRAIT_N[reb.trait]}) menolak dan melanjutkan sendirian!`,'warn'); return false; }
+  shout(other,pick(['Jangan bodoh! Kita pulang!','Diam dan ikut!']),'#cfd8e8',1.6); shout(reb,'Cih… baiklah.','#ffb07a',3.2); return false; }

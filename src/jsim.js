@@ -240,7 +240,7 @@ function advDie(a,src){
   if(src&&src.kind==='m'){ const m=src.u; m.kills++; if(m.abil.includes('serapJiwa')){ const ms=monStats(m); m.hp=Math.min(ms.hp,m.hp+ms.hp*.3); } m.loy=Math.min(100,m.loy+1); const X=monX(m); monGainExp(m,(p.lv*14+20)*(1+X.exp)); if(X.mana) G.mana+=X.mana; if(X.gold){ const g2=Math.round(gold*X.gold); G.gold+=g2; } killer=`${m.name} (${SPECIES[m.sp].n})`; }
   else if(src&&src.kind==='l'){ G.lord.kills++; killer=`Raja Iblis ${G.lord.name}`; }
   if(pa){ pa.members=pa.members.filter(id=>id!==p.id); const left=G.advs.filter(x=>x.party===pa.id);
-    if(!left.length){ pa.state='gone'; log(`${pa.name} musnah di lantai ${a.floor+1}. ${p.name} ${JOBS[p.job].n} Lv${p.lv} adalah yang terakhir tumbang, oleh ${killer}.`,'kill'); }
+    if(!left.length){ pa.state='gone'; if(pa.pushOn) log(`${pa.name} memilih bertarung sampai akhir… dan tidak ada yang pulang.`,'kill'); log(`${pa.name} musnah di lantai ${a.floor+1}. ${p.name} ${JOBS[p.job].n} Lv${p.lv} adalah yang terakhir tumbang, oleh ${killer}.`,'kill'); }
     else if(p.lv>=20||rnd()<.35) log(`${p.name}${p.title?' '+p.title:''} (${JOBS[p.job].n} Lv${p.lv}) dari ${pa.name} tewas oleh ${killer}.`,'kill'); }
 }
 // serangan petualang → monster
