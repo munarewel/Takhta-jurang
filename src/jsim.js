@@ -150,7 +150,8 @@ function enterDungeon(pa){
   pa.state='in'; pa.visits++; G.stats.visits++; pa.loot=0; pa.entered=G.t; pa.retreat=false; pa.disarm={};
   const f=Math.min(pa.saveFloor,topF()); const restX=restSlotX(f);
   const famous=pa.visits>=4||pa.wins>0||pa.hero;
-  if(pa.hero) pa.quote=pick(['Atas nama kerajaan, Raja Iblis harus tumbang hari ini!','Seluruh negeri menunggu kabar kemenangan kami!','Kami dikirim untuk mengakhiri kekuasaanmu.','Aku dipanggil dari dunia lain untuk menghentikanmu, Raja Iblis!','Kata raja, kalau kau tumbang, aku boleh pulang ke duniaku.']);
+  if(pa._mq) pa.quote=pa._mq;
+  else if(pa.hero) pa.quote=pick(['Atas nama kerajaan, Raja Iblis harus tumbang hari ini!','Seluruh negeri menunggu kabar kemenangan kami!','Kami dikirim untuk mengakhiri kekuasaanmu.','Aku dipanggil dari dunia lain untuk menghentikanmu, Raja Iblis!','Kata raja, kalau kau tumbang, aku boleh pulang ke duniaku.']);
   else if(pa.wins>0&&rnd()<.6) pa.quote=pick(SLAYER_LINES).replace('{lord}',pa.slain||'itu');
   else if(famous&&!pa.hero) pa.quote=pick(FAMOUS_LINES).replace('{save}',pa.saveFloor+1).replace('{name}',pa.name).replace('{visits}',pa.visits-1);
   else pa.quote=partyQuote(pa);
@@ -196,7 +197,7 @@ function leaveDungeon(pa,how){
   if(!ppl.length){ pa.state='gone'; return; }
   pa.state='town'; pa.nextVisit=G.t+(how==='menang'?rand(500,900):rand(60,160));
   for(const p of ppl){ p.visits++; levelPerson(p); }
-  if(how==='kabur'){ G.pop+=1+pa.loot*.04; log(`${pa.name} memakai Kristal Kembali dan kabur${pa.loot?` membawa ${pa.loot} emas harta`:''}.`,'adv'); }
+  if(how==='kabur'){ G.pop+=1+pa.loot*.04; log(`${pa.name} memakai Return Scroll dan keluar dari dungeon${pa.loot?` membawa ${pa.loot} emas harta`:''}.`,'adv'); }
   else if(how==='menang'){ G.pop+=4; }
   else if(how==='puas'){ G.pop+=2+pa.loot*.05; log(`${pa.name} pulang dengan puas${pa.loot?` membawa ${pa.loot} emas harta`:''}. Mereka akan bercerita tentang kastil ini di kota.`,'adv'); }
   cullPeople();
@@ -548,7 +549,7 @@ function partyTick(pa){
   const ratio=hp/mx;
   if(ratio<(healer?.22:.35)||lost&&ratio<.5&&rnd()<.02||G.t-pa.entered>240){ pa.retreat=G.t+1; for(const a of mem) say(a.x,a.floor,'Mundur!','#9fe0ff',1); return; }
   // puas: sudah dapat banyak harta dan lelah
-  if(pa.loot>0&&ratio<.5&&(pa.greed||0)<3&&rnd()<.01){ leaveDungeon(pa,'puas'); }
+  if(pa.loot>0&&ratio<.5&&(pa.greed||0)<3&&rnd()<.01){ pa.why='puas'; pa.retreat=G.t+1; for(const a of mem) say(a.x,a.floor,'Cukup, ayo pulang!','#9fe0ff',1); }
 }
 
 /* ---------- AI monster ---------- */
