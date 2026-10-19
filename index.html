@@ -644,6 +644,43 @@ const MON_EN={slime:'Slime',kelelawar:'Cave Bat',kobold:'Kobold',slimeAir:'Water
 for(const k in MON_EN) if(MON[k]) MON[k].n=MON_EN[k];
 
 /* =====================================================================
+   TAKHTA JURANG — evolusi tahap 2 untuk monster yang tadinya tak berevolusi
+   ===================================================================== */
+(function(){
+  const AURA={trueChaoticDragon:'#c040ff',fullfirePhoenix:'#ffe080',archImp:'#ff6a2a',infernoHound:'#ff8a2a',succubusQueen:'#ff60c0',abyssKnight:'#9a40ff',archLich:'#60d0ff',demonOverlord:'#ff4020',ragnarokFenrir:'#ff3050',celestialKitsune:'#ffa0ff',celestialUnicorn:'#c0e0ff',thunderSovereign:'#fff060',elderKraken:'#ff60a0',behemothKing:'#c080ff',nekoKing:'#ffd040'};
+  const UP={F:'E',E:'D',D:'C',C:'B',B:'A',A:'S',S:'SS',SS:'SSS',SSS:'SSS'};
+  // key lama → [key baru, nama, warna, mata, tint (untuk humanoid), deskripsi]
+  const NEW={
+    imp:['archImp','Arch Imp','#8a1a3a','#ffd040',null,'Imp yang sudah ratusan tahun mengumpulkan api neraka. Bola apinya sebesar kepala.'],
+    anjingNeraka:['infernoHound','Inferno Hound','#3a0a0a','#ffb040',null,'Anjing neraka yang bulunya berubah jadi bara. Napasnya melelehkan perisai.'],
+    succubus:['succubusQueen','Succubus Queen',null,null,'#a0207a','Ratu para succubus. Satu kedipan mata, satu party lupa tujuan hidupnya.'],
+    gargoyle:['gargoyleLord','Gargoyle Lord','#4a4a5a','#ff4040',null,'Patung batu tertua di kastil. Sayapnya bisa menutupi seluruh lorong.'],
+    ksatriaNeraka:['abyssKnight','Abyss Knight',null,null,'#3a0a4a','Ksatria neraka yang turun ke dasar jurang dan kembali lebih kejam.'],
+    lichIblis:['archLich','Arch Lich',null,null,'#2a4a6a','Penyihir mayat yang menguasai ribuan mantra terlarang.'],
+    jenderal:['demonOverlord','Demon Overlord',null,null,'#5a0a0a','Jenderal yang sudah memimpin seratus perang. Bahkan Raja Iblis segan padanya.'],
+    ularLaut:['abyssLeviathan','Abyssal Leviathan','#0a2a4a','#9fffff',null,'Ular laut raksasa dari palung terdalam. Ombak tunduk pada geraknya.'],
+    volcanosaur:['volcanoRex','Volcanosaur Rex','#5a1a0a','#ffe040',null,'Raja dinosaurus gunung api. Tiap langkahnya meninggalkan lava.'],
+    tyrant:['tyrantKing','Tyrant King','#3a4a2a','#ff3030',null,'Penguasa zaman purba. Rahangnya bisa meremukkan zirah naga.'],
+    unicorn:['celestialUnicorn','Celestial Unicorn','#f0e8ff','#9fd0ff',null,'Unicorn yang tanduknya menyerap cahaya bintang.'],
+    phoenix:['fullfirePhoenix','Fullfire Phoenix','#ffd040','#ffffff',null,'Phoenix yang terlahir kembali seratus kali. Seluruh tubuhnya api putih keemasan.'],
+    kitsune:['celestialKitsune','Celestial Kitsune','#f8f0ff','#ff6ad0',null,'Rubah sembilan ekor yang naik ke langit. Ilusinya bisa menipu dewa.'],
+    nagaBumi:['ancientEarthDragon','Ancient Earth Dragon','#5a4a2a','#7aff6a',null,'Naga bumi yang tidur seribu tahun. Punggungnya ditumbuhi hutan.'],
+    griffinKaisar:['griffinSovereign','Griffin Sovereign','#e8c050','#ffffff',null,'Penguasa langit. Para griffin kaisar pun menunduk padanya.'],
+    fenrir:['ragnarokFenrir','Ragnarok Fenrir','#1a1a2a','#ff3040',null,'Serigala akhir zaman. Konon ia akan menelan matahari.'],
+    behemoth:['behemothKing','Behemoth King','#4a2a5a','#ffd040',null,'Behemoth terbesar yang pernah tercatat. Tanah bergetar saat ia bernapas.'],
+    thunderbird:['thunderSovereign','Thunderbird Sovereign','#ffe060','#ffffff',null,'Burung petir yang memanggil badai dengan satu kepakan.'],
+    kraken:['elderKraken','Elder Kraken','#5a1a3a','#ffd040',null,'Kraken tertua di samudra. Tentakelnya bisa merobohkan menara.'],
+    megalodon:['abyssMegalodon','Abyss Megalodon','#1a2a3a','#ff4040',null,'Hiu purba dari dasar jurang. Giginya setajam pedang terbaik.'],
+    neko:['nekoKing','Neko King','#f0e0c0','#ffd040',null,'Kucing yang berhasil memimpin seribu kucing lain. Sangat berwibawa… kadang.'],
+    chaoticDragon:['trueChaoticDragon','True Chaotic Dragon','#0a0410','#ff40ff',null,'Wujud sejati Chaotic Dragon. Aura ungunya merobek ruang dan waktu.'],
+  };
+  for(const k in NEW){ const m=MON[k]; if(!m||EVO_NEXT[k]) continue; const [k2,n,c,eye,tint,d]=NEW[k];
+    const m2=JSON.parse(JSON.stringify(m)); Object.assign(m2,{n,rank:UP[m.rank],hp:Math.round(m.hp*1.65),atk:Math.round(m.atk*1.5),evo:2,evolved:1,d,sc:Math.min(2.6,(m.sc||1)*1.15),xp:Math.round((m.xp||0)*1.6),bounty:Math.round((m.bounty||0)*1.6)});
+    if(c) m2.c=c; if(eye) m2.eye=eye; m2.tint=tint||c; m2.aura=AURA[k2]||eye||'#ffd040'; if(m.k==='slime') m2.king=1;
+    MON[k2]=m2; EVO_NEXT[k]=k2; }
+})();
+
+/* =====================================================================
    TAKHTA JURANG — data: elemen, ability, katalog ribuan monster,
    job petualang, nama, ras Raja Iblis, toko
    ===================================================================== */
@@ -837,7 +874,7 @@ function makeSpecies(k,el){
     spd:m.spd||1,ranged:!!m.ranged,legend:!!m.legend,
     rar:Math.min(4,rankRar(m.rank)+E.rar+(m.legend?1:0)),ab:E.ab||baseAbil(m),next:null};
   SPECIES[id]=s; SPECIES_N++;
-  const nx=EVO_NEXT[k]; if(nx&&MON[nx]&&!m.legend) s.next=makeSpecies(nx,el).id;
+  const nx=EVO_NEXT[k]; if(nx&&MON[nx]) s.next=makeSpecies(nx,el).id;
   return s;
 }
 for(const k of ROOTS){ const m=MON[k]; for(const E of ELEM){ if(m.legend&&E.id&&E.rar<1) continue; makeSpecies(k,E.id); } }
@@ -3237,13 +3274,29 @@ function tintCanvas(spr,col,key,a){
 }
 function humDir(race){ const R=SPR(race); return R&&(R.hw||6)>=8?'down':'side'; }
 function frameOf(walk,moving){ return moving?Math.floor(walk*7)%4:0; }
+const POL=new Map();
+function polishSpr(src){ let c=POL.get(src); if(c) return c; c=document.createElement('canvas'); c.width=src.width; c.height=src.height; const g=c.getContext('2d'); g.drawImage(src,0,0);
+  const W=c.width,H=c.height; const img=g.getImageData(0,0,W,H), d=img.data; const o=d.slice();
+  const isOut=i=>o[i+3]<40||(o[i]<40&&o[i+1]<35&&o[i+2]<45);
+  const at=(x,y)=>x<0||y<0||x>=W||y>=H?-1:(y*W+x)*4;
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){ const i=(y*W+x)*4; if(isOut(i)) continue;
+    const up=at(x,y-1), dn=at(x,y+1), lf=at(x-1,y), up2=at(x,y-2);
+    let k=0; if(up<0||isOut(up)) k+=.36; else if(up2<0||isOut(up2)) k+=.14; if(lf<0||isOut(lf)) k+=.12; if(dn<0||isOut(dn)) k-=.34;
+    if(dn>=0&&!isOut(dn)){ const dn2=at(x,y+2); if(dn2<0||isOut(dn2)) k-=.12; }
+    if(k>0){ d[i]+= (255-d[i])*k; d[i+1]+=(255-d[i+1])*k; d[i+2]+=(255-d[i+2])*k; } else if(k<0){ d[i]*=1+k; d[i+1]*=1+k; d[i+2]*=1+k*.7; } }
+  g.putImageData(img,0,0); if(POL.size>3000) POL.clear(); POL.set(src,c); return c; }
+const AUR=new Map();
+function auraSpr(src,col){ const key=src; let c=AUR.get(key); if(c) return c; c=document.createElement('canvas'); c.width=src.width+4; c.height=src.height+4; const g=c.getContext('2d');
+  const t=document.createElement('canvas'); t.width=src.width; t.height=src.height; const tg=t.getContext('2d'); tg.drawImage(src,0,0); tg.globalCompositeOperation='source-in'; tg.fillStyle=col; tg.fillRect(0,0,t.width,t.height);
+  g.globalAlpha=.35; for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[-2,0],[2,0],[0,-2],[-1,-1],[1,-1]]) g.drawImage(t,2+dx,2+dy); g.globalAlpha=1; g.drawImage(src,2,2);
+  const out=document.createElement('canvas'); out.width=src.width; out.height=src.height; out.getContext('2d').drawImage(c,-2,-2); if(AUR.size>2000) AUR.clear(); AUR.set(key,out); return out; }
 function monSpr(sid,f){
   const s=SPECIES[sid]; const M=MON[s.mk];
   const base=monSprite({k:M.k,c:M.c,race:M.race,job:M.job,king:M.king,eye:M.eye,dir:M.k==='hum'?humDir(M.race):undefined},f);
   const E=ELEM_BY[s.el]; let out=base;
   if(M.tint) out=tintCanvas(out,M.tint,'T|'+s.mk+'|'+f,.42);
   if(E&&E.c) out=tintCanvas(out,E.c,'E|'+sid+'|'+f,E.id==='hampa'?.55:.4);
-  return out;
+  out=polishSpr(out); if(M.aura) out=auraSpr(out,M.aura); return out;
 }
 function advSpr(p,f){ return sprite({race:p.race,stage:'dewasa',job:JOBS[p.job].spr,sex:p.sx,skin:p.app.skin,hair:p.app.hair,eye:p.app.eye,cloth:p.app.cloth,cloth2:p.app.cloth2,outfit:p.app.outfit,style:p.app.style},'side',f); }
 function lordSpr(f){ const r=lordRace(), L=G.lord;
@@ -3349,15 +3402,16 @@ function render(){
       if(m.dead){ g.fillStyle='#5a5060'; g.fillRect(m.px-3,base-7,6,7); g.fillRect(m.px-4,base-5,8,2); g.fillStyle='#8a7a9a'; g.fillRect(m.px-1,base-6,2,1);
         const left=Math.max(0,m.reviveAt-G.t); g.fillStyle='rgba(0,0,0,.6)'; g.fillRect(m.px-6,base-11,12,2); g.fillStyle=G.mana>=reviveCost(m)?'#b07aff':'#6a5a7a'; g.fillRect(m.px-6,base-11,12*(1-left/60),2); continue; }
       const S=SPECIES[m.sp], M=MON[S.mk]; const fr=frameOf(m.walk||0,(m.walk||0)>0); const spr=monSpr(m.sp,fr);
-      const sc=Math.min(1.3,M.sc||1)*(M.k==='hum'?1:1);
-      const ko=bodyOff(m); const mx=m.x+(m.face||1)*monLunge(m)+ko.x; const my=base+(M.k==='bat'||M.k==='wyvern'?-4:0);
+      const sc=Math.min(1.5,Math.min(1.3,M.sc||1)*[1,1,1.06,1.13,1.22][S.stage||1]);
+      const ko=bodyOff(m); const mx=m.x+(m.face||1)*monLunge(m)+ko.x; const fly=M.k==='bat'||M.k==='wyvern'||M.k==='ghost'||M.k==='phoenix'||M.k==='thunderbird'; const my=base+(fly?-4+Math.round(Math.sin(G.t*4+m.id)*1.5):0);
+      if(!it.sec){ g.fillStyle='rgba(0,0,0,.32)'; g.beginPath(); g.ellipse(mx,base+.5,6*sc*(fly?.7:1),1.6*sc,0,0,6.3); g.fill(); }
       blit(g,spr,mx,my,(m.face||1)<0,it.sec?Math.min(sc,1)*.8:sc,it.sec?.6:m.hidden?.35:null); if(ko.flash>.25) blit(g,flashSpr(spr),mx,my,(m.face||1)<0,sc,ko.flash*.8);
       if(S.stage>=3){ const n=S.stage>=4?5:3; for(let i=0;i<n;i++){ const a=G.t*2+i*2.1; g.fillStyle=S.stage>=4?(i%2?'#e0a0ff':'#fff'):'#ffd860'; g.fillRect(Math.round(m.x+Math.cos(a)*9),Math.round(base-16+Math.sin(a)*6),1,1); } }
       hpBar(g,m.x,base-24*sc-3,m.hp/monStats(m).hp,'#b07aff',m.lastHit&&G.t-m.lastHit<4);
       if(UI.sel&&UI.sel.k==='m'&&UI.sel.id===m.id){ g.fillStyle='#ffd36a'; g.fillRect(m.x-1,base-30*sc-6,3,2); g.fillRect(m.x,base-30*sc-4,1,1); }
     } else if(it.k==='a'){ const a=u; const p=G.people[a.pid]; if(!p) continue;
       const mv=(a.walk||0)>0; const spr=advSpr(p,frameOf(a.walk||0,mv)); const ox=((a.pid*7)%9-4)*.5; const face=(a.face||fdir(a.floor))<0?-1:1;
-      const wk=JOB_WPN[p.job]||'sword'; const pose=fightPose(a,WPN_ANIM[wk]||'slash'); const ko=bodyOff(a); const ax=a.x+ox+pose.dx*face+ko.x, ay=base+pose.dy;
+      const wk=JOB_WPN[p.job]||'sword'; const pose=fightPose(a,WPN_ANIM[wk]||'slash'); const ko=bodyOff(a); const ax=a.x+ox+pose.dx*face+ko.x, ay=base+pose.dy; g.fillStyle='rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(ax,base+.5,5,1.4,0,0,6.3); g.fill();
       blit(g,spr,ax,ay,face<0,1,a.fx.charm>G.t?.7:null); if(ko.flash>.25) blit(g,flashSpr(spr),ax,ay,face<0,1,ko.flash*.8); drawWeapon(g,p,a,ax,ay,face,pose);
       if(a.fx.sleep>G.t){ g.fillStyle='#d0c0ff'; g.font='5px monospace'; g.fillText('z',a.x+4,base-30-(G.t*4%4)); }
       if(a.fx.stun>G.t){ g.fillStyle='#ffd040'; g.fillRect(a.x-3+Math.round(Math.sin(G.t*8)*3),base-33,2,2); }

@@ -192,7 +192,7 @@ function makeSpecies(k,el){
     spd:m.spd||1,ranged:!!m.ranged,legend:!!m.legend,
     rar:Math.min(4,rankRar(m.rank)+E.rar+(m.legend?1:0)),ab:E.ab||baseAbil(m),next:null};
   SPECIES[id]=s; SPECIES_N++;
-  const nx=EVO_NEXT[k]; if(nx&&MON[nx]&&!m.legend) s.next=makeSpecies(nx,el).id;
+  const nx=EVO_NEXT[k]; if(nx&&MON[nx]) s.next=makeSpecies(nx,el).id;
   return s;
 }
 for(const k of ROOTS){ const m=MON[k]; for(const E of ELEM){ if(m.legend&&E.id&&E.rar<1) continue; makeSpecies(k,E.id); } }
