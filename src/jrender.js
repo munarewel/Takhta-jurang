@@ -127,18 +127,21 @@ function render(){
         const left=Math.max(0,m.reviveAt-G.t); g.fillStyle='rgba(0,0,0,.6)'; g.fillRect(m.px-6,base-11,12,2); g.fillStyle=G.mana>=reviveCost(m)?'#b07aff':'#6a5a7a'; g.fillRect(m.px-6,base-11,12*(1-left/60),2); continue; }
       const S=SPECIES[m.sp], M=MON[S.mk]; const fr=frameOf(m.walk||0,(m.walk||0)>0); const spr=monSpr(m.sp,fr);
       const sc=Math.min(1.3,M.sc||1)*(M.k==='hum'?1:1);
-      blit(g,spr,m.x,base+(M.k==='bat'||M.k==='wyvern'?-4:0),(m.face||1)<0,it.sec?Math.min(sc,1)*.8:sc,it.sec?.6:m.hidden?.35:null);
+      const ko=bodyOff(m); const mx=m.x+(m.face||1)*monLunge(m)+ko.x; const my=base+(M.k==='bat'||M.k==='wyvern'?-4:0);
+      blit(g,spr,mx,my,(m.face||1)<0,it.sec?Math.min(sc,1)*.8:sc,it.sec?.6:m.hidden?.35:null); if(ko.flash>.25) blit(g,flashSpr(spr),mx,my,(m.face||1)<0,sc,ko.flash*.8);
       if(S.stage>=3){ const n=S.stage>=4?5:3; for(let i=0;i<n;i++){ const a=G.t*2+i*2.1; g.fillStyle=S.stage>=4?(i%2?'#e0a0ff':'#fff'):'#ffd860'; g.fillRect(Math.round(m.x+Math.cos(a)*9),Math.round(base-16+Math.sin(a)*6),1,1); } }
       hpBar(g,m.x,base-24*sc-3,m.hp/monStats(m).hp,'#b07aff',m.lastHit&&G.t-m.lastHit<4);
       if(UI.sel&&UI.sel.k==='m'&&UI.sel.id===m.id){ g.fillStyle='#ffd36a'; g.fillRect(m.x-1,base-30*sc-6,3,2); g.fillRect(m.x,base-30*sc-4,1,1); }
     } else if(it.k==='a'){ const a=u; const p=G.people[a.pid]; if(!p) continue;
-      const mv=(a.walk||0)>0; const spr=advSpr(p,frameOf(a.walk||0,mv)); const ox=((a.pid*7)%9-4)*.9; blit(g,spr,a.x+ox,base,(a.face||fdir(a.floor))<0,1,a.fx.charm>G.t?.7:null);
+      const mv=(a.walk||0)>0; const spr=advSpr(p,frameOf(a.walk||0,mv)); const ox=((a.pid*7)%9-4)*.5; const face=(a.face||fdir(a.floor))<0?-1:1;
+      const wk=JOB_WPN[p.job]||'sword'; const pose=fightPose(a,WPN_ANIM[wk]||'slash'); const ko=bodyOff(a); const ax=a.x+ox+pose.dx*face+ko.x, ay=base+pose.dy;
+      blit(g,spr,ax,ay,face<0,1,a.fx.charm>G.t?.7:null); if(ko.flash>.25) blit(g,flashSpr(spr),ax,ay,face<0,1,ko.flash*.8); drawWeapon(g,p,a,ax,ay,face,pose);
       if(a.fx.sleep>G.t){ g.fillStyle='#d0c0ff'; g.font='5px monospace'; g.fillText('z',a.x+4,base-30-(G.t*4%4)); }
       if(a.fx.stun>G.t){ g.fillStyle='#ffd040'; g.fillRect(a.x-3+Math.round(Math.sin(G.t*8)*3),base-33,2,2); }
       if(a.resting){ g.fillStyle='#9fff9a'; g.fillRect(a.x,base-33-(G.t*6%6),1,2); }
       const pa=G.parties.find(x=>x.id===a.party); if(pa&&pa.hero){ g.fillStyle='#ffd36a'; g.fillRect(a.x-1,base-36,3,1); }
       hpBar(g,a.x,base-30,a.hp/advStats(p).hp,'#e0645a',true);
-    } else { const L=u; const r=lordRace(); const spr=lordSpr(Math.floor(G.t*2)%2); blit(g,spr,L.x,base,fdir(it.f)>0,r.sc?Math.min(1.35,r.sc):1.15);
+    } else { const L=u; const r=lordRace(); const spr=lordSpr(Math.floor(G.t*2)%2); { const lt=G.t-(L.atkT||-9); const lx=L.x+(lt>=0&&lt<.28?Math.sin(lt/.28*Math.PI)*5*(fdir(it.f)>0?-1:1):0); blit(g,spr,lx,base,fdir(it.f)>0,r.sc?Math.min(1.35,r.sc):1.15); }
       hpBar(g,L.x,base-42,L.hp/lordStats().hp,'#ff4a6a',true,22); }
   }
   // asisten
@@ -185,6 +188,7 @@ function drawEfx(g,e,base,p){
     case 'crack': g.fillStyle=e.c; g.globalAlpha=1-p; g.fillRect(x-6,base-30,12,30); break;
     case 'spark': g.fillStyle=e.c; g.fillRect(x,base-10-p*10,1,1); break;
     case 'stairs': break;
+    case 'proj': drawProj(g,e,base,p); break;
     default: if(e.k.startsWith('trap_')){ g.fillStyle='#ffffff'; g.globalAlpha=(1-p)*.6; g.fillRect(x-7,base-20,14,20); }
   }
   g.globalAlpha=1;

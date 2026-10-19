@@ -87,13 +87,26 @@ function pMonList(){
   return {t:'Monster',h:h+'</div>'};
 }
 /* gudang perlengkapan */
+function modsHtml(it){ if(!it.mods&&!it.runes) return ''; itFix(it); const br=itemBroken(it);
+  const ms=it.mods.map(md=>`<span class="mod${br?' off':''}">${modTxt(md)}</span>`).join('');
+  const rs=Array.from({length:it.sock},(_,i)=>{ const rn=it.runes[i]; return rn?`<span class="rune${br?" mod off":""}" style="border-color:${RUNE[rn.k].c};color:${RUNE[rn.k].c}">◆ ${runeName(rn)}: ${modTxt(runeMod(rn))}</span>`:'<span class="rune empty">◇ slot rune kosong</span>'; }).join('');
+  const dp=it.dur/it.durMax; const dc=dp>.5?'#7ad07a':dp>.2?'#e0b040':'#e05a5a';
+  return `<span class="mods">${ms}${rs}</span><span class="dur"><i style="width:${Math.round(dp*100)}%;background:${dc}"></i></span><span class="note">Ketahanan ${Math.ceil(it.dur)}/${it.durMax}${br?' · <b style="color:#ff6a6a">RUSAK, efek mati</b>':''}</span>`; }
+function itemShort(it){ itFix(it); return itemTxt(it)+(it.mods.length?' · '+it.mods.map(modTxt).join(' · '):'')+(it.runes.length?' · '+it.runes.map(runeName).join(', '):'')+(itemBroken(it)?' · RUSAK':''); }
 function pGudang(){
+  G.runes=G.runes||[]; const rc=G.inv.reduce((a,it)=>a+repairCost(it),0);
   let h=`<div class="btns"><button class="btn" data-act="tabMon">Monster</button><button class="btn pri">Gudang</button></div>
-  <p class="note">Perlengkapan didapat dari petualang yang tewas (kadang-kadang) atau dibeli dari pedagang, lalu ditempa dengan emas dan mana. Pasang dari halaman detail monster.</p>
-  <div class="btns"><button class="btn pri" data-act="buyItem">Beli perlengkapan acak · 250 emas</button></div>`;
+  <p class="note">Perlengkapan didapat dari petualang yang tewas atau dibeli dari pedagang. Tiap barang punya efek (affix), ketahanan, dan slot rune. Barang yang ketahanannya habis jadi rusak dan efeknya mati sampai diperbaiki.</p>
+  <div class="btns"><button class="btn pri" data-act="buyItem">Beli perlengkapan acak · 250 emas</button><button class="btn" data-act="buyRune">Beli rune acak · 300 emas</button>${rc?`<button class="btn" data-act="repairAll">Perbaiki semua · ${rc} emas</button>`:''}</div>`;
   const list=G.inv.slice().sort((a,b)=>b.r-a.r||b.lv-a.lv);
-  h+=`<div class="sec"><h3>Perlengkapan (${list.length})</h3>${list.length?'':'<p class="note">Gudang masih kosong.</p>'}<div class="abl">${list.map(it=>{ const w=it.on&&G.mons.find(m=>m.id===it.on); const c=forgeCost(it);
-    return `<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}${it.from?` · asal: ${esc(it.from)}`:''}</span><div class="btns" style="margin-top:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.mana} mana</button><button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></div></div>`; }).join('')}</div></div>`;
+  h+=`<div class="sec"><h3>Perlengkapan (${list.length})</h3>${list.length?'':'<p class="note">Gudang masih kosong.</p>'}<div class="abl">${list.map(it=>{ itFix(it); const w=it.on&&G.mons.find(m=>m.id===it.on); const c=forgeCost(it); const rp=repairCost(it);
+    let x=`<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}${it.from?` · asal: ${esc(it.from)}`:''}</span>${modsHtml(it)}
+      <span class="btns" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.mana} mana</button>${rp?`<button class="btn" data-repair="${it.id}">Perbaiki · ${rp}</button>`:''}${it.runes.length<it.sock?`<button class="btn" data-sock="${it.id}">Pasang rune</button>`:''}${it.runes.map((rn,i)=>`<button class="btn" data-unsock="${it.id}:${i}">Cabut ${RUNE[rn.k].n.replace(' Rune','')} · 100</button>`).join('')}${it.sock<3?`<button class="btn" data-addsock="${it.id}">+Slot rune · ${addSocketCost(it)}</button>`:''}<button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></span>`;
+    if(UI.sockFor===it.id){ x+=`<span class="party" style="display:block;margin-top:6px"><b>Pilih rune untuk ${esc(it.n)}</b><br>${G.runes.length?G.runes.slice().sort((a,b)=>b.g-a.g).map(rn=>`<button class="btn" style="margin:2px;border-color:${RUNE[rn.k].c}" data-rsel="${it.id}:${rn.id}">${runeName(rn)} · ${modTxt(runeMod(rn))}</button>`).join(''):'<span class="note">Belum punya rune.</span>'}</span>`; }
+    return x+'</div>'; }).join('')}</div></div>`;
+  const grp={}; for(const r of G.runes){ const k=r.k+':'+r.g; grp[k]=(grp[k]||0)+1; }
+  h+=`<div class="sec"><h3>Rune (${G.runes.length})</h3><p class="note">Rune dipasang ke slot perlengkapan. Gabungkan 3 rune yang sama untuk naik tingkat (I sampai V).</p>${G.runes.length?`<div class="abl">${Object.entries(grp).sort((a,b)=>b[0].split(':')[1]-a[0].split(':')[1]).map(([k,n])=>{ const [rk,g]=k.split(':'); const rn={k:rk,g:+g};
+    return `<div><b style="color:${RUNE[rk].c}">◆ ${runeName(rn)}</b> ×${n}<br><span class="note">${modTxt(runeMod(rn))}</span>${n>=3&&+g<5?`<span class="btns" style="display:flex;margin-top:4px"><button class="btn" data-merge="${k}">Gabung 3 → ${ROMAN[+g+1]} · ${80*g} emas</button></span>`:''}</div>`; }).join('')}</div>`:'<p class="note">Belum ada rune.</p>'}</div>`;
   return {t:'Gudang Kastil',h};
 }
 /* detail monster */
@@ -112,9 +125,9 @@ function pMon(){
   if(m.pending) h+=`<div class="party" style="margin-top:6px"><b style="color:var(--soul)">${esc(m.name)} ingin mempelajari ${ABIL[m.pending].n}!</b><span class="note">${ABIL[m.pending].d} Slot penuh: lupakan satu ability di atas untuk mempelajarinya, atau abaikan.</span><div class="btns"><button class="btn" data-act="skipLearn">Abaikan</button></div></div>`;
   const ls=learnset(m.sp); h+=`<div class="sec" style="margin-top:6px"><h3>Bisa dipelajari sebagai ${esc(s.n)}</h3><div class="abl">${ls.map(e=>{ const has=m.abil.includes(e.ab); return `<div style="${has?'':'opacity:.78'}"><b>${ABIL[e.ab].n}</b><em>${has?'sudah dikuasai':m.lv>=e.lv?'tersedia':'Lv'+e.lv}</em><br><span class="note">${ABIL[e.ab].d}</span></div>`; }).join('')}</div>${nx?`<p class="note">Setelah berevolusi menjadi ${esc(nx.n)}, ada ability baru lain yang bisa dipelajari.</p>`:''}</div></div>`;
   m.eq=m.eq||{};
-  h+=`<div class="sec"><h3>Perlengkapan</h3><div class="abl">${Object.entries(EQ_SLOT).map(([s,nm])=>{ const it=m.eq[s]&&G.inv.find(x=>x.id===m.eq[s]); return `<div><b>${nm}:</b> ${it?`${itemName(it)} ${rarTag(it.r)}<br><span class="note">${itemTxt(it)}</span>`:'<span class="note">kosong</span>'}<div class="btns" style="margin-top:4px"><button class="btn" data-eqs="${s}">${it?'Ganti':'Pasang'}</button>${it?`<button class="btn" data-uneq="${s}">Lepas</button>`:''}</div></div>`; }).join('')}</div>`;
+  h+=`<div class="sec"><h3>Perlengkapan</h3><div class="abl">${Object.entries(EQ_SLOT).map(([s,nm])=>{ const it=m.eq[s]&&G.inv.find(x=>x.id===m.eq[s]); return `<div><b>${nm}:</b> ${it?`${itemName(it)} ${rarTag(it.r)}<br><span class="note">${itemTxt(it)}</span>${modsHtml(it)}`:'<span class="note">kosong</span>'}<div class="btns" style="margin-top:4px"><button class="btn" data-eqs="${s}">${it?'Ganti':'Pasang'}</button>${it?`<button class="btn" data-uneq="${s}">Lepas</button>`:''}</div></div>`; }).join('')}</div>`;
   if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
-    h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemTxt(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
+    h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemShort(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
   h+=`</div>`;
   h+=dropListHtml(monDropTable(m),'Drop ini dipungut petualang yang menumbangkan monster ini dan dibawa pulang. Kalau petualang itu tewas, barangnya hilang (tidak masuk gudang kita).');
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
@@ -148,7 +161,7 @@ function pAdv(){
 function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
-  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
+  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${p.isekai?'🌀 Orang dunia lain':RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span>${p.isekai?`<span class="note" style="color:#9fd0ff">Skill curang: ${esc(p.cheat||'Status Window')} · stat +20%</span>`:''}</div></div>
   <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Barang jarahan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
   return {t:'Petualang',h:h+dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, kita dapat emas, mana, dan jiwa. Kadang ia juga menjatuhkan perlengkapan khas kelasnya; kelas berbintang tinggi lebih sering dan lebih langka.')};
 }
@@ -196,6 +209,8 @@ function act(a,el){
   else if(a==='tabMon'){ openPanel('monster'); return; }
   else if(a==='eqCancel'){ UI.eqSlot=null; }
   else if(a==='skipLearn'&&m){ skipLearn(m); }
+  else if(a==='buyRune'){ const r=buyRune(); if(typeof r==='string') err=r; else toast(`Dapat ${runeName(r)}!`); }
+  else if(a==='repairAll'){ const r=repairAll(); if(r) err=r; else toast('Semua perlengkapan diperbaiki.'); }
   else if(a==='buyItem'){ const r=buyItem(); if(typeof r==='string') err=r; else toast(`Dapat ${r.n} (${RARITY[r.r]})!`); }
   else if(a==='fuseGo'&&m){ const b=G.mons.find(x=>x.id===UI.fuseB); if(b){ err=fuseMons(m,b); if(!err){ toast('Fusi berhasil!'); UI.fuseB=null; UI.fuseA=null; } } }
   else if(a==='release'&&m) UI.confirmRel=m.id;
@@ -238,7 +253,7 @@ function bindUI(){
   for(const b of document.querySelectorAll('#nav button')) b.onclick=()=>{ if(UI.panel===b.dataset.p){ closePanel(); return; } UI.target=null; openPanel(b.dataset.p); };
   const B=$('sheetB');
   B.addEventListener('click',e=>{
-    const t=e.target.closest('[data-act],[data-buy],[data-mon],[data-g],[data-fb],[data-guard],[data-unguard],[data-adv],[data-eqs],[data-uneq],[data-eqi],[data-forge],[data-sell],[data-forget]'); if(!t) return;
+    const t=e.target.closest('[data-act],[data-buy],[data-mon],[data-g],[data-fb],[data-guard],[data-unguard],[data-adv],[data-eqs],[data-uneq],[data-eqi],[data-forge],[data-sell],[data-forget],[data-repair],[data-sock],[data-rsel],[data-unsock],[data-addsock],[data-merge]'); if(!t) return;
     if(t.dataset.act) return act(t.dataset.act,t);
     if(t.dataset.buy) return startPlacing(JSON.parse(t.dataset.buy));
     if(t.dataset.mon){ UI.monId=+t.dataset.mon; UI.fuseA=null; UI.sel={k:'m',id:UI.monId}; openPanel('mon'); const m=G.mons.find(x=>x.id===UI.monId); if(m&&m.floor>=0){ RC.follow=false; $('bFollow').setAttribute('aria-pressed','false'); scrollToFloor(m.floor); } return; }
@@ -253,6 +268,12 @@ function bindUI(){
     if(t.dataset.uneq&&mm){ unequip(mm,t.dataset.uneq); renderPanel(); return; }
     if(t.dataset.eqi&&mm){ const it=G.inv.find(x=>x.id===+t.dataset.eqi); const err=equipItem(mm,it); toast(err||`${mm.name} memakai ${it.n}.`); UI.eqSlot=null; renderPanel(); return; }
     if(t.dataset.forge){ const it=G.inv.find(x=>x.id===+t.dataset.forge); const err=it&&forgeItem(it); toast(err||`${it.n} kini +${it.lv}!`); renderPanel(); return; }
+    if(t.dataset.repair){ const it=G.inv.find(x=>x.id===+t.dataset.repair); const err=it&&repairItem(it); toast(err||`${it.n} diperbaiki.`); renderPanel(); return; }
+    if(t.dataset.sock){ UI.sockFor=UI.sockFor===+t.dataset.sock?null:+t.dataset.sock; renderPanel(); return; }
+    if(t.dataset.rsel){ const [iid,rid]=t.dataset.rsel.split(':').map(Number); const it=G.inv.find(x=>x.id===iid); const err=it&&socketRune(it,rid); toast(err||'Rune terpasang!'); UI.sockFor=null; renderPanel(); return; }
+    if(t.dataset.unsock){ const [iid,ix]=t.dataset.unsock.split(':').map(Number); const it=G.inv.find(x=>x.id===iid); const err=it&&unsocketRune(it,ix); toast(err||'Rune dicabut dan kembali ke gudang.'); renderPanel(); return; }
+    if(t.dataset.addsock){ const it=G.inv.find(x=>x.id===+t.dataset.addsock); const err=it&&addSocket(it); toast(err||'Slot rune bertambah!'); renderPanel(); return; }
+    if(t.dataset.merge){ const [k,g]=t.dataset.merge.split(':'); const r=mergeRunes(k,+g); toast(typeof r==='string'?r:`Jadi ${runeName(r)}!`); renderPanel(); return; }
     if(t.dataset.sell){ const it=G.inv.find(x=>x.id===+t.dataset.sell); if(it){ sellItem(it); toast(`Terjual ${itemValue(it)} emas.`); } renderPanel(); return; }
   });
   B.addEventListener('change',e=>{

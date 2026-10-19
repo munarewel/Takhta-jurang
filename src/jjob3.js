@@ -2,7 +2,7 @@
    TAKHTA JURANG — bintang kelas (★1–★5) & nama bahasa Inggris
    ===================================================================== */
 Object.assign(JOBS,{
-  fistKing:{n:'Fist King',spr:'petarung',hp:64,atk:11,def:6,eva:.14,rng:12,grow:[9,1.9,.9],skill:{n:'Thousand Fists',cd:7,k:'multi',hits:7,m:.45},front:2},
+  fistKing:{n:'Fist King',spr:'petarung',hp:64,atk:11,def:6,eva:.14,rng:16,grow:[9,1.9,.9],skill:{n:'Thousand Fists',cd:7,k:'multi',hits:7,m:.45},front:2},
   spearGod:{n:'Spear God',spr:'pendekarTombak',hp:66,atk:11,def:7,eva:.08,rng:16,grow:[9,1.9,1.1],skill:{n:'Heaven Piercer',cd:8,k:'pierce',m:2.3},front:3},
   iceQueen:{n:'Ice Queen',spr:'penyihirAir',hp:40,atk:11,def:3,eva:.06,rng:52,grow:[6,2,.5],skill:{n:'Absolute Zero',cd:10,k:'aoe',m:1.9},front:0,magic:1},
   arrowQueen:{n:'Arrow Queen',spr:'ratuPanah',hp:46,atk:12,def:4,eva:.12,rng:66,grow:[6,2.2,.5],skill:{n:'Rain of Arrows',cd:9,k:'multi',hits:5,m:.8},front:1},
