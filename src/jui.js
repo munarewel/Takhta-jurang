@@ -12,6 +12,8 @@ const BBOX=new WeakMap();
 function sprBox(spr){ let b=BBOX.get(spr); if(b) return b; const g=spr.getContext('2d'); const d=g.getImageData(0,0,spr.width,spr.height).data; let x0=spr.width,y0=spr.height,x1=0,y1=0; for(let y=0;y<spr.height;y++)for(let x=0;x<spr.width;x++){ if(d[(y*spr.width+x)*4+3]>30){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } } b=x1<x0?{x:0,y:0,w:spr.width,h:spr.height}:{x:x0,y:y0,w:x1-x0+1,h:y1-y0+1}; BBOX.set(spr,b); return b; }
 function iconSpr(cv,spr){ paintIcon(cv,g=>{ const b=sprBox(spr); const k=Math.min(cv.width/b.w,cv.height/b.h); const w=b.w*k,h=b.h*k; g.drawImage(spr,b.x,b.y,b.w,b.h,Math.round((cv.width-w)/2),Math.round(cv.height-h),w,h); }); }
 function iconFix(cv,fx){ const c=document.createElement('canvas'); c.width=32; c.height=48; const g=c.getContext('2d'); drawFix(g,fx,16,44,0); if(fx.t==='rahasia'){ g.fillStyle='#3a3446'; g.globalCompositeOperation='destination-over'; g.fillRect(8,10,16,34); } iconSpr(cv,c); }
+function itemTxt(it){ const s=itemStats(it); const p=[]; if(s.atk) p.push(`+${Math.round(s.atk)} serangan`); if(s.hp) p.push(`+${Math.round(s.hp)} nyawa`); if(s.def) p.push(`+${Math.round(s.def)} pertahanan`); if(s.eva) p.push(`+${Math.round(s.eva*100)}% menghindar`); return p.join(' · '); }
+function itemName(it){ return `${esc(it.n)}${it.lv?` +${it.lv}`:''}`; }
 function rarTag(r){ const n=RARITY[r]; return `<span class="rar" style="background:${RAR_COL[n]}">${n}</span>`; }
 function stars(st,max){ return '◆'.repeat(st)+'◇'.repeat(Math.max(0,max-st)); }
 /* ---------- tips Mira ---------- */
@@ -47,11 +49,11 @@ function onLog(s,c){ if(!$('ticker')) return; if(c==='adv'&&!/masuk/.test(s)&&rn
   if(c==='lord'&&/TUMBANG/.test(s)) miraTip('Yang Mulia tumbang… tapi kegelapan tak pernah mati. Raja baru akan bangkit dengan ras acak. Popularitas kita turun, tapi kita bangun lagi!','lorddeath');
   if(c==='evo'&&/BEREVOLUSI/.test(s)) miraTip('Evolusi pertama kita! Level kembali ke 1, tapi kekuatannya tetap naik. Batas level berikutnya lebih tinggi.','evo1'); }
 /* ---------- panel ---------- */
-function openPanel(p,opt){ UI.panel=p; Object.assign(UI,opt||{}); $('sheet').hidden=false; for(const b of document.querySelectorAll('#nav button')) b.setAttribute('aria-pressed',b.dataset.p===p||(p==='mon'&&b.dataset.p==='monster')?'true':'false'); renderPanel(); }
+function openPanel(p,opt){ UI.panel=p; Object.assign(UI,opt||{}); $('sheet').hidden=false; for(const b of document.querySelectorAll('#nav button')) b.setAttribute('aria-pressed',b.dataset.p===p||((p==='mon'||p==='gudang')&&b.dataset.p==='monster')?'true':'false'); renderPanel(); }
 function closePanel(){ UI.panel=null; UI.sel=null; UI.target=null; UI.fuseA=null; $('sheet').hidden=true; for(const b of document.querySelectorAll('#nav button')) b.setAttribute('aria-pressed','false'); }
 function renderPanel(){
   if(!UI.panel) return; const B=$('sheetB'); const T=$('sheetT');
-  const fn={bangun:pBangun,monster:pMonList,mon:pMon,panggil:pGacha,petualang:pAdv,raja:pRaja,fix:pFix,adv:pAdvOne}[UI.panel];
+  const fn={gudang:pGudang,bangun:pBangun,monster:pMonList,mon:pMon,panggil:pGacha,petualang:pAdv,raja:pRaja,fix:pFix,adv:pAdvOne}[UI.panel];
   const sc=B.scrollTop; const r=fn(); T.textContent=r.t; B.innerHTML=r.h; B.scrollTop=sc;
   for(const cv of B.querySelectorAll('canvas[data-sp]')) iconSpr(cv,monSpr(cv.dataset.sp,0));
   for(const cv of B.querySelectorAll('canvas[data-fix]')) iconFix(cv,JSON.parse(cv.dataset.fix));
@@ -74,10 +76,22 @@ function pBangun(){
 /* daftar monster */
 function pMonList(){
   const list=G.mons.filter(m=>!m.temp).slice().sort((a,b)=>(b.floor-a.floor)||(SPECIES[b.sp].rar-SPECIES[a.sp].rar)||b.lv-a.lv);
-  let h=`<p class="note">${list.length} monster · ${list.filter(m=>m.floor<0).length} di cadangan · maks ${FLOOR_CAP} per lantai. Ketuk untuk detail.</p><div class="grid">`;
+  let h=`<div class="btns"><button class="btn pri">Monster</button><button class="btn" data-act="tabGudang">Gudang (${G.inv.length} barang)</button></div><p class="note">${list.length} monster · ${list.filter(m=>m.floor<0).length} di cadangan · maks ${FLOOR_CAP} per lantai. Ketuk untuk detail.</p><div class="grid">`;
   for(const m of list){ const s=SPECIES[m.sp];
     h+=`<button class="card" data-mon="${m.id}"><canvas class="ic" width="32" height="36" data-sp="${m.sp}"></canvas><span class="t"><b>${esc(m.name)} ${rarTag(s.rar)}</b><span>${esc(s.n)} · ${stars(s.stage,maxStageOf(m.sp))}</span><span>Lv${m.lv}/${monCap(m)} · ${m.floor<0?'Cadangan':m.secret?`L${m.floor+1} rahasia`:`L${m.floor+1}`}${m.dead?' · <span style="color:var(--blood)">tumbang</span>':''}</span></span></button>`; }
   return {t:'Monster',h:h+'</div>'};
+}
+/* gudang perlengkapan */
+function pGudang(){
+  const bh=Object.entries(G.bahan).filter(([k,v])=>v>0);
+  let h=`<div class="btns"><button class="btn" data-act="tabMon">Monster</button><button class="btn pri">Gudang</button></div>
+  <p class="note">Petualang yang tewas kadang menjatuhkan bahan, dan lebih jarang lagi senjata, zirah, atau aksesori. Pasang perlengkapan dari halaman detail monster.</p>
+  <div class="sec"><h3>Bahan</h3><p class="note" style="color:var(--bone)">${bh.length?bh.map(([k,v])=>`${esc(k)} ×${v}`).join(' · '):'Belum ada bahan.'}</p></div>
+  <div class="btns"><button class="btn pri" data-act="buyItem">Beli perlengkapan acak · 250 emas</button></div>`;
+  const list=G.inv.slice().sort((a,b)=>b.r-a.r||b.lv-a.lv);
+  h+=`<div class="sec"><h3>Perlengkapan (${list.length})</h3>${list.length?'':'<p class="note">Gudang masih kosong.</p>'}<div class="abl">${list.map(it=>{ const w=it.on&&G.mons.find(m=>m.id===it.on); const c=forgeCost(it);
+    return `<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}</span><div class="btns" style="margin-top:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.n} ${esc(c.bahan)}</button><button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></div></div>`; }).join('')}</div></div>`;
+  return {t:'Gudang Kastil',h};
 }
 /* detail monster */
 const STRAT={jaga:'Jaga pos',agresif:'Agresif',dukung:'Pendukung',sergap:'Penyergap'};
@@ -91,6 +105,11 @@ function pMon(){
     <p class="note" style="margin-top:3px">${nx?`Berevolusi menjadi <b style="color:var(--bone)">${esc(nx.n)}</b> saat mencapai Lv${cap}. Level kembali ke 1.`:'Tahap akhir jalurnya.'}</p></div>`;
   h+=`<dl class="kv"><dt>Nyawa</dt><dd>${m.dead?`<span style="color:var(--blood)">Tumbang · bangkit ${Math.max(0,Math.ceil(m.reviveAt-G.t))} dtk (${reviveCost(m)} mana)</span>`:`${Math.round(m.hp)} / ${st.hp}`}</dd><dt>Serangan</dt><dd>${Math.round(st.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(st.def)}</dd><dt>Menghindar</dt><dd>${Math.round(st.eva*100)}%</dd><dt>Korban</dt><dd>${m.kills} petualang</dd><dt>Kesetiaan</dt><dd>${Math.round(m.loy)} / 100</dd></dl>`;
   h+=`<div class="sec"><h3>Ability ${m.abil.length}/5</h3><div class="abl">${m.abil.map((a,i)=>`<div><b>${ABIL[a].n}</b><em>${ABIL[a].k==='p'?'pasif':'aktif · '+ABIL[a].cd+' dtk'}</em>${i===0?'<em>diwariskan saat fusi</em>':''}<br><span class="note">${ABIL[a].d}</span></div>`).join('')}</div></div>`;
+  m.eq=m.eq||{};
+  h+=`<div class="sec"><h3>Perlengkapan</h3><div class="abl">${Object.entries(EQ_SLOT).map(([s,nm])=>{ const it=m.eq[s]&&G.inv.find(x=>x.id===m.eq[s]); return `<div><b>${nm}:</b> ${it?`${itemName(it)} ${rarTag(it.r)}<br><span class="note">${itemTxt(it)}</span>`:'<span class="note">kosong</span>'}<div class="btns" style="margin-top:4px"><button class="btn" data-eqs="${s}">${it?'Ganti':'Pasang'}</button>${it?`<button class="btn" data-uneq="${s}">Lepas</button>`:''}</div></div>`; }).join('')}</div>`;
+  if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
+    h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemTxt(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
+  h+=`</div>`;
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
     <label class="note">Lantai <select id="mFloor">${`<option value="-1" ${m.floor<0?'selected':''}>Cadangan</option>`+Array.from({length:G.floors},(_,f)=>`<option value="${f}" ${m.floor===f&&!m.secret?'selected':''} ${floorCount(f)>=FLOOR_CAP&&m.floor!==f?'disabled':''}>L${f+1} (${floorCount(f)}/${FLOOR_CAP})</option>`).join('')}</select></label>
     <label class="note">Strategi <select id="mStrat">${Object.entries(STRAT).map(([k,v])=>`<option value="${k}" ${m.strat===k?'selected':''}>${v}</option>`).join('')}</select></label>
@@ -141,7 +160,11 @@ function pFix(){
   const {f,i}=UI.sel; const fx=G.fix[f]&&G.fix[f][i]; if(!fx) return {t:'Petak',h:'<p class="note">Petak kosong.</p>'};
   const name=fx.t==='chest'?`Peti ${fx.r}`:FIX[fx.t].n;
   let h=`<div class="mhead"><canvas width="32" height="36" data-fix='${JSON.stringify(fx)}'></canvas><div class="nm"><b>${name}</b><span class="note">Lantai ${f+1} · petak ${i+1}</span></div></div>`;
-  if(fx.t==='chest') h+=`<p class="note">Petualang yang membukanya mendapat perlengkapan dan emas senilai sekitar ${fmt(chestCost(fx.r))}. Popularitas naik saat dijarah.</p>`;
+  if(fx.t==='rest'){ const here=G.advs.filter(a=>a.floor===f&&a.resting); const saved=f>0?G.parties.filter(p=>p.state!=='gone'&&p.saveFloor===f&&partyMembers(p).length):[];
+    h+=`<p class="note">${FIX.rest.d} Biaya ${8+f*4} emas per orang.</p><dl class="kv"><dt>Dipakai</dt><dd>${fx.uses||0} kali</dd><dt>Pemasukan</dt><dd>${fmt(fx.earn||0)} emas</dd><dt>Tamu terakhir</dt><dd>${fx.last?esc(fx.last):'-'}</dd></dl>
+    <div class="sec"><h3>Sedang beristirahat (${here.length})</h3>${here.length?`<div class="grid">${here.map(a=>{ const p=G.people[a.pid]; const s=advStats(p); return `<button class="card" data-adv="${p.id}"><canvas class="ic" width="32" height="36" data-adv="${p.id}"></canvas><span class="t"><b>${esc(p.name)}</b><span>${JOBS[p.job].n} Lv${p.lv} · ${Math.round(a.hp/s.hp*100)}%</span></span></button>`; }).join('')}</div>`:'<p class="note">Api unggun menyala, tapi belum ada tamu.</p>'}</div>
+    <div class="sec"><h3>Party yang menyimpan kemajuan di sini (${saved.length})</h3>${f===0?'<p class="note">Lantai 1 adalah pintu masuk, jadi tidak jadi titik simpan. Pasang di lantai atas supaya party kembali lewat sini.</p>':saved.length?`<ul class="log">${saved.slice(0,12).map(p=>`<li class="adv">${esc(p.name)} · ${partyMembers(p).map(x=>JOBS[x.job].n+' Lv'+x.lv).join(', ')} · ${p.state==='in'?'sedang di kastil':'di kota'}</li>`).join('')}</ul>`:'<p class="note">Belum ada.</p>'}</div>`; }
+  else if(fx.t==='chest') h+=`<p class="note">Petualang yang membukanya mendapat perlengkapan dan emas senilai sekitar ${fmt(chestCost(fx.r))}. Popularitas naik saat dijarah.</p>`;
   else h+=`<p class="note">${FIX[fx.t].d}</p>`;
   if(FIX[fx.t]&&FIX[fx.t].cat==='jebakan') h+=`<dl class="kv"><dt>Level</dt><dd>${fx.lv||1} / 10</dd><dt>Terpicu</dt><dd>${fx.hits||0} kali</dd></dl><div class="btns"><button class="btn pri" data-act="trapUp" ${(fx.lv||1)>=10?'disabled':''}>Naikkan level · ${trapUpCost(fx)} mana</button></div>`;
   if(fx.t==='rahasia'){ const gs=secretMons(fx);
@@ -162,6 +185,10 @@ function act(a,el){
   else if(a==='train'&&m){ err=trainMon(m); if(!err) toast(`${m.name} berlatih keras.`); }
   else if(a==='fuse'&&m){ UI.fuseA=UI.fuseA===m.id?null:m.id; UI.fuseB=null; }
   else if(a==='fuseNo'){ UI.fuseB=null; }
+  else if(a==='tabGudang'){ openPanel('gudang'); return; }
+  else if(a==='tabMon'){ openPanel('monster'); return; }
+  else if(a==='eqCancel'){ UI.eqSlot=null; }
+  else if(a==='buyItem'){ const r=buyItem(); if(typeof r==='string') err=r; else toast(`Dapat ${r.n} (${RARITY[r.r]})!`); }
   else if(a==='fuseGo'&&m){ const b=G.mons.find(x=>x.id===UI.fuseB); if(b){ err=fuseMons(m,b); if(!err){ toast('Fusi berhasil!'); UI.fuseB=null; UI.fuseA=null; } } }
   else if(a==='release'&&m) UI.confirmRel=m.id;
   else if(a==='releaseNo') UI.confirmRel=null;
@@ -181,7 +208,7 @@ function onCanvasTap(hit){
   if(UI.placing){
     if(hit.k==='slot'){ if(G.fix[hit.f][hit.i]){ toast('Petak itu sudah terisi.'); return; } if(UI.placing.move){ const mv=UI.placing.move; const err=moveFix(mv.f,mv.i,hit.f,hit.i); if(err) toast(err); else toast('Dipindahkan.'); stopPlacing(); return; } const err=orderPlace(hit.f,hit.i,UI.placing); if(err) toast(err); else toast('Mira berangkat memasang!'); }
     return; }
-  if(hit.k==='m'){ UI.monId=hit.id; UI.fuseA=null; UI.sel={k:'m',id:hit.id}; openPanel('mon'); return; }
+  if(hit.k==='m'){ UI.monId=hit.id; UI.fuseA=null; UI.eqSlot=null; UI.sel={k:'m',id:hit.id}; openPanel('mon'); return; }
   if(hit.k==='a'){ UI.advId=hit.id; openPanel('adv'); return; }
   if(hit.k==='l'){ openPanel('raja'); return; }
   if(hit.k==='slot'){ if(G.fix[hit.f][hit.i]){ UI.sel={k:'fix',f:hit.f,i:hit.i}; openPanel('fix'); } else { UI.target={f:hit.f,i:hit.i}; openPanel('bangun'); } }
@@ -203,7 +230,7 @@ function bindUI(){
   for(const b of document.querySelectorAll('#nav button')) b.onclick=()=>{ if(UI.panel===b.dataset.p){ closePanel(); return; } UI.target=null; openPanel(b.dataset.p); };
   const B=$('sheetB');
   B.addEventListener('click',e=>{
-    const t=e.target.closest('[data-act],[data-buy],[data-mon],[data-g],[data-fb],[data-guard],[data-unguard],[data-adv]'); if(!t) return;
+    const t=e.target.closest('[data-act],[data-buy],[data-mon],[data-g],[data-fb],[data-guard],[data-unguard],[data-adv],[data-eqs],[data-uneq],[data-eqi],[data-forge],[data-sell]'); if(!t) return;
     if(t.dataset.act) return act(t.dataset.act,t);
     if(t.dataset.buy) return startPlacing(JSON.parse(t.dataset.buy));
     if(t.dataset.mon){ UI.monId=+t.dataset.mon; UI.fuseA=null; UI.sel={k:'m',id:UI.monId}; openPanel('mon'); const m=G.mons.find(x=>x.id===UI.monId); if(m&&m.floor>=0){ RC.follow=false; $('bFollow').setAttribute('aria-pressed','false'); scrollToFloor(m.floor); } return; }
@@ -212,6 +239,12 @@ function bindUI(){
     if(t.dataset.guard){ const {f,i}=UI.sel; const m=G.mons.find(x=>x.id===+t.dataset.guard); if(m){ const err=addSecret(f,i,m); toast(err||`${m.name} masuk ke ruang rahasia.`); renderPanel(); } return; }
     if(t.dataset.unguard){ const m=G.mons.find(x=>x.id===+t.dataset.unguard); if(m){ clearSecret(m); m.px=SLOT_X(ri(1,8)); toast(`${m.name} keluar dari ruang rahasia.`); renderPanel(); } return; }
     if(t.dataset.adv){ UI.advId=+t.dataset.adv; openPanel('adv'); return; }
+    const mm=UI.monId&&G.mons.find(x=>x.id===UI.monId);
+    if(t.dataset.eqs){ UI.eqSlot=UI.eqSlot===t.dataset.eqs?null:t.dataset.eqs; renderPanel(); return; }
+    if(t.dataset.uneq&&mm){ unequip(mm,t.dataset.uneq); renderPanel(); return; }
+    if(t.dataset.eqi&&mm){ const it=G.inv.find(x=>x.id===+t.dataset.eqi); const err=equipItem(mm,it); toast(err||`${mm.name} memakai ${it.n}.`); UI.eqSlot=null; renderPanel(); return; }
+    if(t.dataset.forge){ const it=G.inv.find(x=>x.id===+t.dataset.forge); const err=it&&forgeItem(it); toast(err||`${it.n} kini +${it.lv}!`); renderPanel(); return; }
+    if(t.dataset.sell){ const it=G.inv.find(x=>x.id===+t.dataset.sell); if(it){ sellItem(it); toast(`Terjual ${itemValue(it)} emas.`); } renderPanel(); return; }
   });
   B.addEventListener('change',e=>{
     const m=UI.monId&&G.mons.find(x=>x.id===UI.monId);

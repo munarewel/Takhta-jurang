@@ -73,16 +73,16 @@ const ELEM=[
 ];
 const ELEM_BY={}; for(const e of ELEM) ELEM_BY[e.id]=e;
 // ability bawaan menurut bentuk tubuh
-const SHAPE_AB={slime:'regen',wolf:'ganda',hound:'ganda',bat:'haus',spider:'jaring',mimic:'pemburu',wyvern:'api',boar:'tebas',ghost:'gesit',bear:'amarah',imp:'kutuk',salamander:'api',cockatrice:'kutuk',harpy:'gesit',basilisk:'kutuk',pegasus:'kedip',treant:'regen',yeti:'raung',griffin:'kedip',manticore:'auraRacun',chimera:'api',cerberus:'raung',hydra:'regen',dodo:'untung',jamur:'kutuk',kodok:'jaring',kepiting:'kulitBaja',ular:'auraRacun',gagak:'gesit',kalajengking:'auraRacun',rubah:'goda',tikus:'panggil',kumbang:'kulitBatu',boneka:'kutuk',mata:'petir',cacing:'tebas',zirah:'berani',peri:'sembuh',kelinci:'ganda',gurita:'jaring',raptor:'ganda',raptorA:'ganda',batroww:'haus',nulleye:'kutuk',dragonW:'api',tyrvern:'raung',kong:'raung',bee:'auraRacun',beeQ:'panggil',agroo:'tebas',kangaroo:'ganda',tiger:'ganda',dinoV:'ledak',dinoT:'raung',unicorn:'sembuh',phoenix:'regen',kitsune:'goda',dragonE:'kulitBatu',griffinK:'kedip',fenrir:'raung',behemoth:'kulitBaja',thunderbird:'petir'};
-const RACE_AB={kobold:'panggil',goblin:'pemburu',hobgoblin:'tebas',zombie:'berani',skeleton:'berani',lizard:'duri',orc:'amarah',troll:'regen',ogre:'tebas',golem:'kulitBaja',minotaur:'raung',succubus:'goda'};
-function baseAbil(m){ if(m.k==='hum') return RACE_AB[m.race]||'tebas'; return SHAPE_AB[m.k]||'tebas'; }
+const SHAPE_AB={slime:'regen',wolf:'ganda',hound:'ganda',bat:'haus',spider:'jaring',mimic:'pemburu',wyvern:'api',boar:'tebas',ghost:'gesit',bear:'amarah',imp:'kutuk',salamander:'api',cockatrice:'kutuk',harpy:'gesit',basilisk:'kutuk',pegasus:'kedip',treant:'regen',yeti:'raung',griffin:'kedip',manticore:'auraRacun',chimera:'api',cerberus:'raung',hydra:'regen',dodo:'untung',horseman:'raung',mudHand:'jaring',cryingDemon:'kutuk',hedgehog:'duri',drone:'petir',robot:'kulitBaja',snowman:'beku',penguin:'gesit',kaktus:'duri',bunga:'jaring',kura:'kulitBatu',labu:'ledak',rusa:'sembuh',kraken:'jaring',shark:'haus',seaSerpent:'beku',neko:'gesit',dragonE:'kulitBatu',jamur:'kutuk',kodok:'jaring',kepiting:'kulitBaja',ular:'auraRacun',gagak:'gesit',kalajengking:'auraRacun',rubah:'goda',tikus:'panggil',kumbang:'kulitBatu',boneka:'kutuk',mata:'petir',cacing:'tebas',zirah:'berani',peri:'sembuh',kelinci:'ganda',gurita:'jaring',raptor:'ganda',raptorA:'ganda',batroww:'haus',nulleye:'kutuk',dragonW:'api',tyrvern:'raung',kong:'raung',bee:'auraRacun',beeQ:'panggil',agroo:'tebas',kangaroo:'ganda',tiger:'ganda',dinoV:'ledak',dinoT:'raung',unicorn:'sembuh',phoenix:'regen',kitsune:'goda',dragonE:'kulitBatu',griffinK:'kedip',fenrir:'raung',behemoth:'kulitBaja',thunderbird:'petir'};
+const RACE_AB={kobold:'panggil',goblin:'pemburu',hobgoblin:'tebas',zombie:'berani',skeleton:'berani',lizard:'duri',orc:'amarah',troll:'regen',ogre:'tebas',golem:'kulitBaja',minotaur:'raung',succubus:'goda',mumi:'kutuk',cyborg:'petir',iblis:'amarah',neraka:'amarah',jenderal:'raung'};
+function baseAbil(m){ if(m.ab) return m.ab; if(m.k==='hum') return RACE_AB[m.race]||'tebas'; return SHAPE_AB[m.k]||'tebas'; }
 
 /* ---------- katalog spesies ---------- */
 // akar = spesies tahap 1; setiap akar × elemen = satu jalur evolusi tersendiri
-const SKIP_MON=new Set(['neko','chaoticDragon','kraken','megalodon','ularLaut']);
+const SKIP_MON=new Set([]);
 const EVO_PREV={}; for(const [a,b] of Object.entries(EVO_NEXT)) (EVO_PREV[b]=EVO_PREV[b]||[]).push(a);
 function monStage(k){ return MON[k].evo||1; }
-const ROOTS=Object.keys(MON).filter(k=>{ const m=MON[k]; return !SKIP_MON.has(k)&&!m.demon&&!m.sea&&!m.evolved&&!(EVO_PREV[k]&&monStage(k)>1); });
+const ROOTS=Object.keys(MON).filter(k=>{ const m=MON[k]; return !SKIP_MON.has(k)&&!m.evolved&&!(EVO_PREV[k]&&monStage(k)>1); });
 const SPECIES={}; let SPECIES_N=0;
 function rankRar(rank){ const i=RANK_ORDER.indexOf(rank); return i<=1?0:i<=3?1:i===4?2:i===5?3:4; }
 function spId(k,el){ return el?k+'.'+el:k; }
@@ -134,7 +134,37 @@ const JOBS={
   paladin:{n:'Paladin',spr:'paladin',hp:64,atk:7,def:8,eva:.03,rng:12,grow:[9,1.2,1.3],skill:{n:'Doa Pelindung',cd:12,k:'heal',m:.18},front:3},
   ranger:{n:'Ranger',spr:'ksatriaPemanah',hp:44,atk:8,def:4,eva:.12,rng:50,grow:[6,1.4,.6],skill:{n:'Panah Ganda',cd:6,k:'multi',hits:2,m:1},front:1,scout:1},
   bard:{n:'Bard',spr:'bard',hp:40,atk:5,def:3,eva:.08,rng:40,grow:[6,.9,.5],skill:{n:'Lagu Semangat',cd:14,k:'buff'},front:0},
+  samurai:{n:'Samurai',spr:'pendekar',hp:58,atk:10,def:6,eva:.1,rng:12,grow:[8,1.7,.8],skill:{n:'Iai Kilat',cd:8,k:'crit',m:2.4},front:2},
+  ninja:{n:'Ninja',spr:'assassin',hp:44,atk:8,def:3,eva:.22,rng:30,grow:[6,1.5,.5],skill:{n:'Shuriken Bayangan',cd:6,k:'multi',hits:3,m:.8},front:1,scout:1},
+  necro:{n:'Necromancer',spr:'necromancer',hp:38,atk:9,def:3,eva:.04,rng:48,grow:[5,1.8,.4],skill:{n:'Kutukan Massal',cd:10,k:'aoe',m:1.4},front:0,magic:1},
+  druid:{n:'Druid',spr:'druid',hp:46,atk:6,def:4,eva:.06,rng:44,grow:[7,1,.6],skill:{n:'Berkah Alam',cd:9,k:'heal',m:.25},front:0,magic:1},
+  alkemis:{n:'Alchemist',spr:'alkemis',hp:42,atk:7,def:3,eva:.06,rng:40,grow:[6,1.3,.5],skill:{n:'Bom Ramuan',cd:8,k:'aoe',m:1.5},front:1},
+  summoner:{n:'Summoner',spr:'summoner',hp:40,atk:8,def:3,eva:.05,rng:44,grow:[6,1.6,.5],skill:{n:'Roh Panggilan',cd:9,k:'multi',hits:3,m:.9},front:0,magic:1},
+  sage:{n:'Sage',spr:'sageAgung',hp:40,atk:11,def:3,eva:.05,rng:52,grow:[6,2.1,.5],skill:{n:'Meteor Kecil',cd:11,k:'aoe',m:2},front:0,magic:1},
+  dragoon:{n:'Dragon Knight',spr:'ksatriaNaga',hp:70,atk:10,def:8,eva:.04,rng:16,grow:[10,1.6,1.2],skill:{n:'Tombak Naga',cd:9,k:'pierce',m:2},front:3},
+  swordmaster:{n:'Swordmaster',spr:'rajaPedang',hp:60,atk:11,def:6,eva:.1,rng:12,grow:[8,1.9,.9],skill:{n:'Tebasan Raja',cd:7,k:'multi',hits:3,m:1},front:2},
+  sniper:{n:'Sniper',spr:'ratuPanah',hp:38,atk:10,def:2,eva:.08,rng:64,grow:[5,1.8,.4],skill:{n:'Panah Jantung',cd:9,k:'snipe',m:2.8},front:0},
+  axeman:{n:'Axe Warrior',spr:'pendekarKapak',hp:64,atk:11,def:5,eva:.03,rng:13,grow:[9,1.8,.8],skill:{n:'Putaran Kapak',cd:8,k:'aoe',m:1.3},front:3},
+  darkmage:{n:'Dark Mage',spr:'penyihirHitam',hp:36,atk:11,def:2,eva:.05,rng:50,grow:[5,2,.4],skill:{n:'Api Hitam',cd:9,k:'aoe',m:1.8},front:0,magic:1},
+  hunter:{n:'Hunter',spr:'pemburu',hp:46,atk:8,def:4,eva:.12,rng:54,grow:[6,1.5,.6],skill:{n:'Panah Pelacak',cd:7,k:'snipe',m:2},front:1,scout:1},
+  cleric:{n:'Cleric',spr:'tabib',hp:42,atk:5,def:4,eva:.05,rng:44,grow:[7,.8,.7],skill:{n:'Ramuan Penyembuh',cd:7,k:'heal',m:.35},front:0},
+  hydromancer:{n:'Hydromancer',spr:'penyihirAir',hp:36,atk:9,def:2,eva:.05,rng:50,grow:[5,1.8,.4],skill:{n:'Gelombang Pasang',cd:9,k:'aoe',m:1.5},front:0,magic:1},
 };
+/* kalimat tiap role saat masuk kastil */
+const JOB_LINES={
+  knight:['Berlindung di belakangku!','Perisaiku tak akan retak.'],mage:['Biar kubakar semuanya.','Mana penuh, siap merapal!'],priest:['Semoga cahaya melindungi kita.','Jangan jauh-jauh dariku, ya.'],
+  archer:['Aku jaga dari belakang.','Satu panah, satu monster.'],thief:['Peti di sini punyaku.','Hati-hati, lantainya mencurigakan.'],dualblade:['Dua pedang, dua kali lebih cepat.','…'],
+  lancer:['Tombakku menembus apa pun.','Barisan depan, maju!'],monk:['Tinjuku sudah gatal.','Tenangkan pikiran, kuatkan tubuh.'],berserker:['DARAH! AKU BUTUH DARAH!','Jangan halangi amukanku.'],
+  paladin:['Atas nama cahaya!','Aku akan melindungi kalian semua.'],ranger:['Aku tahu jalan rahasia di tempat seperti ini.','Jejaknya masih segar.'],bard:['Lagu pembuka, untuk keberuntungan kita~','Ayo, semangat!'],
+  samurai:['Pedangku belum pernah tumpul.','Satu tebasan cukup.'],ninja:['…bayangan tak pernah bersuara.','Aku sudah di belakangmu.'],necro:['Mayat monster di sini pasti berguna.','Hehehe… jiwa-jiwa yang lezat.'],
+  druid:['Hutan memberiku kekuatan.','Bahkan di jurang, alam tetap hidup.'],alkemis:['Ramuan baru ini harus dicoba!','Jangan sentuh botol merah itu.'],summoner:['Roh-roh, datanglah!','Aku tidak bertarung sendirian.'],
+  sage:['Pengetahuan adalah senjata terkuat.','Kastil ini… menarik untuk diteliti.'],dragoon:['Darah naga mengalir di tombakku!','Langit milikku.'],swordmaster:['Seribu tebasan, satu tujuan.','Akhirnya lawan yang layak.'],
+  sniper:['Target terkunci.','Jangan bergerak, Raja Iblis.'],axeman:['Kapakku haus!','Tebas, belah, ulangi!'],darkmage:['Kegelapan melawan kegelapan.','Raja Iblis? Aku lebih gelap.'],
+  hunter:['Monster langka, kulit mahal.','Aku mencium bau sarang.'],cleric:['Siapkan perban.','Aku bawa ramuan untuk semua.'],hydromancer:['Biar kubanjiri lantai ini.','Air selalu menemukan jalan.'],
+};
+/* kalimat party terkenal */
+const FAMOUS_LINES=['Kami kembali! Kali ini singgasanamu, Raja Iblis!','Lantai {save} bukan masalah lagi bagi kami.','Ingat kami? {name} tak pernah lupa jalan.','Sudah {visits} kali kami ke sini. Hari ini yang terakhir untukmu!','Para penggemar di kota menunggu cerita kami!','Kastil ini makin tinggi, tapi kami makin kuat.'];
+const SLAYER_LINES=['Raja Iblis {lord} sudah kami tumbangkan. Kau berikutnya!','Kami pembunuh Raja Iblis. Gemetarlah!','Satu singgasana lagi untuk koleksi kami.'];
 const JOB_KEYS=Object.keys(JOBS);
 const EPI_ADJ=['Loner','Silent','Crimson','Iron','Wandering','Black','Thousand-Cut','Unbroken','Moonlit','Last','Storm','Grave','Golden','Nameless','Laughing','Frozen'];
 const EPI_JOB={knight:'Bulwark',mage:'Archmage',priest:'Saint',archer:'Hawkeye',thief:'Phantom',dualblade:'Twinblade',lancer:'Lancer',monk:'Fist',berserker:'Berserker',paladin:'Paladin',ranger:'Ranger',bard:'Bard'};
@@ -175,6 +205,7 @@ const FIX={
   lubang:{n:'Lubang Jatuh',cat:'jebakan',cost:220,dmg:.18,fall:1,d:'Jatuh ke lantai bawah sambil terluka.'},
   apiT:{n:'Semburan Api',cat:'jebakan',cost:260,dmg:.2,burn:1,d:'Pipa api menyembur. Membakar.'},
   jaringT:{n:'Jaring Jerat',cat:'jebakan',cost:180,root:3,d:'Menjerat satu petualang 3 detik.'},
+  mimik:{n:'Peti Mimik',cat:'jebakan',cost:240,d:'Terlihat seperti peti harta. Saat dibuka, menggigit keras dan mencuri emas pembukanya.'},
   rest:{n:'Tempat Istirahat',cat:'fasilitas',cost:300,d:'Petualang membayar emas untuk memulihkan diri dan menyimpan kemajuan.'},
   rahasia:{n:'Dinding Retak',cat:'fasilitas',cost:450,d:'Jalan rahasia menuju ruang monster rahasia. Hanya Thief/Ranger yang bisa menemukannya.'},
   obor:{n:'Obor Ungu',cat:'dekor',cost:40,aura:2,d:'Menambah Aura Seram.'},
@@ -194,3 +225,9 @@ const THEMES=[
   {n:'Jurang Hampa',wall:'#140e1e',wall2:'#0e0a16',floor:'#2e2240',acc:'#d060ff'},
 ];
 function themeOf(f){ return THEMES[Math.floor(f/10)%THEMES.length]; }
+
+/* ---------- perlengkapan monster & bahan ---------- */
+const EQ_SLOT={senjata:'Senjata',zirah:'Zirah',aksesori:'Aksesori'};
+const EQ_NAMES={senjata:['Taring','Cakar Besi','Pedang Karat','Gada Tulang','Tombak Hitam','Kapak Neraka','Sabit Jiwa','Tanduk Baja'],zirah:['Zirah Kulit','Sisik Naga','Jubah Bayangan','Cangkang Batu','Rantai Besi','Zirah Tulang'],aksesori:['Cincin Darah','Kalung Taring','Jimat Kutukan','Mahkota Duri','Anting Bulan','Gelang Roh']};
+const EQ_PRE=['','Retak ','','Tajam ','Terkutuk ','Kuno ','Agung ','Iblis '];
+const BAHAN=['Taring Retak','Kulit Kasar','Bijih Besi','Kristal Mana','Sisik Langka','Inti Naga','Pecahan Bintang'];

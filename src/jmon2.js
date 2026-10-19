@@ -78,5 +78,5 @@ function drawJurangMon(P,m,f){
   if(k==='kelinci'){ const hop=f===2?-2:0; sh(9); P(-5,-7+hop,9,6,c); P(-4,-8+hop,6,1,lt); P(2,-10+hop,5,5,c); P(3,-15+hop,1,5,c); P(5,-15+hop,1,5,c); P(3,-14+hop,1,3,'#f0a0b0'); P(6,-12+hop,2,2,'#e8e0c8'); P(5,-9+hop,1,1,eye); P(-6,-6+hop,2,2,'#ffffff'); P(-3,-1,2,1,dk); P(1,-1,2,1,dk); return; }
   if(k==='gurita'){ sh(14); P(-6,-19,12,10,c); P(-5,-20,10,1,c); P(-5,-19,4,2,lt); P(-3,-15,2,2,'#fff'); P(1,-15,2,2,'#fff'); P(-2,-14,1,1,eye); P(2,-14,1,1,eye);
     for(let i=0;i<4;i++){ const x=-7+i*4, o=(i+f)%2; P(x,-9,2,8,c); P(x+(o?1:-1),-2,2,2,dk); } return; }
-  return false;
+  return drawJurangMon2(P,m,f);
 }

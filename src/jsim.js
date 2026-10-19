@@ -20,7 +20,7 @@ function rand(a,b){ return a+rnd()*(b-a); }
 function newGame(){
   srand((Date.now()%2147483000)|1);
   G={v:1,nextId:1,t:0,day:1,mana:120,gold:600,jiwa:40,pop:0,floors:3,fix:[],mons:[],people:{},parties:[],advs:[],lord:null,
-     log:[],hall:[],aura:0,lordSince:0,spawnT:6,stats:{kills:0,lords:0,visits:0,chests:0,gacha:0},assist:{x:FW/2,f:2,q:[],busy:0,tip:0},settings:{autoChest:false}};
+     log:[],hall:[],aura:0,inv:[],bahan:{},lordSince:0,spawnT:6,stats:{kills:0,lords:0,visits:0,chests:0,gacha:0},assist:{x:FW/2,f:2,q:[],busy:0,tip:0},settings:{autoChest:false}};
   for(let f=0;f<G.floors;f++) G.fix.push(Array(SLOTS).fill(null));
   newLord(true);
   const starters=[['slime',0],['goblin',0],['kelelawar',1],['kobold',1],['wolf',2]];
@@ -41,7 +41,33 @@ function monStats(m){
   let hp=s.hp*2.2*(1+.12*(m.lv-1))*m.boost*lf, atk=s.atk*2*(1+.1*(m.lv-1))*m.boost*lf*(lr==='iblis'?1.1:1)*rg;
   let def=(RANK_ORDER.indexOf(s.rank)*2+m.lv*.6)*(m.abil.includes('kulitBatu')?1.35:1);
   let eva=.03+(m.abil.includes('gesit')?.15:0)+(s.el==='bayang'?.04:0)+floorKabut(m.floor);
+  const E=eqBonus(m); hp+=E.hp; atk+=E.atk; def+=E.def; eva+=E.eva;
   return {hp:Math.round(hp),atk,def,eva,spd:Math.min(1.6,.6+s.spd*.5),rng:s.ranged?40:13};
+}
+function itemStats(it){ const k=1+(it.lv||0)*.12; return {atk:(it.atk||0)*k,hp:(it.hp||0)*k,def:(it.def||0)*k,eva:(it.eva||0)}; }
+function eqBonus(m){ const o={atk:0,hp:0,def:0,eva:0}; if(!m.eq||!G||!G.inv) return o; for(const s in m.eq){ const it=G.inv.find(x=>x.id===m.eq[s]); if(!it) continue; const st=itemStats(it); o.atk+=st.atk; o.hp+=st.hp; o.def+=st.def; o.eva+=st.eva; } return o; }
+function genItem(lv,minR){
+  const slot=pick(Object.keys(EQ_SLOT)); let r=0; const x=rnd()+Math.min(.5,lv/200); r=x>1.18?4:x>1.02?3:x>.85?2:x>.6?1:0; if(minR!=null) r=Math.max(r,minR);
+  const base=1+lv*.5, mul=1+r*.55;
+  const it={id:nid(),s:slot,r,lv:0,n:EQ_PRE[Math.min(EQ_PRE.length-1,r*2+ri(0,1))]+pick(EQ_NAMES[slot]),on:null};
+  if(slot==='senjata'){ it.atk=+(base*1.1*mul).toFixed(1); }
+  else if(slot==='zirah'){ it.hp=Math.round((12+lv*4)*mul); it.def=+((1+lv*.3)*mul).toFixed(1); }
+  else { it.eva=+(.02+r*.012).toFixed(3); it.atk=+(base*.35*mul).toFixed(1); it.hp=Math.round((5+lv*1.5)*mul); }
+  G.inv.push(it); return it;
+}
+function itemValue(it){ return Math.round(30*(1+it.r*1.6)*(1+(it.lv||0)*.5)); }
+function equipItem(m,it){ if(!it) return 'Barang tidak ada.'; m.eq=m.eq||{}; if(it.on&&it.on!==m.id){ const o=G.mons.find(x=>x.id===it.on); if(o&&o.eq) delete o.eq[it.s]; }
+  const old=m.eq[it.s]&&G.inv.find(x=>x.id===m.eq[it.s]); if(old) old.on=null; m.eq[it.s]=it.id; it.on=m.id; return null; }
+function unequip(m,slot){ if(!m.eq||!m.eq[slot]) return; const it=G.inv.find(x=>x.id===m.eq[slot]); if(it) it.on=null; delete m.eq[slot]; }
+function forgeCost(it){ return {gold:Math.round(60*(it.lv+1)*(it.r+1)),bahan:BAHAN[Math.min(BAHAN.length-1,it.r+Math.floor(it.lv/4))],n:1+Math.floor(it.lv/2)}; }
+function forgeItem(it){ if(it.lv>=10) return 'Sudah +10.'; const c=forgeCost(it); if(G.gold<c.gold) return `Emas kurang (butuh ${c.gold}).`; if((G.bahan[c.bahan]||0)<c.n) return `Butuh ${c.n} ${c.bahan}.`; G.gold-=c.gold; G.bahan[c.bahan]-=c.n; it.lv++; return null; }
+function sellItem(it){ if(it.on){ const m=G.mons.find(x=>x.id===it.on); if(m) unequip(m,it.s); } G.inv=G.inv.filter(x=>x!==it); G.gold+=itemValue(it); }
+function buyItem(){ const c=250; if(G.gold<c) return `Emas kurang (butuh ${c}).`; G.gold-=c; return genItem(Math.max(1,fameLv()*.6)); }
+function advDrops(p,a,hero){
+  const out=[];
+  if(rnd()<.28){ const b=BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12)+(rnd()<.15?1:0))]; G.bahan[b]=(G.bahan[b]||0)+1; out.push(b); }
+  if(hero||rnd()<.05+p.lv*.0015){ const it=genItem(p.lv,hero?3:null); out.push(it.n); if(it.r>=3||hero) log(`${p.name} menjatuhkan ${it.n} (${RARITY[it.r]})! Barang masuk ke gudang kastil.`,'evo'); }
+  if(out.length) say(a.x,a.floor,'+'+out[out.length-1],'#c8f0a0',1.6);
 }
 function floorKabut(f){ return G.mons.some(o=>!o.dead&&o.floor===f&&o.abil.includes('kabut'))?.08:0; }
 function lordStats(){ const L=G.lord; const r=L.race;
@@ -97,12 +123,19 @@ function enterDungeon(pa){
   const mem=partyMembers(pa); if(!mem.length){ pa.state='gone'; return; }
   pa.state='in'; pa.visits++; G.stats.visits++; pa.loot=0; pa.entered=G.t; pa.retreat=false; pa.disarm={};
   const f=Math.min(pa.saveFloor,topF()); const restX=restSlotX(f);
-  pa.quote=pick(QUOTES[pa.tier]);
+  const famous=pa.visits>=4||pa.wins>0||pa.hero;
+  if(pa.hero) pa.quote=pick(['Atas nama kerajaan, Raja Iblis harus tumbang hari ini!','Seluruh negeri menunggu kabar kemenangan kami!','Kami dikirim untuk mengakhiri kekuasaanmu.']);
+  else if(pa.wins>0&&rnd()<.6) pa.quote=pick(SLAYER_LINES).replace('{lord}',pa.slain||'itu');
+  else if(famous&&!pa.hero) pa.quote=pick(FAMOUS_LINES).replace('{save}',pa.saveFloor+1).replace('{name}',pa.name).replace('{visits}',pa.visits-1);
+  else pa.quote=pick(QUOTES[pa.tier]);
+  pa.famous=famous;
   mem.forEach((p,i)=>{ const st=advStats(p); const a={pid:p.id,party:pa.id,floor:f,x:(f>0&&restX!=null?restX:fstart(f))-fdir(f)*i*9,hp:st.hp,cd:{atk:rand(0,.5),sk:rand(2,5)},fx:{},walk:0,seen:{},dmgDone:0};
     G.advs.push(a); });
   const lead=G.advs.find(a=>a.party===pa.id);
-  say(lead.x,f,`"${pa.quote}"`,'#ffe8c0',3.2);
-  log(`${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${JOBS[p.job].n} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
+  say(lead.x,f,`"${pa.quote}"`,famous?'#ffd36a':'#ffe8c0',3.2);
+  const talkers=G.advs.filter(a=>a.party===pa.id).sort(()=>rnd()-.5).slice(0,famous?2:1);
+  talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
+  log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${JOBS[p.job].n} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
 }
 function heroTick(){
   const days=(G.t-G.lordSince)/DAY_LEN; G.heroN=G.heroN||0;
@@ -114,7 +147,7 @@ function heroTick(){
   const ld=G.people[pa.members[0]]; ld.title='Sang Pahlawan'; pa.name=`Rombongan Pahlawan ${ld.name}`;
   let best=0; for(let f=0;f<G.floors;f++) if(restSlotX(f)!=null) best=f; pa.saveFloor=Math.max(0,Math.min(best,G.floors-2));
   G.parties.push(pa); log(`Kerajaan-kerajaan cemas: Raja Iblis ${G.lord.name} sudah ${Math.floor(days)} hari tak terkalahkan. ${pa.name} dikirim untuk menumpasnya!`,'warn');
-  enterDungeon(pa); pa.quote='Atas nama kerajaan, Raja Iblis harus tumbang hari ini!';
+  enterDungeon(pa);
 }
 function restSlotX(f){ const row=G.fix[f]; if(!row) return null; const i=row.findIndex(x=>x&&x.t==='rest'); return i>=0?SLOT_X(i):null; }
 function spawnTick(dt){
@@ -170,6 +203,7 @@ function advDie(a,src){
   fxAt('soul',a.x,a.floor,'#c08aff',1);
   say(a.x,a.floor,`+${Math.round(gold)}G`,'#ffd36a',1.4);
   lordGainExp(p.lv*6+10);
+  advDrops(p,a,pa&&pa.hero);
   let killer='jebakan';
   if(src&&src.kind==='m'){ const m=src.u; m.kills++; m.loy=Math.min(100,m.loy+1); monGainExp(m,p.lv*14+20); killer=`${m.name} (${SPECIES[m.sp].n})`; }
   else if(src&&src.kind==='l'){ G.lord.kills++; killer=`Raja Iblis ${G.lord.name}`; }
@@ -216,7 +250,7 @@ function lordDie(a){
   if(p){ p.title=p.title||'Pembunuh Raja Iblis'; p.hall=1; }
   log(`RAJA IBLIS TUMBANG! ${L.name} sang ${r.n} (Lv${L.lv}) dikalahkan oleh ${pa?pa.name:'petualang'}${p?`, pukulan terakhir dari ${p.name}`:''}. Mereka menjarah ${loot} emas. Popularitas kastil anjlok.`,'lord');
   fxAt('boom',L.x,topF(),'#ff4060',1.4);
-  if(pa){ pa.wins++; pa.loot+=loot; leaveDungeon(pa,'menang'); }
+  if(pa){ pa.wins++; pa.slain=L.name; pa.loot+=loot; leaveDungeon(pa,'menang'); }
   G.heroN=0; G.sealed=G.t+45; G.rage=G.t+DAY_LEN*1.5; setTimeout0(()=>newLord(false),3);
 }
 const TIMERS=[]; function setTimeout0(fn,s){ TIMERS.push({at:G.t+s,fn}); }
@@ -402,11 +436,12 @@ function onFixture(a,p,pa,f,i){
   const key=f+':'+i; if(a.seen[key]) return false; a.seen[key]=1;
   const st=advStats(p); const sx=SLOT_X(i);
   if(fx.t==='chest'){ a.x=sx; a.opening=1.1; say(sx,f,'Peti!','#ffd36a',1); return true; }
+  if(fx.t==='mimik'){ const scout=partyMembers(pa||{members:[]}).find(pp=>JOBS[pp.job].scout); if(scout&&rnd()<.2+scout.lv*.003){ say(sx,f,'Itu mimik!','#9fe0ff',1.3); return false; } a.x=sx; a.opening=1.1; say(sx,f,'Peti!','#ffd36a',1); return true; }
   if(fx.t==='rest'){
     const mates=G.advs.filter(x=>x.party===a.party);
     const hurt=mates.some(x=>x.hp<advStats(G.people[x.pid]).hp*.7);
     if(pa&&(hurt||f>pa.saveFloor)){ const fee=8+f*4; let paid=0; for(const x of mates){ const pp=G.people[x.pid]; const c=Math.min(pp.gold,fee); pp.gold-=c; paid+=c; x.resting=3.5; x.x=sx-fdir(f)*mates.indexOf(x)*7; x.floor=f; }
-      G.gold+=paid; G.mana+=paid*.3; pa.saveFloor=Math.max(pa.saveFloor,f); G.pop+=.6;
+      G.gold+=paid; G.mana+=paid*.3; pa.saveFloor=Math.max(pa.saveFloor,f); G.pop+=.6; fx.uses=(fx.uses||0)+1; fx.earn=(fx.earn||0)+paid; fx.last=pa.name;
       say(sx,f,`Istirahat (+${paid}G)`,'#ffd36a',1.6); fxAt('fire',sx,f,'#ffa040',3.5); return true; }
     return false;
   }
@@ -435,8 +470,10 @@ function triggerTrap(fx,a,p,st,f,sx,pa){
   if(D.dmg){ const victims=fx.t==='apiT'?near:[a]; for(const x of victims){ const xs=advStats(G.people[x.pid]); const raw=xs.hp*D.dmg*mult+lv*4; x.hp-=Math.round(raw*(x.fx.sleep>G.t?2:1)); if(x.fx.sleep>G.t){ x.fx.sleep=0; say(x.x,f,'KOMBO!','#ff9ad0',1.2); } say(x.x,f,String(Math.round(raw)),'#ff8a7a',.9); if(D.stun) x.fx.stun=G.t+D.stun; if(D.burn) x.fx.burn=G.t+4; if(x.hp<=0) advDie(x,null); } }
 }
 function openChest(a,pa){
-  const f=a.floor; const i=G.fix[f].findIndex((x,j)=>x&&x.t==='chest'&&Math.abs(SLOT_X(j)-a.x)<4); if(i<0) return;
-  const fx=G.fix[f][i]; const v=chestValue(fx.r); const gold=Math.round(chestCost(fx.r)*rand(.6,1.1));
+  const f=a.floor; const i=G.fix[f].findIndex((x,j)=>x&&(x.t==='chest'||x.t==='mimik')&&Math.abs(SLOT_X(j)-a.x)<4); if(i<0) return;
+  const fx=G.fix[f][i];
+  if(fx.t==='mimik'){ const p=G.people[a.pid]; const st=advStats(p); const lv=fx.lv||1; const dmg=Math.round(st.hp*(.28+lv*.04)); const steal=Math.round(p.gold*.25); p.gold-=steal; G.gold+=steal; fx.hits=(fx.hits||0)+1;
+    fxAt('claw',a.x,f,'#ff6060',.5); say(a.x,f,'MIMIK!','#ff6060',1.4); say(a.x+6,f,String(dmg),'#ff8a7a',1); if(steal) say(a.x,f,`+${steal}G`,'#ffd36a',1.4); a.fx.stun=G.t+1; a.hp-=dmg; if(a.hp<=0) advDie(a,null); return; } const v=chestValue(fx.r); const gold=Math.round(chestCost(fx.r)*rand(.6,1.1));
   G.fix[f][i]=null; G.stats.chests++;
   const mem=pa?partyMembers(pa):[G.people[a.pid]];
   for(const p of mem){ p.eq.atk+=1+v*1.4; p.eq.def+=.6+v*.9; p.eq.hp+=4+v*6; p.gold+=Math.round(gold/mem.length); }

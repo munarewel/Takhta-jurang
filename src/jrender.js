@@ -55,6 +55,8 @@ function drawFix(g,fx,x,y,f){
   if(fx.t==='chest'){ const v=chestValue(fx.r); const col=['#8a5a2a','#7a6a5a','#5a7a5a','#4a6a9a','#7a4a9a','#b8862a','#d0d0e0','#e3b75e','#ff7a5a'][v];
     g.fillStyle='#2a1a10'; g.fillRect(x-6,y-9,12,9); g.fillStyle=col; g.fillRect(x-5,y-8,10,7); g.fillStyle=shade(col,.25); g.fillRect(x-5,y-8,10,2);
     g.fillStyle=v>=6?'#fff2a0':'#d8b860'; g.fillRect(x-1,y-6,2,3); if(v>=5&&Math.floor(t*3)%2){ g.fillStyle='#fffbe0'; g.fillRect(x+3,y-11,1,1); g.fillRect(x-4,y-12,1,1); } return; }
+  if(fx.t==='mimik'){ g.fillStyle='#2a1a10'; g.fillRect(x-6,y-9,12,9); g.fillStyle='#4a6a9a'; g.fillRect(x-5,y-8,10,7); g.fillStyle=shade('#4a6a9a',.25); g.fillRect(x-5,y-8,10,2); g.fillStyle='#d8b860'; g.fillRect(x-1,y-6,2,3);
+    g.fillStyle='#f0f0e0'; g.fillRect(x-4,y-6,1,1); g.fillRect(x+3,y-6,1,1); if(Math.floor(t*1.3)%5===0){ g.fillStyle='#ff3a3a'; g.fillRect(x-3,y-7,1,1); g.fillRect(x+2,y-7,1,1); } return; }
   if(fx.t==='duri'){ g.fillStyle='#4a4450'; g.fillRect(x-7,y-1,14,1); g.fillStyle='#c8c8d0'; for(let i=-6;i<=5;i+=3){ g.fillRect(x+i,y-4,1,3); g.fillRect(x+i+1,y-3,1,2); } return; }
   if(fx.t==='panah'){ g.fillStyle='#1a1418'; g.fillRect(x-1,y-26,3,8); g.fillStyle='#6a6070'; g.fillRect(x-2,y-27,5,1); g.fillRect(x-2,y-18,5,1); return; }
   if(fx.t==='gas'){ g.fillStyle='#3a3a44'; g.fillRect(x-4,y-2,8,2); g.fillStyle='#8a7aa8'; g.fillRect(x-3,y-3,6,1); if(Math.floor(t*2)%3===0){ g.fillStyle='rgba(200,180,255,.35)'; g.fillRect(x-3,y-8,6,4); } return; }
