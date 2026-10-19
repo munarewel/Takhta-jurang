@@ -116,7 +116,7 @@ function render(){
     g.fillStyle='#e3b75e'; g.font='bold 7px "Pixelify Sans",monospace'; g.textAlign='center'; g.fillText('TAKHTA JURANG',FW/2,ROOF-5); }
   for(let f=0;f<G.floors;f++){
     const top=floorTop(f); if(top>y1||top+FH<y0) continue;
-    const ti=Math.floor(f/10)%THEMES.length; g.drawImage(wallBg(ti),0,top);
+    const ti=(Math.floor(f/10)+(G.themeOff||0))%THEMES.length; g.drawImage(wallBg(ti),0,top);
     const base=floorBase(f);
     // label lantai
     g.fillStyle='rgba(0,0,0,.45)'; g.fillRect(1,top+2,17,8); g.fillStyle=THEMES[ti].acc; g.font='6px "Pixelify Sans",monospace'; g.textAlign='left'; g.fillText('L'+(f+1),3,top+8);
@@ -164,12 +164,12 @@ function render(){
   // asisten
   { const A=G.assist; const base=floorBase(A.f); const bob=Math.round(Math.sin(G.t*3)*1.5); blit(g,assistSpr(Math.floor(G.t*4)%4),A.x,base-3+bob,(A.dir||1)<0,1); if(A.busy){ g.fillStyle='#ff9ad0'; g.fillRect(A.x+6,base-26+bob,2,2); } }
   // efek
-  for(const e of EFX){ if(e.k==='txt') continue; const base=floorBase(e.f); const p=1-e.t/e.t0; drawEfx(g,e,base,p); }
+  const WID=G.isNeighbor?G.wid:0; for(const e of EFX){ if(e.k==='txt'||(e.w||0)!==WID) continue; const base=floorBase(e.f); const p=1-e.t/e.t0; drawEfx(g,e,base,p); }
   // dasar tanah
   { const by=ROOF+G.floors*FH; if(by<y1){ g.fillStyle='#1a1018'; g.fillRect(0,by,FW,BASE); g.fillStyle='#2a1a22'; for(let x=0;x<FW;x+=9) g.fillRect(x,by+3+(x%4),5,2); } }
   // teks melayang (di ruang layar agar tajam)
   g.setTransform(1,0,0,1,0,0); g.textAlign='center';
-  for(const e of EFX){ if(e.k!=='txt') continue; const p=1-e.t/e.t0; const wy=floorBase(e.f)-34-p*10; const sx=e.x*s, sy=(wy-RC.camY)*s; if(sy<-20||sy>cv.height+20) continue;
+  for(const e of EFX){ if(e.k!=='txt'||(e.w||0)!==WID) continue; const p=1-e.t/e.t0; const wy=floorBase(e.f)-34-p*10; const sx=e.x*s, sy=(wy-RC.camY)*s; if(sy<-20||sy>cv.height+20) continue;
     const quote=e.s.length>14; const fs=Math.round((quote?6:6.5)*s);
     g.font=`${quote?'500':'700'} ${fs}px "Signika","Alegreya Sans",sans-serif`;
     g.globalAlpha=Math.min(1,e.t*3);

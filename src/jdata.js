@@ -322,7 +322,7 @@ const THEMES=[
   {n:'Black Palace',wall:'#24182a',wall2:'#1c1222',floor:'#4a2e4a',acc:'#e3b75e'},
   {n:'Void Abyss',wall:'#140e1e',wall2:'#0e0a16',floor:'#2e2240',acc:'#d060ff'},
 ];
-function themeOf(f){ return THEMES[Math.floor(f/10)%THEMES.length]; }
+function themeOf(f){ return THEMES[(Math.floor(f/10)+((typeof G!=='undefined'&&G&&G.themeOff)||0))%THEMES.length]; }
 
 /* ---------- perlengkapan monster & bahan ---------- */
 const EQ_SLOT={senjata:'Weapon',zirah:'Armor',aksesori:'Accessory'};

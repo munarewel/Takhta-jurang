@@ -58,12 +58,13 @@ function openPanel(p,opt){ UI.panel=p; Object.assign(UI,opt||{}); $('sheet').hid
 function closePanel(){ UI.panel=null; UI.sel=null; UI.target=null; UI.fuseA=null; $('sheet').hidden=true; for(const b of document.querySelectorAll('#nav button')) b.setAttribute('aria-pressed','false'); }
 function renderPanel(){
   if(!UI.panel) return; const B=$('sheetB'); const T=$('sheetT');
-  const fn={gudang:pGudang,bangun:pBangun,monster:pMonList,mon:pMon,panggil:pGacha,petualang:pAdv,raja:pRaja,fix:pFix,adv:pAdvOne}[UI.panel];
+  const fn={gudang:pGudang,bangun:pBangun,monster:pMonList,mon:pMon,panggil:pGacha,petualang:pAdv,raja:pRaja,fix:pFix,adv:pAdvOne,...(typeof NB_PANELS!=='undefined'?NB_PANELS:{})}[UI.panel]; if(!fn){ closePanel(); return; }
   const sc=B.scrollTop; const r=fn(); T.textContent=r.t; B.innerHTML=r.h; B.scrollTop=sc;
   for(const cv of B.querySelectorAll('canvas[data-sp]')) iconSpr(cv,monSpr(cv.dataset.sp,0));
   for(const cv of B.querySelectorAll('canvas[data-fix]')) iconFix(cv,JSON.parse(cv.dataset.fix));
   for(const cv of B.querySelectorAll('canvas[data-adv]')){ const p=G.people[cv.dataset.adv]; if(p) iconSpr(cv,advSpr(p,0)); }
   for(const cv of B.querySelectorAll('canvas[data-lord]')) iconSpr(cv,lordSpr(0));
+  if(typeof nbAfterRender==='function') nbAfterRender(B);
   UI.lastRefresh=performance.now();
 }
 /* Bangun / Toko */
@@ -312,7 +313,7 @@ function frame(ts){
   for(let i=EFX.length-1;i>=0;i--){ EFX[i].t-=real*(UI.speed?Math.min(UI.speed,1.5):0); if(EFX[i].t<=0) EFX.splice(i,1); }
   followCam(real); render();
   hudAcc+=real; if(hudAcc>.25){ hudAcc=0; updateHUD(); }
-  if(UI.panel&&['mon','petualang','raja','adv','fix'].includes(UI.panel)&&performance.now()-UI.lastRefresh>1000&&!(document.activeElement&&['INPUT','SELECT'].includes(document.activeElement.tagName))) renderPanel();
+  if(UI.panel&&['mon','petualang','raja','adv','fix','tetangga','nmon'].includes(UI.panel)&&performance.now()-UI.lastRefresh>1000&&!(document.activeElement&&['INPUT','SELECT'].includes(document.activeElement.tagName))) renderPanel();
   saveAcc+=real; if(saveAcc>15){ saveAcc=0; saveGame(); }
   requestAnimationFrame(frame);
 }

@@ -86,7 +86,7 @@ function drawWeapon(g,p,a,x,base,face,pose){ const wk=JOB_WPN[p.job]||'sword'; c
   if(pose.glow&&kind==='cast'&&gem){ g.save(); g.globalAlpha=.5*pose.glow; g.fillStyle=gem; const r=3+pose.glow*3; const a2=pose.ang*Math.PI/180; g.beginPath(); g.arc(hx+face*Math.sin(a2)*16,hy-Math.cos(a2)*16,r,0,6.3); g.fill(); g.restore(); }
 }
 /* proyektil */
-function projAt(x0,x1,f,pk,c,t){ if(EFX.length>300) EFX.shift(); const d=Math.abs(x1-x0); EFX.push({k:'proj',x:x0,x0,x1,f,pk,c:c||'#fff',t:t||Math.min(.35,.08+d/260),t0:t||Math.min(.35,.08+d/260)}); }
+function projAt(x0,x1,f,pk,c,t){ if(EFX.length>300) EFX.shift(); const d=Math.abs(x1-x0); EFX.push({k:'proj',w:G&&G.isNeighbor?G.wid:0,x:x0,x0,x1,f,pk,c:c||'#fff',t:t||Math.min(.35,.08+d/260),t0:t||Math.min(.35,.08+d/260)}); }
 function drawProj(g,e,base,p){ const x=e.x0+(e.x1-e.x0)*p, dir=Math.sign(e.x1-e.x0)||1; let y=base-14; g.globalAlpha=1;
   switch(e.pk){
     case 'arrow': g.fillStyle='#e8e0c8'; g.fillRect(x-4*dir,y,7,1); g.fillStyle='#d8e0e8'; g.fillRect(x+3*dir-(dir<0?1:0),y-1,1,3); g.fillStyle=e.c; g.fillRect(x-4*dir-(dir<0?1:0),y-1,1,3); break;

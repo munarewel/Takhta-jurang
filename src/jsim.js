@@ -11,9 +11,9 @@ function fdir(f){ return f%2===0?1:-1; }
 function fstart(f){ return f%2===0?10:FW-10; }
 function fend(f){ return f%2===0?FW-10:10; }
 function topF(){ return G.floors-1; }
-function say(x,f,s,c,t){ if(typeof UI!=='undefined'&&UI.speed>=2&&/^\d+$/.test(s)&&rnd()<(UI.speed>=4?.6:.3)) return; if(EFX.length>200){ const i=EFX.findIndex(e=>e.k==='txt'&&!/"/.test(e.s)); if(i>=0) EFX.splice(i,1); } EFX.push({k:'txt',x,f,s,c:c||'#fff',t:t||1.4,t0:t||1.4}); }
-function fxAt(k,x,f,c,t){ if(EFX.length>300) EFX.shift(); EFX.push({k,x,f,c,t:t||.6,t0:t||.6}); }
-function log(s,c){ G.log.unshift({d:G.day,s,c:c||'n'}); if(G.log.length>160) G.log.pop(); if(typeof onLog==='function') onLog(s,c); }
+function say(x,f,s,c,t){ if(typeof UI!=='undefined'&&UI.speed>=2&&/^\d+$/.test(s)&&rnd()<(UI.speed>=4?.6:.3)) return; if(EFX.length>200){ const i=EFX.findIndex(e=>e.k==='txt'&&!/"/.test(e.s)); if(i>=0) EFX.splice(i,1); } EFX.push({k:'txt',x,f,s,c:c||'#fff',t:t||1.4,t0:t||1.4,w:G&&G.isNeighbor?G.wid:0}); }
+function fxAt(k,x,f,c,t){ if(EFX.length>300) EFX.shift(); EFX.push({k,x,f,c,t:t||.6,t0:t||.6,w:G&&G.isNeighbor?G.wid:0}); }
+function log(s,c){ G.log.unshift({d:G.day,s,c:c||'n'}); if(G.log.length>160) G.log.pop(); if(typeof onLog==='function'&&!(typeof NB_MUTE!=='undefined'&&NB_MUTE)&&(!G.isNeighbor||(typeof MAINW!=='undefined'&&MAINW&&MAINW.visit===G.wid))) onLog(s,c); }
 function rand(a,b){ return a+rnd()*(b-a); }
 
 /* ---------- game baru ---------- */
@@ -302,7 +302,7 @@ function lordDie(a){
   if(pa){ pa.wins++; pa.slain=L.name; pa.loot+=loot; leaveDungeon(pa,'menang'); }
   G.heroN=0; G.sealed=G.t+45; G.rage=G.t+DAY_LEN*1.5; setTimeout0(()=>newLord(false),3);
 }
-const TIMERS=[]; function setTimeout0(fn,s){ TIMERS.push({at:G.t+s,fn}); }
+const TIMERS=[]; function setTimeout0(fn,s){ TIMERS.push({at:G.t+s,fn,w:G}); }
 
 /* ---------- monster: level, evolusi, fusi ---------- */
 function monGainExp(m,n){
@@ -653,7 +653,7 @@ function step(){
   G.mana+=dt*(1+G.advs.length*.15+G.floors*.06)*(G.lord.race==='elfGelap'?1.5:1);
   G.pop+=dt*.004*G.floors; G.gold+=dt*(.6+G.floors*.15);
   for(const a of G.advs) if(a.floor>(G.stats.deep||0)) G.stats.deep=a.floor;
-  for(let i=TIMERS.length-1;i>=0;i--) if(G.t>=TIMERS[i].at){ const t=TIMERS[i]; TIMERS.splice(i,1); t.fn(); }
+  for(let i=TIMERS.length-1;i>=0;i--) if((!TIMERS[i].w||TIMERS[i].w===G)&&G.t>=TIMERS[i].at){ const t=TIMERS[i]; TIMERS.splice(i,1); t.fn(); }
   spawnTick(dt); if(Math.floor(G.t)!==Math.floor(G.t-dt)) heroTick();
   for(const a of G.advs.slice()) advTick(a,dt);
   for(const pa of G.parties) if(pa.state==='in') partyTick(pa);
