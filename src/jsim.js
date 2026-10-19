@@ -70,11 +70,11 @@ function sellItem(it){ if(it.on){ const m=G.mons.find(x=>x.id===it.on); if(m) un
 function buyItem(){ const c=250; if(G.gold<c) return `Emas kurang (butuh ${c}).`; G.gold-=c; return genItem(Math.max(1,fameLv()*.6)); }
 function advDrops(p,a,hero){
   const out=[];
-  if(rnd()<.2){ const b=BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12)+(rnd()<.15?1:0))]; addBahan(b); out.push(b); }
+  if(rnd()<.12){ const b=BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12)+(rnd()<.15?1:0))]; addBahan(b); out.push(b); }
   // barang bawaan (hasil rampasan dari monster kita) kembali ke kastil
   const got=[]; for(const e of p.bag||[]){ if(e.k==='eq'){ const it=genItem(e.lv,e.r,{s:e.s,n:e.n,from:e.from}); it.r=e.r; got.push(it.n+' ('+RARITY[it.r]+')'); } else { addBahan(e.n,e.t); got.push(e.n); } }
   if(got.length){ out.push(got[0]); if(got.length>1||(p.bag||[]).some(e=>e.k!=='mat')) log(`Dari jasad ${p.name}, Mira memungut ${got.slice(0,4).join(', ')}${got.length>4?', …':''} untuk gudang.`,'evo'); } p.bag=[];
-  if(hero||rnd()<.14+p.lv*.002){ const gear=JOB_GEAR[p.job]; const sl=rnd()<.5?'senjata':rnd()<.7?'zirah':'aksesori'; const idx={senjata:0,zirah:1,aksesori:2}[sl];
+  if(hero||rnd()<Math.min(.07,.025+p.lv*.0004)){ const gear=JOB_GEAR[p.job]; const sl=rnd()<.5?'senjata':rnd()<.7?'zirah':'aksesori'; const idx={senjata:0,zirah:1,aksesori:2}[sl];
     const nm=gear?pick(gear[idx])+(p.el?' '+ELEM_BY[p.el].n:''):null; const it=genItem(p.lv,hero?3:null,{s:sl,n:nm||undefined,from:`${p.name} (${JOBS[p.job].n})`}); out.push(it.n);
     if(it.r>=2||hero||rnd()<.3) log(`${p.name} (${JOBS[p.job].n}) menjatuhkan ${it.n} (${RARITY[it.r]})! Mira menyimpannya di gudang.`,'evo'); }
   if(out.length) say(a.x,a.floor,'+'+out[out.length-1],'#c8f0a0',1.6);
@@ -254,7 +254,7 @@ function hitMon(m,amt,a,opts){
 function monLoot(m,a){
   if(!a||m.temp) return; const p=G.people[a.pid]; if(!p) return; const T=dropTheme(m.sp); const s=SPECIES[m.sp]; const rk=RANK_ORDER.indexOf(s.rank);
   p.bag=p.bag||[]; const r=rnd();
-  if(r<.04+rk*.006){ const slot=pick(Object.keys(EQ_SLOT)); const n=pick(T.eq[slot]); const e={k:'eq',s:slot,n,r:Math.min(4,T.rar+(rnd()<.1?1:0)),lv:m.lv+rk*4,from:s.n}; p.bag.push(e);
+  if(r<.015+rk*.003){ const slot=pick(Object.keys(EQ_SLOT)); const n=pick(T.eq[slot]); const e={k:'eq',s:slot,n,r:Math.min(4,T.rar+(rnd()<.1?1:0)),lv:m.lv+rk*4,from:s.n}; p.bag.push(e);
     const lvB=e.lv; const mul=1+e.r*.55; if(slot==='senjata') p.eq.atk+=(1+lvB*.5)*1.1*mul; else if(slot==='zirah'){ p.eq.hp+=(12+lvB*4)*mul; p.eq.def+=(1+lvB*.3)*mul; } else p.eq.atk+=(1+lvB*.5)*.35*mul;
     say(m.x,m.floor,n+'!','#ffd36a',1.6); log(`${p.name} (${JOBS[p.job].n}) memungut ${n} (${RARITY[e.r]}) dari ${m.name} si ${s.n} yang tumbang!`,'warn'); }
   else if(r<.1+rk*.008){ p.bag.push({k:'core',n:T.core,t:Math.min(6,T.tier+1)}); say(m.x,m.floor,T.core,'#c8a0ff',1.4); }
