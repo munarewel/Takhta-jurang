@@ -36,3 +36,21 @@ const SKILL_EN={knight:'Steel Guard',mage:'Fireball',priest:'Healing Light',arch
   hydromancer:'Tidal Wave',aeromancer:'Mini Tornado',geomancer:'Stone Spear',enchanter:'Shining Weapon',runeKnight:'Rune Blade',beastmaster:'Pack Charge',saint:'Miracle',hero:"Hero's Slash",
   weaponMaster:'Thousand Weapons',duelist:'Elegant Thrust',miner:'Pickaxe Smash',cook:'Warm Soup',farmer:'Hoe Swing',monsterHunter:"Hunter's Slash",tamer:'Summon Mount'};
 for(const k in SKILL_EN) if(JOBS[k]) JOBS[k].skill.n=SKILL_EN[k];
+// perlengkapan khas tiap kelas (bisa jatuh saat petualang tewas)
+const JOB_GEAR_EN={knight:[['Knight Sword','Longsword'],['Knight Armor','Tower Shield'],['Knight Badge']],mage:[['Magic Staff'],['Mage Robe'],['Mana Ring']],priest:[['Holy Mace'],['Priest Robe'],['Silver Rosary']],
+  archer:[['Longbow'],['Archer Vest'],['Archer Gloves']],thief:[['Thief Dagger'],['Dark Cloak'],['Magic Key']],dualblade:[['Twin Blades'],['Light Armor'],['Blade Belt']],
+  lancer:[['Long Spear'],['Lancer Armor'],['Small Banner']],monk:[['Fist Wraps'],['Monk Garb'],['Prayer Beads']],berserker:[['Giant Axe'],['Beast Hide'],['Fang Necklace']],
+  paladin:[['Holy Sword'],['Holy Armor','Holy Shield'],['Light Pendant']],ranger:[['Ranger Bow'],['Forest Cloak'],['Worn Map']],bard:[['Lute'],['Bard Outfit'],['Feather Hat']],
+  samurai:[['Katana'],['Samurai Armor'],['Shrine Charm']],ninja:[['Shuriken','Kunai'],['Ninja Garb'],['Ninja Headband']],necro:[['Skull Staff'],['Death Robe'],['Black Grimoire']],
+  druid:[['Root Staff'],['Leaf Robe'],['Twig Crown']],alkemis:[['Potion Bomb'],['Alchemist Apron'],['Bottle Pouch']],summoner:[['Summoner Staff'],['Spirit Robe'],['Contract Stone']],
+  sage:[['Sage Staff'],['Grand Robe'],['Ancient Tome']],dragoon:[['Dragon Lance'],['Dragon Armor'],['Dragon Crest']],swordmaster:[["King's Sword"],["Sword King's Plate"],["Champion's Belt"]],
+  sniper:[['Sniper Bow'],['Camo Vest'],['Spyglass']],axeman:[['War Axe'],['Chainmail'],['Iron Bracer']],darkmage:[['Staff of Darkness'],['Black Robe'],['Dark Crystal Orb']],
+  hunter:[['Hunting Bow'],['Leather Jacket'],['Trophy Fang']],cleric:[['Healing Staff'],['White Robe'],['Holy Potion']],hydromancer:[['Wave Staff'],['Sea Robe'],['Blue Pearl']],
+  aeromancer:[['Wind Staff'],['Storm Robe'],['Eagle Feather']],geomancer:[['Stone Staff'],['Earth Robe'],['Philosopher Stone']],enchanter:[['Rune Staff'],['Enchanter Robe'],['Rune Ring']],
+  runeKnight:[['Rune Blade'],['Rune Armor'],['Rune Crest']],beastmaster:[['Tamer Whip'],['Hide Vest'],['Beast Whistle']],saint:[['Saint Staff'],['Saint Robe'],['Little Halo']],
+  hero:[["Hero's Sword"],["Hero's Armor"],["Hero's Crest"]],weaponMaster:[['Master Sword','Master Spear'],['Weapon Master Plate'],['Weapon Belt']],duelist:[['Rapier'],['Noble Shirt'],['White Gloves']],
+  miner:[['Pickaxe'],['Mining Helmet'],['Mining Lamp']],cook:[['Kitchen Knife','Iron Pan'],['Chef Apron'],['Chef Hat']],farmer:[['Hoe'],['Farmer Clothes'],['Straw Hat']],
+  monsterHunter:[['Monster Slayer Blade'],['Monster Hide Armor'],['Fang Trophy']],tamer:[['Tamer Whip'],['Small Saddle'],['Tamer Whistle']],
+  fistKing:[['Dragon Gauntlets'],['Fist King Gi'],['Champion Belt']],spearGod:[['Heaven Spear'],['Spear God Armor'],['Thunder Tassel']],iceQueen:[['Frost Scepter'],['Ice Queen Gown'],['Snow Tiara']],
+  arrowQueen:[['Queen Bow'],['Royal Hunter Cloak'],['Golden Quiver']],stormLord:[['Storm Staff'],['Tempest Robe'],['Thunder Crown']]};
+for(const k in JOB_GEAR_EN) JOB_GEAR[k]=JOB_GEAR_EN[k];

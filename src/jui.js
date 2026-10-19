@@ -16,7 +16,7 @@ function itemTxt(it){ const s=itemStats(it); const p=[]; if(s.atk) p.push(`+${Ma
 function pct(p){ return p>=1?'pasti':p>=.1?Math.round(p*100)+'%':(p*100).toFixed(p>=.01?1:2).replace('.',',')+'%'; }
 function dropListHtml(list,note){ return `<div class="sec"><h3>Daftar drop</h3>${note?`<p class="note">${note}</p>`:''}<div class="abl">${list.map(d=>{
   const tag=d.k==='eq'?`${rarTag(d.r)}<em>${EQ_SLOT[d.s]}</em>`:d.k==='core'?`<em>inti · tingkat ${d.t+1}</em>`:d.k==='mat'?`<em>bahan · tingkat ${d.t+1}</em>`:'';
-  const info=d.k==='eq'?`<br><span class="note">${itemTxt(d.it)} · dijual ±${itemValue(d.it)} emas</span>`:d.k==='core'?'<br><span class="note">Bahan tempa bermutu tinggi.</span>':d.k==='mat'?'<br><span class="note">Bahan untuk menempa perlengkapan.</span>':`<br><span class="note">±${d.v} emas</span>`;
+  const info=d.k==='eq'?`<br><span class="note">${itemTxt(d.it)} · dijual ±${itemValue(d.it)} emas</span>`:d.k==='core'?'<br><span class="note">Bahan tempa bermutu tinggi.</span>':d.k==='mat'?'<br><span class="note">Bahan untuk menempa perlengkapan.</span>':`<br><span class="note">±${d.v} ${d.n.toLowerCase()}</span>`;
   return `<div><b>${esc(d.n)}</b> ${tag}<span style="float:right;font-family:var(--display);color:var(--gold)">${pct(d.p)}</span>${info}</div>`; }).join('')}</div></div>`; }
 function itemName(it){ return `${esc(it.n)}${it.lv?` +${it.lv}`:''}`; }
 function rarTag(r){ const n=RARITY[r]; return `<span class="rar" style="background:${RAR_COL[n]}">${n}</span>`; }
@@ -89,7 +89,7 @@ function pMonList(){
 /* gudang perlengkapan */
 function pGudang(){
   let h=`<div class="btns"><button class="btn" data-act="tabMon">Monster</button><button class="btn pri">Gudang</button></div>
-  <p class="note">Perlengkapan dibeli dari pedagang, lalu ditempa dengan emas dan mana. Pasang dari halaman detail monster.</p>
+  <p class="note">Perlengkapan didapat dari petualang yang tewas (kadang-kadang) atau dibeli dari pedagang, lalu ditempa dengan emas dan mana. Pasang dari halaman detail monster.</p>
   <div class="btns"><button class="btn pri" data-act="buyItem">Beli perlengkapan acak · 250 emas</button></div>`;
   const list=G.inv.slice().sort((a,b)=>b.r-a.r||b.lv-a.lv);
   h+=`<div class="sec"><h3>Perlengkapan (${list.length})</h3>${list.length?'':'<p class="note">Gudang masih kosong.</p>'}<div class="abl">${list.map(it=>{ const w=it.on&&G.mons.find(m=>m.id===it.on); const c=forgeCost(it);
@@ -148,8 +148,8 @@ function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
   const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
-  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
-  return {t:'Petualang',h};
+  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
+  return {t:'Petualang',h:h+dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, kita dapat emas, mana, dan jiwa. Kadang ia juga menjatuhkan perlengkapan khas kelasnya; kelas berbintang tinggi lebih sering dan lebih langka.')};
 }
 /* raja */
 function pRaja(){

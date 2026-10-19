@@ -62,9 +62,10 @@ function monDropTable(m){ const s=SPECIES[m.sp]; const T=dropTheme(m.sp); const 
   const out=[{k:'mat',n:T.mat,p:pm,t:T.tier},{k:'core',n:T.core,p:pc,t:Math.min(6,T.tier+1)}];
   for(const sl of Object.keys(EQ_SLOT)) for(const n of T.eq[sl]) out.push({k:'eq',n,s:sl,p:pe/3/T.eq[sl].length,r:Math.min(4,T.rar),it:itemPreview(sl,lv,Math.min(4,T.rar))});
   return out; }
-function advDropTable(p){ const gear=JOB_GEAR[p.job]; const pg=Math.min(.07,.025+p.lv*.0004); const out=[{k:'gold',n:'Emas',v:Math.round(p.gold*.8+p.lv*4),p:1},{k:'mat',n:BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12))],p:.12,t:Math.min(BAHAN.length-1,Math.floor(p.lv/12))}];
-  const r=Math.min(4,Math.floor(p.lv/30)); const sp={senjata:.5,zirah:.35,aksesori:.15};
-  if(gear) for(const sl of Object.keys(EQ_SLOT)){ const names=gear[{senjata:0,zirah:1,aksesori:2}[sl]]; for(const n0 of names){ const n=n0+(p.el?' '+ELEM_BY[p.el].n:''); out.push({k:'eq',n,s:sl,p:pg*sp[sl]/names.length,r,it:itemPreview(sl,p.lv,r)}); } }
+function advDropTable(p){ const gear=JOB_GEAR[p.job]; const pg=advGearP(p); const r=advGearR(p,false);
+  const out=[{k:'gold',n:'Emas',v:Math.round(p.gold*.8+p.lv*4),p:1},{k:'res',n:'Mana',v:5+p.lv,p:1},{k:'res',n:'Jiwa',v:1+Math.floor(p.lv/10),p:1}];
+  const sp={senjata:.5,zirah:.35,aksesori:.15};
+  if(gear) for(const sl of Object.keys(EQ_SLOT)){ const names=gear[{senjata:0,zirah:1,aksesori:2}[sl]]; for(const n0 of names){ const n=n0+(p.el?' of '+ELEM_BY[p.el].n:''); out.push({k:'eq',n,s:sl,p:pg*sp[sl]/names.length,r,it:itemPreview(sl,p.lv,r)}); } }
   return out; }
 function itemValue(it){ return Math.round(30*(1+it.r*1.6)*(1+(it.lv||0)*.5)); }
 function equipItem(m,it){ if(!it) return 'Barang tidak ada.'; m.eq=m.eq||{}; if(it.on&&it.on!==m.id){ const o=G.mons.find(x=>x.id===it.on); if(o&&o.eq) delete o.eq[it.s]; }
@@ -77,7 +78,13 @@ function forgeItem(it){ if(it.lv>=10) return 'Sudah +10.'; const c=forgeCost(it)
   G.gold-=c.gold; G.mana-=c.mana; it.lv++; return null; }
 function sellItem(it){ if(it.on){ const m=G.mons.find(x=>x.id===it.on); if(m) unequip(m,it.s); } G.inv=G.inv.filter(x=>x!==it); G.gold+=itemValue(it); }
 function buyItem(){ const c=250; if(G.gold<c) return `Emas kurang (butuh ${c}).`; G.gold-=c; return genItem(Math.max(1,fameLv()*.6)); }
-function advDrops(p){ p.bag=[]; }
+function advGearP(p){ return Math.min(.08,.025+p.lv*.0004)*(1+(JOBS[p.job].star-2)*.15); }
+function advGearR(p,hero){ return hero?3:Math.max(0,JOBS[p.job].star-3); }
+function advDrops(p,a,hero){ p.bag=[];
+  if(hero||rnd()<advGearP(p)){ const gear=JOB_GEAR[p.job]; const sl=rnd()<.5?'senjata':rnd()<.7?'zirah':'aksesori'; const idx={senjata:0,zirah:1,aksesori:2}[sl];
+    const nm=gear?pick(gear[idx])+(p.el?' of '+ELEM_BY[p.el].n:''):null; const it=genItem(p.lv,advGearR(p,hero),{s:sl,n:nm||undefined,from:`${p.name} (${JOBS[p.job].n})`});
+    say(a.x,a.floor,'+'+it.n,'#c8f0a0',1.6);
+    if(it.r>=2||hero||rnd()<.3) log(`${p.name} (${jobTag(p.job)}) menjatuhkan ${it.n} (${RARITY[it.r]})! Mira menyimpannya di gudang.`,'evo'); } }
 function monAtkEl(m){ for(const ab of m.abil){ const A=ABIL[ab]; if(A&&A.eff==='elemAtk') return A.el; } return SPECIES[m.sp].el||(FIRE_MK.has(SPECIES[m.sp].mk)?'api':ICE_MK.has(SPECIES[m.sp].mk)?'es':''); }
 function monDefEl(m){ const s=SPECIES[m.sp]; return s.el||(FIRE_MK.has(s.mk)?'api':ICE_MK.has(s.mk)?'es':''); }
 function applyStatus(a,st,m,d){ const p=G.people[a.pid];
@@ -223,7 +230,7 @@ function advDie(a,src){
   fxAt('soul',a.x,a.floor,'#c08aff',1);
   say(a.x,a.floor,`+${Math.round(gold)}G`,'#ffd36a',1.4);
   lordGainExp(p.lv*6+10);
-  p.bag=[];
+  advDrops(p,a,pa&&pa.hero);
   let killer='jebakan';
   if(src&&src.kind==='m'){ const m=src.u; m.kills++; if(m.abil.includes('serapJiwa')){ const ms=monStats(m); m.hp=Math.min(ms.hp,m.hp+ms.hp*.3); } m.loy=Math.min(100,m.loy+1); monGainExp(m,p.lv*14+20); killer=`${m.name} (${SPECIES[m.sp].n})`; }
   else if(src&&src.kind==='l'){ G.lord.kills++; killer=`Raja Iblis ${G.lord.name}`; }
