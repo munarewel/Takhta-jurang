@@ -263,7 +263,7 @@ function monLoot(m,a){
   p.bag=p.bag||[]; const r=rnd();
   if(r<.015+rk*.003){ const slot=pick(Object.keys(EQ_SLOT)); const n=pick(T.eq[slot]); const e={k:'eq',s:slot,n,r:Math.min(4,T.rar+(rnd()<.1?1:0)),lv:m.lv+rk*4,from:s.n}; p.bag.push(e);
     const lvB=e.lv; const mul=1+e.r*.55; if(slot==='senjata') p.eq.atk+=(1+lvB*.5)*1.1*mul; else if(slot==='zirah'){ p.eq.hp+=(12+lvB*4)*mul; p.eq.def+=(1+lvB*.3)*mul; } else p.eq.atk+=(1+lvB*.5)*.35*mul;
-    say(m.x,m.floor,n+'!','#ffd36a',1.6); log(`${p.name} (${JOBS[p.job].n}) memungut ${n} (${RARITY[e.r]}) dari ${m.name} si ${s.n} yang tumbang!`,'warn'); }
+    say(m.x,m.floor,n+'!','#ffd36a',1.6); log(`${p.name} (${jobTag(p.job)}) memungut ${n} (${RARITY[e.r]}) dari ${m.name} si ${s.n} yang tumbang!`,'warn'); }
   else if(r<.1+rk*.008){ p.bag.push({k:'core',n:T.core,t:Math.min(6,T.tier+1)}); say(m.x,m.floor,T.core,'#c8a0ff',1.4); }
   else if(r<.4){ p.bag.push({k:'mat',n:T.mat,t:T.tier}); }
   if(p.bag.length>12) p.bag.shift();
@@ -272,6 +272,7 @@ function monDie(m,a){
   m.dead=true; m.hp=0; m.reviveAt=G.t+60; m.loy=Math.max(0,m.loy-3); m.fx={};
   fxAt('poof',m.x,m.floor,'#a89ab8',.8);
   if(a){ const p=G.people[a.pid]; if(p){ p.kills++; p.exp+=m.lv*10+20; } }
+  monLoot(m,a);
   if(m.secret){ const fx=G.fix[m.secret.f]&&G.fix[m.secret.f][m.secret.slot]; if(fx&&fx.found&&a&&secretMons(fx).every(g=>g.dead)){ const pa=G.parties.find(x=>x.id===a.party); const bonus=60+m.secret.f*35; if(pa){ pa.loot+=bonus; for(const p of partyMembers(pa)){ p.gold+=Math.round(bonus/Math.max(1,pa.members.length)); p.eq.atk+=2; } } G.pop+=10; log(`${pa?pa.name:'Seseorang'} menaklukkan penjaga ruang rahasia lantai ${m.secret.f+1} dan membawa pulang harta tersembunyi (${bonus} emas). Kabarnya cepat menyebar!`,'warn'); } }
 }
 function hitLord(amt,a,opts){

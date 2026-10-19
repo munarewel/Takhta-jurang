@@ -736,17 +736,17 @@ function learnset(sid){
 /* ---------- drop sesuai monster ---------- */
 const FIRE_MK=new Set(['redDragon','nagaMerahTua','salamander','salamanderLava','phoenix','volcanosaur','impApi','iblisApi','anjingLava','anjingMagma','kura','kuraVulkan','kuraTitan','golemMagma','golemInti','bayiNaga','nagaRemaja','nagaDewasa','nagaPurba']);
 const ICE_MK=new Set(['nagaEs','nagaEsPurba','golemEs','golemGletser','yeti','yetiRaja','serigalaSalju','serigalaEs','snowman','snowmanRaksasa','rajaSalju','penguin','penguinKaisar']);
-const DROP_NAMES={slime:['Pecahan Slime','Inti Slime',['Cambuk Lendir'],['Zirah Lendir'],['Cincin Slime']],skel:['Tulang Tua','Inti Kerangka',['Pedang Besi','Kapak Besi'],['Zirah Besi','Perisai Tulang'],['Kalung Tulang']],
-  mayat:['Kain Kafan','Inti Mayat',['Belati Karat'],['Jubah Kafan'],['Jimat Makam']],goblin:['Telinga Goblin','Inti Goblin',['Belati Goblin','Gada Goblin'],['Zirah Kulit Goblin'],['Kalung Gigi']],
-  orc:['Taring Orc','Inti Orc',['Kapak Besar','Gada Duri'],['Zirah Kulit Tebal'],['Gelang Prajurit']],iblis:['Tanduk Iblis','Inti Iblis',['Sabit Neraka','Cambuk Neraka'],['Zirah Neraka'],['Mahkota Duri']],
-  naga:['Sisik Naga','Inti Naga',['Pedang Naga','Tombak Taring Naga'],['Zirah Sisik Naga'],['Taring Naga']],mesin:['Baut Logam','Inti Mesin',['Pedang Laser','Gada Batu'],['Zirah Mesin','Zirah Batu'],['Chip Kuno','Cincin Rune']],
-  roh:['Debu Roh','Inti Roh',['Sabit Roh'],['Jubah Roh'],['Liontin Roh']],terbang:['Bulu Langka','Inti Angin',['Busur Bulu'],['Jubah Bulu'],['Anting Bulu']],tanaman:['Getah Hutan','Inti Hutan',['Tongkat Akar'],['Zirah Kulit Kayu'],['Mahkota Daun']],
-  cangkang:['Pecahan Cangkang','Inti Serangga',['Tombak Sengat'],['Zirah Cangkang'],['Jimat Racun']],prajurit:['Sabuk Pendekar','Inti Ksatria',['Katana','Tongkat Sakti'],['Baju Pendekar'],['Ikat Kepala']],
-  buas:['Taring Buas','Inti Buas',['Cakar Buas','Gada Taring'],['Jubah Bulu Buas'],['Kalung Taring']],hum:['Lencana Rusak','Inti Jiwa',['Pedang Tua'],['Zirah Rantai'],['Cincin Tembaga']]};
+const DROP_NAMES={slime:['Slime Shard','Slime Core',['Slime Whip'],['Slime Armor'],['Slime Ring']],skel:['Old Bone','Skeleton Core',['Iron Sword','Iron Axe'],['Iron Armor','Bone Shield'],['Bone Necklace']],
+  mayat:['Burial Cloth','Corpse Core',['Rusty Dagger'],['Shroud Robe'],['Tomb Charm']],goblin:['Goblin Ear','Goblin Core',['Goblin Dagger','Goblin Club'],['Goblin Hide Armor'],['Tooth Necklace']],
+  orc:['Orc Tusk','Orc Core',['Great Axe','Spiked Club'],['Thick Hide Armor'],['Warrior Bracelet']],iblis:['Demon Horn','Demon Core',['Hell Scythe','Hell Whip'],['Hell Armor'],['Thorn Crown']],
+  naga:['Dragon Scale','Dragon Core',['Dragon Sword','Dragon Fang Spear'],['Dragon Scale Armor'],['Dragon Fang']],mesin:['Metal Bolt','Machine Core',['Laser Sword','Stone Mace'],['Mech Armor','Stone Armor'],['Ancient Chip','Rune Ring']],
+  roh:['Spirit Dust','Spirit Core',['Spirit Scythe'],['Spirit Robe'],['Spirit Pendant']],terbang:['Rare Feather','Wind Core',['Feather Bow'],['Feather Cloak'],['Feather Earring']],tanaman:['Forest Sap','Forest Core',['Root Staff'],['Bark Armor'],['Leaf Crown']],
+  cangkang:['Shell Fragment','Insect Core',['Stinger Spear'],['Shell Armor'],['Venom Charm']],prajurit:['Warrior Sash','Knight Core',['Katana','Monkey Staff'],['Warrior Garb'],['Headband']],
+  buas:['Beast Fang','Beast Core',['Beast Claw','Fang Club'],['Beast Fur Cloak'],['Fang Necklace']],hum:['Broken Badge','Soul Core',['Old Sword'],['Chainmail'],['Copper Ring']]};
 function dropTheme(sid){ const s=SPECIES[sid], M=MON[s.mk]; const g=monGroup(M); const D=DROP_NAMES[g]||DROP_NAMES.buas;
-  const el=s.el?ELEM_BY[s.el].n:FIRE_MK.has(s.mk)?'Api':ICE_MK.has(s.mk)?'Es':'';
-  const tier=Math.min(6,RANK_ORDER.indexOf(s.rank)); const base=M.n;
-  return {mat:(D[0]+(el?' '+el:'')),core:`Inti ${base}`,eq:{senjata:D[2].map(n=>n+(el?' '+el:'')),zirah:D[3].map(n=>n+(el?' '+el:'')),aksesori:D[4].map(n=>n+(el?' '+el:''))},tier,rar:Math.min(4,s.rar),from:s.n}; }
+  const el=s.el?ELEM_BY[s.el].n:FIRE_MK.has(s.mk)?'Fire':ICE_MK.has(s.mk)?'Ice':'';
+  const tier=Math.min(6,RANK_ORDER.indexOf(s.rank)); const base=M.n; const pre=n=>(el?el+' ':'')+n;
+  return {mat:pre(D[0]),core:`${base} Core`,eq:{senjata:D[2].map(pre),zirah:D[3].map(pre),aksesori:D[4].map(pre)},tier,rar:Math.min(4,s.rar),from:s.n}; }
 
 /* ---------- elemen (pengali variasi spesies) ---------- */
 const ELEM=[
@@ -1332,7 +1332,7 @@ function monLoot(m,a){
   p.bag=p.bag||[]; const r=rnd();
   if(r<.015+rk*.003){ const slot=pick(Object.keys(EQ_SLOT)); const n=pick(T.eq[slot]); const e={k:'eq',s:slot,n,r:Math.min(4,T.rar+(rnd()<.1?1:0)),lv:m.lv+rk*4,from:s.n}; p.bag.push(e);
     const lvB=e.lv; const mul=1+e.r*.55; if(slot==='senjata') p.eq.atk+=(1+lvB*.5)*1.1*mul; else if(slot==='zirah'){ p.eq.hp+=(12+lvB*4)*mul; p.eq.def+=(1+lvB*.3)*mul; } else p.eq.atk+=(1+lvB*.5)*.35*mul;
-    say(m.x,m.floor,n+'!','#ffd36a',1.6); log(`${p.name} (${JOBS[p.job].n}) memungut ${n} (${RARITY[e.r]}) dari ${m.name} si ${s.n} yang tumbang!`,'warn'); }
+    say(m.x,m.floor,n+'!','#ffd36a',1.6); log(`${p.name} (${jobTag(p.job)}) memungut ${n} (${RARITY[e.r]}) dari ${m.name} si ${s.n} yang tumbang!`,'warn'); }
   else if(r<.1+rk*.008){ p.bag.push({k:'core',n:T.core,t:Math.min(6,T.tier+1)}); say(m.x,m.floor,T.core,'#c8a0ff',1.4); }
   else if(r<.4){ p.bag.push({k:'mat',n:T.mat,t:T.tier}); }
   if(p.bag.length>12) p.bag.shift();
@@ -1341,6 +1341,7 @@ function monDie(m,a){
   m.dead=true; m.hp=0; m.reviveAt=G.t+60; m.loy=Math.max(0,m.loy-3); m.fx={};
   fxAt('poof',m.x,m.floor,'#a89ab8',.8);
   if(a){ const p=G.people[a.pid]; if(p){ p.kills++; p.exp+=m.lv*10+20; } }
+  monLoot(m,a);
   if(m.secret){ const fx=G.fix[m.secret.f]&&G.fix[m.secret.f][m.secret.slot]; if(fx&&fx.found&&a&&secretMons(fx).every(g=>g.dead)){ const pa=G.parties.find(x=>x.id===a.party); const bonus=60+m.secret.f*35; if(pa){ pa.loot+=bonus; for(const p of partyMembers(pa)){ p.gold+=Math.round(bonus/Math.max(1,pa.members.length)); p.eq.atk+=2; } } G.pop+=10; log(`${pa?pa.name:'Seseorang'} menaklukkan penjaga ruang rahasia lantai ${m.secret.f+1} dan membawa pulang harta tersembunyi (${bonus} emas). Kabarnya cepat menyebar!`,'warn'); } }
 }
 function hitLord(amt,a,opts){
@@ -3061,6 +3062,7 @@ function pMon(){
   if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
     h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemTxt(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
   h+=`</div>`;
+  h+=dropListHtml(monDropTable(m),'Drop ini dipungut petualang yang menumbangkan monster ini dan dibawa pulang. Kalau petualang itu tewas, barangnya hilang (tidak masuk gudang kita).');
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
     <label class="note">Lantai <select id="mFloor">${`<option value="-1" ${m.floor<0?'selected':''}>Cadangan</option>`+Array.from({length:G.floors},(_,f)=>`<option value="${f}" ${m.floor===f&&!m.secret?'selected':''} ${floorCount(f)>=FLOOR_CAP&&m.floor!==f?'disabled':''}>L${f+1} (${floorCount(f)}/${FLOOR_CAP})</option>`).join('')}</select></label>
     <label class="note">Strategi <select id="mStrat">${Object.entries(STRAT).map(([k,v])=>`<option value="${k}" ${m.strat===k?'selected':''}>${v}</option>`).join('')}</select></label>
@@ -3093,7 +3095,7 @@ function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
   const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
-  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
+  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Barang jarahan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
   return {t:'Petualang',h:h+dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, kita dapat emas, mana, dan jiwa. Kadang ia juga menjatuhkan perlengkapan khas kelasnya; kelas berbintang tinggi lebih sering dan lebih langka.')};
 }
 /* raja */

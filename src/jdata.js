@@ -92,17 +92,17 @@ function learnset(sid){
 /* ---------- drop sesuai monster ---------- */
 const FIRE_MK=new Set(['redDragon','nagaMerahTua','salamander','salamanderLava','phoenix','volcanosaur','impApi','iblisApi','anjingLava','anjingMagma','kura','kuraVulkan','kuraTitan','golemMagma','golemInti','bayiNaga','nagaRemaja','nagaDewasa','nagaPurba']);
 const ICE_MK=new Set(['nagaEs','nagaEsPurba','golemEs','golemGletser','yeti','yetiRaja','serigalaSalju','serigalaEs','snowman','snowmanRaksasa','rajaSalju','penguin','penguinKaisar']);
-const DROP_NAMES={slime:['Pecahan Slime','Inti Slime',['Cambuk Lendir'],['Zirah Lendir'],['Cincin Slime']],skel:['Tulang Tua','Inti Kerangka',['Pedang Besi','Kapak Besi'],['Zirah Besi','Perisai Tulang'],['Kalung Tulang']],
-  mayat:['Kain Kafan','Inti Mayat',['Belati Karat'],['Jubah Kafan'],['Jimat Makam']],goblin:['Telinga Goblin','Inti Goblin',['Belati Goblin','Gada Goblin'],['Zirah Kulit Goblin'],['Kalung Gigi']],
-  orc:['Taring Orc','Inti Orc',['Kapak Besar','Gada Duri'],['Zirah Kulit Tebal'],['Gelang Prajurit']],iblis:['Tanduk Iblis','Inti Iblis',['Sabit Neraka','Cambuk Neraka'],['Zirah Neraka'],['Mahkota Duri']],
-  naga:['Sisik Naga','Inti Naga',['Pedang Naga','Tombak Taring Naga'],['Zirah Sisik Naga'],['Taring Naga']],mesin:['Baut Logam','Inti Mesin',['Pedang Laser','Gada Batu'],['Zirah Mesin','Zirah Batu'],['Chip Kuno','Cincin Rune']],
-  roh:['Debu Roh','Inti Roh',['Sabit Roh'],['Jubah Roh'],['Liontin Roh']],terbang:['Bulu Langka','Inti Angin',['Busur Bulu'],['Jubah Bulu'],['Anting Bulu']],tanaman:['Getah Hutan','Inti Hutan',['Tongkat Akar'],['Zirah Kulit Kayu'],['Mahkota Daun']],
-  cangkang:['Pecahan Cangkang','Inti Serangga',['Tombak Sengat'],['Zirah Cangkang'],['Jimat Racun']],prajurit:['Sabuk Pendekar','Inti Ksatria',['Katana','Tongkat Sakti'],['Baju Pendekar'],['Ikat Kepala']],
-  buas:['Taring Buas','Inti Buas',['Cakar Buas','Gada Taring'],['Jubah Bulu Buas'],['Kalung Taring']],hum:['Lencana Rusak','Inti Jiwa',['Pedang Tua'],['Zirah Rantai'],['Cincin Tembaga']]};
+const DROP_NAMES={slime:['Slime Shard','Slime Core',['Slime Whip'],['Slime Armor'],['Slime Ring']],skel:['Old Bone','Skeleton Core',['Iron Sword','Iron Axe'],['Iron Armor','Bone Shield'],['Bone Necklace']],
+  mayat:['Burial Cloth','Corpse Core',['Rusty Dagger'],['Shroud Robe'],['Tomb Charm']],goblin:['Goblin Ear','Goblin Core',['Goblin Dagger','Goblin Club'],['Goblin Hide Armor'],['Tooth Necklace']],
+  orc:['Orc Tusk','Orc Core',['Great Axe','Spiked Club'],['Thick Hide Armor'],['Warrior Bracelet']],iblis:['Demon Horn','Demon Core',['Hell Scythe','Hell Whip'],['Hell Armor'],['Thorn Crown']],
+  naga:['Dragon Scale','Dragon Core',['Dragon Sword','Dragon Fang Spear'],['Dragon Scale Armor'],['Dragon Fang']],mesin:['Metal Bolt','Machine Core',['Laser Sword','Stone Mace'],['Mech Armor','Stone Armor'],['Ancient Chip','Rune Ring']],
+  roh:['Spirit Dust','Spirit Core',['Spirit Scythe'],['Spirit Robe'],['Spirit Pendant']],terbang:['Rare Feather','Wind Core',['Feather Bow'],['Feather Cloak'],['Feather Earring']],tanaman:['Forest Sap','Forest Core',['Root Staff'],['Bark Armor'],['Leaf Crown']],
+  cangkang:['Shell Fragment','Insect Core',['Stinger Spear'],['Shell Armor'],['Venom Charm']],prajurit:['Warrior Sash','Knight Core',['Katana','Monkey Staff'],['Warrior Garb'],['Headband']],
+  buas:['Beast Fang','Beast Core',['Beast Claw','Fang Club'],['Beast Fur Cloak'],['Fang Necklace']],hum:['Broken Badge','Soul Core',['Old Sword'],['Chainmail'],['Copper Ring']]};
 function dropTheme(sid){ const s=SPECIES[sid], M=MON[s.mk]; const g=monGroup(M); const D=DROP_NAMES[g]||DROP_NAMES.buas;
-  const el=s.el?ELEM_BY[s.el].n:FIRE_MK.has(s.mk)?'Api':ICE_MK.has(s.mk)?'Es':'';
-  const tier=Math.min(6,RANK_ORDER.indexOf(s.rank)); const base=M.n;
-  return {mat:(D[0]+(el?' '+el:'')),core:`Inti ${base}`,eq:{senjata:D[2].map(n=>n+(el?' '+el:'')),zirah:D[3].map(n=>n+(el?' '+el:'')),aksesori:D[4].map(n=>n+(el?' '+el:''))},tier,rar:Math.min(4,s.rar),from:s.n}; }
+  const el=s.el?ELEM_BY[s.el].n:FIRE_MK.has(s.mk)?'Fire':ICE_MK.has(s.mk)?'Ice':'';
+  const tier=Math.min(6,RANK_ORDER.indexOf(s.rank)); const base=M.n; const pre=n=>(el?el+' ':'')+n;
+  return {mat:pre(D[0]),core:`${base} Core`,eq:{senjata:D[2].map(pre),zirah:D[3].map(pre),aksesori:D[4].map(pre)},tier,rar:Math.min(4,s.rar),from:s.n}; }
 
 /* ---------- elemen (pengali variasi spesies) ---------- */
 const ELEM=[
