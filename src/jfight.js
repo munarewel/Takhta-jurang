@@ -8,7 +8,7 @@ const JOB_WPN={knight:'sword',mage:'staff',priest:'staffGold',archer:'bow',thief
   monsterHunter:'greatsword',tamer:'whip',fistKing:'fist',spearGod:'spearGold',iceQueen:'staffIce',arrowQueen:'bowGold',stormLord:'staffStorm'};
 // cara menyerang per jenis senjata
 const WPN_ANIM={sword:'slash',greatsword:'slash',katana:'slash',holy:'slash',runeblade:'slash',bigaxe:'slash',mace:'slash',pick:'slash',hoe:'slash',pan:'slash',darkstaff:'cast',
-  shield:'bash',gun:'gunshot',scythe:'slash',warhammer:'slash',claw:'punch',tome:'cast',bomb:'throw',dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
+  shield:'bash',gun:'gunshot',spyglass:'cast',scythe:'slash',warhammer:'slash',claw:'punch',tome:'cast',bomb:'throw',dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
   bow:'shoot',bowGold:'shoot',staff:'cast',staffGold:'cast',staffSkull:'cast',staffLeaf:'cast',staffCross:'cast',staffIce:'cast',staffStorm:'cast'};
 const WC=new Map();
 function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return c; c=document.createElement('canvas'); c.width=24; c.height=26; const g=c.getContext('2d');
@@ -48,6 +48,7 @@ function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return 
     case 'claw': Q(-1,-2,3,3,'#7a7a82'); Q(-1,-5,1,3,'#e8eef6'); Q(1,-5,1,3,'#e8eef6'); Q(0,-6,1,4,'#ffffff'); break;
     case 'tome': Q(-2,-4,5,6,gem||'#5a3a8a'); Q(-1,-3,3,4,'#e8e0c8'); Q(0,-3,1,4,'#8a7a6a'); break;
     case 'bomb': Q(-2,-4,4,4,'#2a2a2e'); Q(-1,-3,1,1,'#6a6a72'); Q(1,-6,1,2,'#8a6a3a'); Q(2,-7,1,1,'#ffb040'); break;
+    case 'spyglass': Q(0,-9,2,10,'#c8a050'); Q(0,-9,2,1,'#fff0b0'); Q(0,-4,2,1,'#6a4a2a'); Q(-1,-10,4,2,'#8a6a3a'); Q(0,-11,2,1,'#9fd0ff'); break;
     case 'darkstaff': Q(0,-14,1,17,'#2a1a2a'); Q(-1,-18,3,3,'#a01a3a'); Q(-2,-19,1,2,'#3a1a2a'); Q(2,-19,1,2,'#3a1a2a'); Q(0,-17,1,1,'#ff4a6a'); break;
   }
   WC.set(key,c); return c; }

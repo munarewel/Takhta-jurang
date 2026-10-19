@@ -450,13 +450,13 @@ function advTick(a,dt){
   if(tgt&&td<=reach&&!charmed){
     a.walk=0; a.face=Math.sign(tgt.u.x-a.x)||dir;
     if(a.cd.sk<=0){ useSkill(a,p,J,tgt,st,pa); a.cd.sk=J.skill.cd; return; }
-    if(a.cd.atk<=0){ a.cd.atk=1.05; if(a.fx.blind>G.t&&rnd()<.5){ say(a.x,f,'Meleset!','#cfd8e8',.8); return; } const crit=rnd()<.06; const mult=(a.fx.rage>G.t?1.6:1)*(a.fx.buff>G.t?1.25:1)*(a.fx.curse>G.t?.7:1);
+    if(a.cd.atk<=0){ a.cd.atk=1.05; if(a.fx.blind>G.t&&rnd()<.5){ say(a.x,f,'Meleset!','#cfd8e8',.8); return; } const crit=rnd()<.06||(a.fx.critNext>G.t&&!(a.fx.critNext=0)); const mult=(a.fx.rage>G.t?1.6:1)*(a.fx.buff>G.t?1.25:1)*(a.fx.curse>G.t?.7:1);
       a.atkT=G.t; a.atkK='atk'; { const pk=typeof projKindFor==='function'&&J.rng>20?projKindFor(p.job):null; if(pk) projAt(a.x,tgt.u.x,f,pk,p.el?(ELEM_BY[p.el]||{}).c:'#9fd0ff'); else fxAt(J.rng>20?(J.magic?'bolt':'arrow'):'slash',tgt.u.x,f,J.magic?'#9fd0ff':'#ffffff',.25); }
       if(tgt.k==='m') hitMon(tgt.u,st.atk,a,{mult,crit,magic:J.magic,ranged:J.rng>20}); else hitLord(st.atk,a,{mult,crit}); }
     return;
   }
   if(tgt&&td<60&&!charmed){ // dekati
-    const mv=24*dt*(a.fx.slow>G.t?.5:1); if(a.fx.root>G.t) return; a.x+=Math.sign(tgt.u.x-a.x)*mv; a.walk+=dt; a.face=Math.sign(tgt.u.x-a.x); return; }
+    const mv=24*dt*(a.fx.slow>G.t?.5:1)*(pa&&pa.spd||1); if(a.fx.root>G.t) return; a.x+=Math.sign(tgt.u.x-a.x)*mv; a.walk+=dt; a.face=Math.sign(tgt.u.x-a.x); return; }
   if(pa&&pa.retreat) return;
   // jaga barisan: tunggu anggota yang tertinggal di lantai yang sama
   const mates=G.advs.filter(x=>x.party===a.party&&x.floor===f&&x!==a);
@@ -465,7 +465,7 @@ function advTick(a,dt){
   if(ahead||restingMate){ a.walk=0; return; }
   if(a.fx.root>G.t) return;
   // maju
-  const nx=a.x+dir*20*dt*(a.fx.slow>G.t?.5:1);
+  const nx=a.x+dir*20*dt*(a.fx.slow>G.t?.5:1)*(pa&&pa.spd||1);
   // fasilitas di antara posisi lama dan baru
   for(let i=0;i<SLOTS;i++){ const sx=SLOT_X(i); if((a.x-sx)*(nx-sx)<=0&&(a.x!==sx)){ if(onFixture(a,p,pa,f,i)) return; } }
   a.x=nx; a.walk+=dt; a.face=dir;

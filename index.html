@@ -43,7 +43,7 @@ header{display:flex;flex-direction:column;gap:5px;padding-block:7px 6px;padding-
 .side{position:absolute;right:8px;bottom:62px;display:flex;flex-direction:column;gap:5px}
 .side button{width:36px;height:34px;border-radius:7px;border:1px solid var(--line);background:rgba(23,18,32,.92);font-family:var(--display);font-size:12px;color:var(--bone)}
 .side button[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
-.mira{position:absolute;left:8px;right:52px;bottom:8px;display:flex;align-items:flex-end;gap:6px;cursor:pointer}
+.mira{position:absolute;left:8px;right:52px;bottom:8px;display:flex;align-items:flex-end;gap:6px;pointer-events:none}.mira canvas{pointer-events:auto;cursor:pointer}.mira p{opacity:.93}
 .mira canvas{position:static;width:40px;height:45px;flex:0 0 auto;image-rendering:pixelated;background:var(--stone2);border:1px solid var(--line);border-radius:7px}
 .mira p{margin:0;background:rgba(33,26,44,.95);border:1px solid #6a3a5a;border-radius:9px 9px 9px 2px;padding:5px 9px;font-size:12.5px;line-height:1.3;color:#ffe0f0}
 .mira p b{color:var(--pink)}
@@ -1189,6 +1189,24 @@ function pickJobStar(tier){ const w=STAR_W[tier]||STAR_W.biasa; let r=rnd()*w.re
   let pool=JOB_KEYS.filter(k=>JOBS[k].star===st&&k!=='hero'&&!JOBS[k].special); if(!pool.length) pool=JOB_KEYS.filter(k=>k!=='hero'&&!JOBS[k].special); return pick(pool); }
 
 /* =====================================================================
+   TAKHTA JURANG — kelas tambahan: Medic Ninja, Navigator, dll
+   ===================================================================== */
+const NEWJOBS2=[
+ ['medicNinja','Medic Ninja',3,'healer',{n:'Healing Jutsu',cd:7,k:'heal',m:.35},'ninja',{base:'assassin',cloth:'#3a5a4a',pants:'#1a2a24'},'',['Luka kecil, biar kurawat.','Ninja medis tidak boleh tumbang duluan.'],[['Medical Kunai'],['Field Medic Garb'],['Herb Scroll']],['manusia','halfelf']],
+ ['navigator','Navigator',2,'support',{n:'Chart Course',cd:12,k:'buff'},'spyglass',{base:'bangsawan',cloth:'#2a4a6a',pants:'#3a2a1a'},'angin',['Kompasku bilang… lewat sini. Mungkin.','Peta lantai ini sudah kugambar!'],[['Brass Spyglass'],['Navigator Coat'],['Star Compass']],['manusia','halfelf','beastkin']],
+ ['captain','Captain',3,'melee',{n:"Captain's Order",cd:12,k:'buff'},'sword',{base:'pencuri',cloth:'#7a1a1a',pants:'#2a1a1a',trim:'#e3b75e'},'air',['Kru, ikuti aku!','Kapten tidak pernah meninggalkan kapalnya!'],[["Captain's Cutlass"],["Captain's Coat"],['Tricorn Hat']],['manusia','orc']],
+ ['scout','Scout',2,'ranged',{n:'Throwing Knives',cd:6,k:'multi',hits:3,m:.7},'ninja',{base:'pencuri',cloth:'#5a6a3a'},'',['Aku lihat ada jalan rahasia di sana.','Biar aku jalan duluan.'],[['Throwing Knife'],['Scout Cloak'],['Field Lens']],['halfelf','goblin','kobold']],
+ ['sentinel','Sentinel',3,'tank',{n:'Hold the Line',cd:12,k:'taunt'},'spear',{base:'kavaleri',cloth:'#4a5a6a'},'',['Tidak ada yang lewat selama aku berdiri.'],[['Sentinel Pike'],['Sentinel Mail'],['Watch Horn']],['dwarf','lizard']],
+ ['kunoichi','Kunoichi',3,'rogue',{n:'Shadow Bloom',cd:7,k:'crit',m:2.4},'ninja',{base:'assassin',cloth:'#5a1a3a',pants:'#1a1018',female:1},'bayang',['Jangan lengah… aku di belakangmu.'],[['Silk Kunai'],['Kunoichi Garb'],['Poison Hairpin']]],
+ ['swordSaint','Sword Saint',5,'melee',{n:'Thousand Petals',cd:8,k:'multi',hits:6,m:.75},'katana',{base:'pendekar',cloth:'#e8e0d0',pants:'#4a4a5a'},'',['Pedang ini tidak pernah ditarik dua kali.','…'],[['Saint Katana'],['Pilgrim Hakama'],['Bell Charm']]],
+ ['harpooner','Harpooner',2,'melee',{n:'Harpoon Toss',cd:8,k:'pierce',m:1.7},'spear',{base:'pendekarTombak',cloth:'#3a5a7a'},'air',['Ikan besar? Monster besar? Sama saja.'],[['Whale Harpoon'],['Oilskin Vest'],['Rope Coil']],['lizard','orc']],
+];
+for(const [k,n,star,ty,skill,wpn,look,el,lines,gear,races,special] of NEWJOBS2){
+  JOBS[k]=Object.assign({n,spr:look.base,look,skill,star},JSON.parse(JSON.stringify(JT[ty]))); if(special) JOBS[k].special=1; if(races) JOBS[k].races=races;
+  if(!JOB_KEYS.includes(k)) JOB_KEYS.push(k); JOB_LINES[k]=lines; if(el) JOB_EL[k]=[el]; JOB_GEAR[k]=gear; JOB_WPN_NEW[k]=wpn; }
+JOBS.scout.scout=1; JOBS.navigator.scout=1;
+
+/* =====================================================================
    TAKHTA JURANG — simulasi kastil
    ===================================================================== */
 const FW=200, FH=52, SLOTS=10, DT=1/30, DAY_LEN=120;
@@ -1640,13 +1658,13 @@ function advTick(a,dt){
   if(tgt&&td<=reach&&!charmed){
     a.walk=0; a.face=Math.sign(tgt.u.x-a.x)||dir;
     if(a.cd.sk<=0){ useSkill(a,p,J,tgt,st,pa); a.cd.sk=J.skill.cd; return; }
-    if(a.cd.atk<=0){ a.cd.atk=1.05; if(a.fx.blind>G.t&&rnd()<.5){ say(a.x,f,'Meleset!','#cfd8e8',.8); return; } const crit=rnd()<.06; const mult=(a.fx.rage>G.t?1.6:1)*(a.fx.buff>G.t?1.25:1)*(a.fx.curse>G.t?.7:1);
+    if(a.cd.atk<=0){ a.cd.atk=1.05; if(a.fx.blind>G.t&&rnd()<.5){ say(a.x,f,'Meleset!','#cfd8e8',.8); return; } const crit=rnd()<.06||(a.fx.critNext>G.t&&!(a.fx.critNext=0)); const mult=(a.fx.rage>G.t?1.6:1)*(a.fx.buff>G.t?1.25:1)*(a.fx.curse>G.t?.7:1);
       a.atkT=G.t; a.atkK='atk'; { const pk=typeof projKindFor==='function'&&J.rng>20?projKindFor(p.job):null; if(pk) projAt(a.x,tgt.u.x,f,pk,p.el?(ELEM_BY[p.el]||{}).c:'#9fd0ff'); else fxAt(J.rng>20?(J.magic?'bolt':'arrow'):'slash',tgt.u.x,f,J.magic?'#9fd0ff':'#ffffff',.25); }
       if(tgt.k==='m') hitMon(tgt.u,st.atk,a,{mult,crit,magic:J.magic,ranged:J.rng>20}); else hitLord(st.atk,a,{mult,crit}); }
     return;
   }
   if(tgt&&td<60&&!charmed){ // dekati
-    const mv=24*dt*(a.fx.slow>G.t?.5:1); if(a.fx.root>G.t) return; a.x+=Math.sign(tgt.u.x-a.x)*mv; a.walk+=dt; a.face=Math.sign(tgt.u.x-a.x); return; }
+    const mv=24*dt*(a.fx.slow>G.t?.5:1)*(pa&&pa.spd||1); if(a.fx.root>G.t) return; a.x+=Math.sign(tgt.u.x-a.x)*mv; a.walk+=dt; a.face=Math.sign(tgt.u.x-a.x); return; }
   if(pa&&pa.retreat) return;
   // jaga barisan: tunggu anggota yang tertinggal di lantai yang sama
   const mates=G.advs.filter(x=>x.party===a.party&&x.floor===f&&x!==a);
@@ -1655,7 +1673,7 @@ function advTick(a,dt){
   if(ahead||restingMate){ a.walk=0; return; }
   if(a.fx.root>G.t) return;
   // maju
-  const nx=a.x+dir*20*dt*(a.fx.slow>G.t?.5:1);
+  const nx=a.x+dir*20*dt*(a.fx.slow>G.t?.5:1)*(pa&&pa.spd||1);
   // fasilitas di antara posisi lama dan baru
   for(let i=0;i<SLOTS;i++){ const sx=SLOT_X(i); if((a.x-sx)*(nx-sx)<=0&&(a.x!==sx)){ if(onFixture(a,p,pa,f,i)) return; } }
   a.x=nx; a.walk+=dt; a.face=dir;
@@ -2108,6 +2126,48 @@ useSkill=function(a,p,J,tgt,st,pa){ const S=J.skill; if(S.k!=='shield'&&S.k!=='t
   else if(S.k==='taunt'){ a.fx.guard=G.t+6; for(const m of G.mons) if(!m.dead&&m.floor===f&&Math.abs(m.x-a.x)<80){ m.aggro=a.pid; m.aggroT=G.t; } fxAt('roar',a.x,f,'#ffd36a',.7); }
   else if(S.k==='drain'&&tgt){ const d=tgt.k==='m'?hitMon(tgt.u,st.atk,a,{mult:S.m,magic:J.magic}):hitLord(st.atk,a,{mult:S.m}); a.hp=Math.min(st.hp,a.hp+(d||0)*.6); fxAt('curse',tgt.u.x,f,'#c8203a',.6); }
 };
+
+/* =====================================================================
+   TAKHTA JURANG — party tambahan + pasif Dual Sword (Switch, Parry, Evade Master)
+   ===================================================================== */
+PARTY_THEME.push(
+  {id:'mistNinja',j:['ninja','ninja','medicNinja','kunoichi','assassin','scout'],sz:[3,5],n:['Ninjas of the Mist Village','Mist Village Shinobi','Hidden Mist Squad'],q:['Kabut adalah rumah kami.','(kabut tipis ikut masuk bersama mereka)','Misi dari desa: selidiki kastil ini. Jangan sampai ketahuan.','Ninja medis siap. Formasi kabut!']},
+  {id:'lostPirate',j:['pirate','pirate','navigator','captain','cannoneer','harpooner'],sz:[3,5],n:['Lost Compass Pirates','The Wrong Way Crew','Pirates of Nowhere'],q:['Navigator! Ini laut atau dungeon?!','Kompasnya muter-muter terus, Kapten!','Pokoknya harta karun pasti di sini… kayaknya.','Kita nyasar lagi, ya?'],lead:'Captain'},
+  {id:'durable',j:['guardian','templar','juggernaut','sentinel','knight','paladin'],sz:[4,5],n:['High Durability'],q:['Pukul saja. Kami tidak merasakan apa-apa.','Lambat tapi pasti. Seperti tembok berjalan.','Damage kami kecil, tapi kami tidak pernah mati.']},
+  {id:'fastClear',j:['ranger','archer','sniper','gunslinger','musketeer','spiritArcher','hunter','demonHunter','arrowQueen'],sz:[3,5],spd:1.35,n:['Fast Clear'],q:['Tembak dari jauh, lari, ulangi.','Target terkunci. Clear dalam lima menit.','Monster belum sempat mendekat, sudah tumbang.']},
+  {id:'dualSword',slots:[['dualblade'],['duelist']],sxs:['m','f'],passives:[['switch','parry','evadeMaster'],['switch']],extraHp:3,n:['Dual Sword'],q:['Kau kiri, aku kanan. Seperti biasa.','Kalau aku jatuh, kau gantikan. Kalau kau jatuh… aku gantikan.','Dua pedang, satu napas.']}
+);
+PARTY_THEME_BY.mistNinja=PARTY_THEME[PARTY_THEME.length-5]; for(const t of PARTY_THEME) PARTY_THEME_BY[t.id]=t;
+const PASSIVE_N={switch:'Switch',parry:'Parry',evadeMaster:'Evade Master'};
+const PASSIVE_D={switch:'Saat HP rendah, bertukar posisi dengan partner lalu minum potion.',parry:'20% menangkis serangan jarak dekat lalu membalas.',evadeMaster:'Menghindar +15%. Setelah menghindar, serangan berikutnya pasti kritikal.'};
+const _newPartyP2=newParty;
+newParty=function(){ const pa=_newPartyP2(); const th=pa.th&&PARTY_THEME_BY[pa.th]; if(!th) return pa;
+  if(th.spd) pa.spd=th.spd;
+  pa.members.forEach((id,i)=>{ const p=G.people[id]; if(!p) return;
+    if(th.sxs&&th.sxs[i]&&p.sx!==th.sxs[i]){ for(let k=0;k<20;k++){ const a=advName(p.race); if(a.sx===th.sxs[i]){ p.name=a.n; p.sx=a.sx; break; } } if(th.sxs[i]==='f'){ p.app.style=pick(['long','tail']); } }
+    if(th.passives&&th.passives[i]) p.passives=th.passives[i].slice();
+    if(th.extraHp){ p.items=p.items||{}; p.items.hp=(p.items.hp||0)+th.extraHp; } });
+  return pa; };
+function hasPas(p,k){ return p&&p.passives&&p.passives.includes(k); }
+// Evade Master: menghindar +15%
+const _advStatsP2=advStats; advStats=function(p){ const s=_advStatsP2(p); if(hasPas(p,'evadeMaster')) s.eva+=.15; return s; };
+// Parry & Evade Master: bungkus hitAdv
+const _hitAdvP2=hitAdv;
+hitAdv=function(a,amt,src,opts){ opts=opts||{}; const p=G.people[a.pid];
+  if(p&&hasPas(p,'parry')&&src&&src.kind==='m'&&!opts.sure&&!(src.u.ranged)&&Math.abs(src.u.x-a.x)<24&&rnd()<.2){ say(a.x,a.floor,'PARRY!','#bff0ff',1); a.atkT=G.t; a.atkK='atk'; fxAt('slash',src.u.x,a.floor,'#bff0ff',.3); hitMon(src.u,advStats(p).atk*.8,a,{sure:1}); return 0; }
+  const hp0=a.hp; const d=_hitAdvP2(a,amt,src,opts);
+  if(p&&hasPas(p,'evadeMaster')&&d===0&&a.hp===hp0&&!opts.sure){ a.fx.critNext=G.t+4; }
+  return d; };
+// Switch: partner bertukar posisi saat salah satu HP rendah
+function switchTick(pa){ if(!pa.members.some(id=>hasPas(G.people[id],'switch'))) return; const mem=G.advs.filter(x=>x.party===pa.id); if(mem.length<2||G.t-(pa.swT||0)<6) return;
+  for(const a of mem){ const p=G.people[a.pid]; if(!hasPas(p,'switch')) continue; const st=advStats(p); if(a.hp/st.hp>=.35) continue;
+    const b=mem.find(x=>x!==a&&x.floor===a.floor&&hasPas(G.people[x.pid],'switch')&&x.hp/advStats(G.people[x.pid]).hp>.5); if(!b) continue;
+    const q=G.people[b.pid]; const ax=a.x; a.x=b.x; b.x=ax; if(Math.abs(a.x-b.x)<10){ a.x-=fdir(a.floor)*10; }
+    pa.swT=G.t; say(a.x,a.floor,'Switch!','#ffd36a',1.2); say(b.x,b.floor,`${q.name}: "Giliranku!"`,'#ffe0a0',2);
+    for(const m of G.mons) if(!m.dead&&m.floor===a.floor&&m.aggro===a.pid){ m.aggro=b.pid; m.aggroT=G.t; }
+    if(p.items&&p.items.hp>0){ p.items.hp--; a.hp=Math.min(st.hp,a.hp+st.hp*.35); say(a.x,a.floor,'HP Potion!','#e04a4a',1.2); fxAt('heal',a.x,a.floor,'#e04a4a',.7); } else a.hp=Math.min(st.hp,a.hp+st.hp*.1);
+    a.cd.atk=1; break; } }
+const _partyTickP2=partyTick; partyTick=function(pa){ if(pa.state==='in') switchTick(pa); return _partyTickP2(pa); };
 
 /* =====================================================================
    TAKHTA JURANG — item petualang, jalan pulang / Return Scroll, ingatan party
@@ -3662,7 +3722,7 @@ const JOB_WPN={knight:'sword',mage:'staff',priest:'staffGold',archer:'bow',thief
   monsterHunter:'greatsword',tamer:'whip',fistKing:'fist',spearGod:'spearGold',iceQueen:'staffIce',arrowQueen:'bowGold',stormLord:'staffStorm'};
 // cara menyerang per jenis senjata
 const WPN_ANIM={sword:'slash',greatsword:'slash',katana:'slash',holy:'slash',runeblade:'slash',bigaxe:'slash',mace:'slash',pick:'slash',hoe:'slash',pan:'slash',darkstaff:'cast',
-  shield:'bash',gun:'gunshot',scythe:'slash',warhammer:'slash',claw:'punch',tome:'cast',bomb:'throw',dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
+  shield:'bash',gun:'gunshot',spyglass:'cast',scythe:'slash',warhammer:'slash',claw:'punch',tome:'cast',bomb:'throw',dagger:'stab',twin:'stab',rapier:'stab',spear:'stab',spearGold:'stab',ninja:'throw',flask:'throw',whip:'whip',fist:'punch',lute:'strum',
   bow:'shoot',bowGold:'shoot',staff:'cast',staffGold:'cast',staffSkull:'cast',staffLeaf:'cast',staffCross:'cast',staffIce:'cast',staffStorm:'cast'};
 const WC=new Map();
 function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return c; c=document.createElement('canvas'); c.width=24; c.height=26; const g=c.getContext('2d');
@@ -3702,6 +3762,7 @@ function wpnCanvas(k,gem){ const key=k+'|'+gem; let c=WC.get(key); if(c) return 
     case 'claw': Q(-1,-2,3,3,'#7a7a82'); Q(-1,-5,1,3,'#e8eef6'); Q(1,-5,1,3,'#e8eef6'); Q(0,-6,1,4,'#ffffff'); break;
     case 'tome': Q(-2,-4,5,6,gem||'#5a3a8a'); Q(-1,-3,3,4,'#e8e0c8'); Q(0,-3,1,4,'#8a7a6a'); break;
     case 'bomb': Q(-2,-4,4,4,'#2a2a2e'); Q(-1,-3,1,1,'#6a6a72'); Q(1,-6,1,2,'#8a6a3a'); Q(2,-7,1,1,'#ffb040'); break;
+    case 'spyglass': Q(0,-9,2,10,'#c8a050'); Q(0,-9,2,1,'#fff0b0'); Q(0,-4,2,1,'#6a4a2a'); Q(-1,-10,4,2,'#8a6a3a'); Q(0,-11,2,1,'#9fd0ff'); break;
     case 'darkstaff': Q(0,-14,1,17,'#2a1a2a'); Q(-1,-18,3,3,'#a01a3a'); Q(-2,-19,1,2,'#3a1a2a'); Q(2,-19,1,2,'#3a1a2a'); Q(0,-17,1,1,'#ff4a6a'); break;
   }
   WC.set(key,c); return c; }
@@ -3794,7 +3855,7 @@ const TIPS=[
 ];
 function miraTip(s,key){
   if(key){ G.tipsSeen=G.tipsSeen||[]; if(G.tipsSeen.includes(key)) return; G.tipsSeen.push(key); }
-  const p=$('miraTxt'); p.innerHTML=`<b>Mira:</b> ${s}`; p.hidden=false; clearTimeout(miraTip.h); miraTip.h=setTimeout(()=>p.hidden=true,9000); }
+  const p=$('miraTxt'); p.innerHTML=`<b>Mira:</b> ${s}`; p.hidden=false; clearTimeout(miraTip.h); miraTip.h=setTimeout(()=>p.hidden=true,6500); }
 function miraReport(){
   const dead=G.mons.filter(m=>m.dead&&!m.temp); const out=[];
   if(dead.length){ const need=dead.reduce((s,m)=>s+reviveCost(m),0); out.push(G.mana>=need?`${dead.length} monster sedang menunggu bangkit. Mana cukup.`:`${dead.length} monster tumbang. Butuh ${need} mana untuk membangkitkan semuanya, kita punya ${Math.floor(G.mana)}.`); }
@@ -3921,7 +3982,7 @@ function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
   const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${p.isekai?'🌀 Orang dunia lain':raceName(p.race)}${pa?' · '+esc(pa.name):''}</span>${p.isekai?`<span class="note" style="color:#9fd0ff">Skill curang: ${esc(p.cheat||'Status Window')} · stat +20%</span>`:''}</div></div>
-  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Watak</dt><dd>${TRAIT_N[traitOf(p)]}</dd><dt>Tas</dt><dd>${itemsTxt(p)}</dd>${p.replaces?`<dt>Menggantikan</dt><dd>${esc(p.replaces)} (gugur)</dd>`:''}${pa&&pa.mem&&pa.mem.fallen.length?`<dt>Kawan gugur</dt><dd>${pa.mem.fallen.slice(-4).map(x=>esc(x.name)).join(', ')}</dd>`:''}<dt>Barang jarahan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
+  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd>${p.passives&&p.passives.length?`<dt>Pasif</dt><dd>${p.passives.map(k=>`<b title="${PASSIVE_D[k]}">${PASSIVE_N[k]}</b>`).join(', ')}<br><span class="note">${p.passives.map(k=>PASSIVE_D[k]).join(' ')}</span></dd>`:''}<dt>Watak</dt><dd>${TRAIT_N[traitOf(p)]}</dd><dt>Tas</dt><dd>${itemsTxt(p)}</dd>${p.replaces?`<dt>Menggantikan</dt><dd>${esc(p.replaces)} (gugur)</dd>`:''}${pa&&pa.mem&&pa.mem.fallen.length?`<dt>Kawan gugur</dt><dd>${pa.mem.fallen.slice(-4).map(x=>esc(x.name)).join(', ')}</dd>`:''}<dt>Barang jarahan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
   return {t:'Petualang',h:h+dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, kita dapat emas, mana, dan jiwa. Kadang ia juga menjatuhkan perlengkapan khas kelasnya; kelas berbintang tinggi lebih sering dan lebih langka.')};
 }
 /* raja */
