@@ -59,7 +59,8 @@ function drawBeastman(P,m,f){
   const fur=hd==='panda'?'#f4f4f0':hd==='kappa'?'#5a9a4a':hd==='tengu'?'#c83a2a':c;
   P(-4,-25,8,7,fur); P(-4,-25,8,1,shade(fur,.2));
   const E=(x,y)=>P(x,y,1,1,eye);
-  if(hd==='rakun'){ P(-4,-27,2,2,c); P(2,-27,2,2,c); P(-4,-23,8,2,'#2a2a2a'); P(-2,-23,1,1,'#ffffff'); P(1,-23,1,1,'#ffffff'); P(3,-21,2,2,'#e8dcc8'); P(4,-21,1,1,'#1a1a1a'); }
+  if(typeof drawBeastHead2==='function'&&drawBeastHead2(P,hd,fur,eye,c,dk,lt)){}
+  else if(hd==='rakun'){ P(-4,-27,2,2,c); P(2,-27,2,2,c); P(-4,-23,8,2,'#2a2a2a'); P(-2,-23,1,1,'#ffffff'); P(1,-23,1,1,'#ffffff'); P(3,-21,2,2,'#e8dcc8'); P(4,-21,1,1,'#1a1a1a'); }
   else if(hd==='serigala'||hd==='rubah'){ P(-4,-28,2,3,fur); P(2,-28,2,3,fur); P(4,-22,3,2,hd==='rubah'?'#fff4e8':lt); P(6,-22,1,1,'#1a1a1a'); E(1,-23); if(hd==='rubah') P(-3,-27,1,1,'#2a1a1a'); }
   else if(hd==='kera'){ P(-2,-24,5,4,'#e8c0a0'); P(-5,-23,1,2,fur); P(4,-23,1,2,fur); E(-1,-23); E(2,-23); P(0,-21,2,1,'#a06050'); }
   else if(hd==='kappa'){ P(-3,-27,6,2,'#e8e0c8'); P(-4,-26,1,1,'#3a7a3a'); P(3,-26,1,1,'#3a7a3a'); P(4,-22,3,2,'#e8c040'); E(1,-23); }
@@ -92,5 +93,5 @@ function drawJurangMon3(P,m,f){
   if(m.k==='dragonE2'){ drawDragon2(P,m,f,true); return; }
   if(m.k==='golemX'){ drawGolem2(P,m,f); return; }
   if(m.k==='beastman'){ drawBeastman(P,m,f); return; }
-  return false;
+  return drawJurangMon4(P,m,f);
 }

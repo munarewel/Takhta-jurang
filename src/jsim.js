@@ -56,6 +56,16 @@ function genItem(lv,minR,opt){
   else { it.eva=+(.02+r*.012).toFixed(3); it.atk=+(base*.35*mul).toFixed(1); it.hp=Math.round((5+lv*1.5)*mul); }
   G.inv.push(it); return it;
 }
+function itemPreview(slot,lv,r){ const base=1+lv*.5, mul=1+r*.55; const o={s:slot,r,lv:0};
+  if(slot==='senjata') o.atk=+(base*1.1*mul).toFixed(1); else if(slot==='zirah'){ o.hp=Math.round((12+lv*4)*mul); o.def=+((1+lv*.3)*mul).toFixed(1); } else { o.eva=+(.02+r*.012).toFixed(3); o.atk=+(base*.35*mul).toFixed(1); o.hp=Math.round((5+lv*1.5)*mul); } return o; }
+function monDropTable(m){ const s=SPECIES[m.sp]; const T=dropTheme(m.sp); const rk=RANK_ORDER.indexOf(s.rank); const pe=.015+rk*.003, pc=(.1+rk*.008)-pe, pm=.4-(.1+rk*.008); const lv=m.lv+rk*4;
+  const out=[{k:'mat',n:T.mat,p:pm,t:T.tier},{k:'core',n:T.core,p:pc,t:Math.min(6,T.tier+1)}];
+  for(const sl of Object.keys(EQ_SLOT)) for(const n of T.eq[sl]) out.push({k:'eq',n,s:sl,p:pe/3/T.eq[sl].length,r:Math.min(4,T.rar),it:itemPreview(sl,lv,Math.min(4,T.rar))});
+  return out; }
+function advDropTable(p){ const gear=JOB_GEAR[p.job]; const pg=Math.min(.07,.025+p.lv*.0004); const out=[{k:'gold',n:'Emas',v:Math.round(p.gold*.8+p.lv*4),p:1},{k:'mat',n:BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12))],p:.12,t:Math.min(BAHAN.length-1,Math.floor(p.lv/12))}];
+  const r=Math.min(4,Math.floor(p.lv/30)); const sp={senjata:.5,zirah:.35,aksesori:.15};
+  if(gear) for(const sl of Object.keys(EQ_SLOT)){ const names=gear[{senjata:0,zirah:1,aksesori:2}[sl]]; for(const n0 of names){ const n=n0+(p.el?' '+ELEM_BY[p.el].n:''); out.push({k:'eq',n,s:sl,p:pg*sp[sl]/names.length,r,it:itemPreview(sl,p.lv,r)}); } }
+  return out; }
 function itemValue(it){ return Math.round(30*(1+it.r*1.6)*(1+(it.lv||0)*.5)); }
 function equipItem(m,it){ if(!it) return 'Barang tidak ada.'; m.eq=m.eq||{}; if(it.on&&it.on!==m.id){ const o=G.mons.find(x=>x.id===it.on); if(o&&o.eq) delete o.eq[it.s]; }
   const old=m.eq[it.s]&&G.inv.find(x=>x.id===m.eq[it.s]); if(old) old.on=null; m.eq[it.s]=it.id; it.on=m.id; return null; }
@@ -128,7 +138,8 @@ function newParty(){
   else if(r<.92){ tier='veteran'; size=ri(3,5); lv=L*rand(1.15,1.5); }
   else { tier='elite'; size=ri(4,5); lv=L*rand(1.5,1.9); }
   const jobs=[]; const core=size>=3?['knight','priest',pick(['mage','archer'])]:[];
-  for(let i=0;i<size;i++) jobs.push(core[i]||pick(JOB_KEYS));
+  const pickJob=()=>{ let k=pick(JOB_KEYS); if(JOBS[k].rare&&rnd()<.85) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); if((k==='farmer'||k==='cook')&&tier!=='baru'&&rnd()<.7) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); return k; };
+  for(let i=0;i<size;i++) jobs.push(core[i]||pickJob());
   const pa={id:nid(),tier,members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:'',quote:''};
   for(const j of jobs){ const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pick(['dualblade','knight','mage','lancer','monk','berserker']):j); p.party=pa.id; pa.members.push(p.id); }
   if(tier==='solo'){ const p=G.people[pa.members[0]]; p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]}`; pa.name=`${p.name} ${p.title}`; }

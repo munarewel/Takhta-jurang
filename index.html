@@ -559,6 +559,78 @@ function drawJurangMon(P,m,f){
 })();
 
 /* =====================================================================
+   TAKHTA JURANG — gelombang monster ke-5: prajurit hewan baru,
+   humanoid baru, dan makhluk dengan gambar sendiri
+   ===================================================================== */
+(function(){
+  const BASE={F:[18,3],E:[30,5],D:[52,9],C:[115,14],B:[270,22],A:[500,35],S:[1150,60],SS:[2300,85]};
+  const add=(chain,shape)=>chain.forEach((r,i)=>{ const [key,n,rank,c,eye,sc,d,opt]=r; const o=Object.assign({},shape,opt||{}); const [hp,atk]=BASE[rank];
+    const m={n,k:o.k,rank,hp:Math.round(hp*(o.hpM||1)),atk:Math.round(atk*(o.atkM||1)),spd:o.spd||1.05,xp:Math.round(hp/3),bounty:Math.round(hp/8),beast:1,sc,d,evo:i+1};
+    if(c) m.c=c; if(eye) m.eye=eye; for(const f of ['race','job','tint','ab']) if(o[f]) m[f]=o[f]; if(i>0) m.evolved=1;
+    MON[key]=m; if(i<chain.length-1) EVO_NEXT[key]=chain[i+1][0]; });
+  // ---- prajurit hewan baru ----
+  const B=(job,ab)=>({k:'beastman',job,ab});
+  add([['gajahPenjaga','Gajah Penjaga','C','#8a8a94','#1a1a1a',1.15,'Prajurit gajah bertombak berat.',B('gajah|spear|s|#5a3a2a','kulitTebal')],['gajahPerang','Gajah Perang','A','#6a6a74','#ffd040',1.35,'Satu injakannya meretakkan lantai.',B('gajah|spear|s|#7a1a1a','gempa')]]);
+  add([['buayaGladiator','Buaya Gladiator','C','#4a7a3a','#ffd040',1.1,'Rahangnya lebih tajam dari pedangnya.',B('buaya|axe|g|#6a4a2a','haus')],['rajaBuaya','Raja Buaya Rawa','A','#2a5a2a','#ff3a3a',1.3,'Penguasa rawa di bawah kastil.',B('buaya|axe|g|#e3b75e','amarah')]]);
+  add([['singaKsatria','Singa Ksatria','B','#d8a040','#1a1a1a',1.15,'Surainya bagai mahkota emas.',B('singa|katana|s|#a82a2a','wibawa')],['rajaSinga','Raja Singa','S','#e8b850','#ff3a3a',1.35,'Raungannya membuat petualang berlutut.',B('singa|katana|s|#e3b75e','raung')]]);
+  add([['manusiaHiu','Manusia Hiu','C','#5a7a9a','#1a1a1a',1.1,'Berenang di lantai seperti di air.',B('hiu|spear|g|#2a4a6a','haus')],['hiuPanglima','Panglima Hiu','A','#3a5a7a','#ff3a3a',1.3,'Memimpin pasukan dari laut dalam.',B('hiu|spear|s|#1a2a4a','tajam')]]);
+  add([['kambingIblis','Kambing Iblis','D','#3a2a2a','#ff3a3a',1,'Bertanduk melingkar dan haus jiwa.',B('kambing|staff|w|#3a0a1a','kutuk')],['baphomet','Baphomet','A','#1a0a0a','#ff3a3a',1.35,'Iblis bertanduk penguasa ritual.',B('kambing|staff|w|#5a0a2a','status_neraka')]]);
+  add([['ayamPetarung','Ayam Petarung','E','#e8e0d0','#1a1a1a',1,'Taji di kakinya sangat tajam.',B('ayam|fist|g|#c83a2a','ganda')],['ayamJago','Ayam Jago Legendaris','C','#e8701a','#ffd040',1.15,'Kokoknya membangunkan seluruh kastil.',B('ayam|fist|g|#e3b75e','teriak')]]);
+  add([['manusiaKelelawar','Manusia Kelelawar','D','#4a3a5a','#ff3a3a',1,'Tergantung di langit-langit menunggu mangsa.',B('kelelawar|fist|n|#2a1a3a','haus')],['bangsawanMalam','Bangsawan Malam','A','#2a1a3a','#ff1a1a',1.25,'Vampir bersayap yang anggun.',B('kelelawar|katana|w|#5a0a1a','status_darah')]]);
+  add([['domba','Domba Penyihir','E','#f0f0e8','#1a1a1a',1,'Bulunya lembut, mantranya tidak.',B('domba|staff|w|#6a5aa8','tidur')],['dombaAgung','Domba Arkanis','C','#e8e0ff','#c060ff',1.15,'Menenun mimpi buruk dari bulunya.',B('domba|staff|w|#3a2a6a','status_mimpi')]]);
+  add([['werewolf','Werewolf','C','#5a4a3a','#ffd040',1.15,'Manusia serigala yang mengamuk di malam hari.',{k:'werewolf',ab:'amarah'}],['werewolfAlfa','Werewolf Alfa','A','#3a3a3a','#ff3a3a',1.35,'Pemimpin kawanan manusia serigala.',{k:'werewolf',ab:'raung'}],['werewolfBulan','Werewolf Bulan Merah','S','#7a1a1a','#ffd040',1.5,'Hanya muncul saat bulan berdarah.',{k:'werewolf',ab:'semangat'}]]);
+  add([['centaur','Centaur Pemanah','C','#8a5a3a','#1a1a1a',1.2,'Setengah kuda, setengah pemanah.',{k:'centaur',ab:'elang'}],['centaurPanglima','Panglima Centaur','A','#5a3a2a','#ffd040',1.4,'Panahnya tak pernah meleset.',{k:'centaur',ab:'tajam'}]]);
+  add([['lamia','Lamia','C','#5a8a5a','#ffd040',1.15,'Tubuh ular, senyum yang memikat.',{k:'lamia',ab:'goda'}],['medusa','Medusa','A','#3a6a4a','#ff3aff',1.35,'Tatapannya mengubah lawan jadi batu.',{k:'lamia',ab:'status_batu'}],['ratuGorgon','Ratu Gorgon','S','#1a4a3a','#ffd040',1.55,'Ibu dari semua gorgon.',{k:'lamia',ab:'kutuk'}]]);
+  add([['ubur','Ubur-ubur Hantu','E','#c8a0f0','#ffffff',1,'Melayang di udara lembap kastil.',{k:'ubur',ab:'status_petir'}],['uburRaja','Ubur-ubur Raksasa','C','#a070e0','#ffffff',1.3,'Tentakelnya menyetrum.',{k:'ubur',ab:'badai_petir'}]]);
+  add([['tengkorakApi','Tengkorak Terbang','D','#e8e0c8','#ff6a1a',1,'Tengkorak berapi yang tertawa.',{k:'tengkorak',ab:'tembak_api'}],['tengkorakIblis','Tengkorak Iblis','B','#d8d0b8','#c060ff',1.25,'Api ungu dari neraka.',{k:'tengkorak',ab:'ledak_neraka'}]]);
+  add([['lentera','Hantu Lentera','E','#e8c040','#ffe080',1,'Cahayanya menyesatkan petualang.',{k:'lentera',ab:'status_kabut'}],['lenteraJiwa','Lentera Jiwa','C','#40c8a0','#a0ffe0',1.2,'Menyimpan jiwa korban di dalamnya.',{k:'lentera',ab:'serapJiwa'}]]);
+  add([['belalang','Belalang Sembah','D','#5ac83a','#1a1a1a',1,'Lengan sabitnya secepat kilat.',{k:'belalang',ab:'ganda'}],['belalangRaja','Belalang Pedang','B','#3a9a2a','#ff3a3a',1.25,'Ahli pedang dari dunia serangga.',{k:'belalang',ab:'tajam'}],['belalangKaisar','Kaisar Belalang','A','#2a6a1a','#ffd040',1.45,'Sabitnya membelah zirah.',{k:'belalang',ab:'status_baja'}]]);
+  add([['siput','Siput Raksasa','F','#c89a6a','#1a1a1a',1,'Pelan, berlendir, keras kepala.',{k:'siput',ab:'kulitTebal',spd:.5}],['siputBaja','Siput Bercangkang Baja','D','#8a9aaa','#1a1a1a',1.25,'Cangkangnya tak bisa ditembus.',{k:'siput',ab:'kulitBaja',spd:.5}],['siputBenteng','Siput Benteng','B','#5a6a7a','#ffd040',1.5,'Benteng berjalan.',{k:'siput',ab:'perisai',spd:.5}]]);
+  // ---- humanoid baru ----
+  add([['ksatriaGoblin','Ksatria Goblin','D',null,null,1,'Goblin yang mencuri zirah ksatria.',{k:'hum',race:'goblin',job:'mHob',ab:'perisai'}],['jenderalGoblin','Jenderal Goblin','B',null,null,1.15,'Memimpin barisan goblin berzirah.',{k:'hum',race:'hobgoblin',job:'mOrcLord',ab:'teriak',tint:'#5a7a3a'}]]);
+  add([['elfGelap','Pemanah Elf Gelap','C',null,null,1,'Elf yang dibuang ke jurang.',{k:'hum',race:'elf',job:'ratuPanah',ab:'elang',tint:'#3a2a5a'}],['elfGelapRatu','Ratu Elf Gelap','A',null,null,1.15,'Memerintah dari bayangan.',{k:'hum',race:'elf',job:'penyihirHitam',ab:'status_bayang',tint:'#2a1a4a'}]]);
+  add([['vampirBangsawan','Vampir Bangsawan','B',null,null,1,'Minum anggur merah… atau bukan anggur.',{k:'hum',race:'manusia',job:'bangsawan',ab:'haus',tint:'#7a1a2a'}],['vampirLord','Vampir Lord','S',null,null,1.15,'Seribu tahun dan tak pernah kenyang.',{k:'hum',race:'manusia',job:'rajaIblis',ab:'status_darah',tint:'#5a0a1a'}]]);
+  add([['dukunOrc','Dukun Orc','C',null,null,1,'Tengkorak di tongkatnya berbisik.',{k:'hum',race:'orc',job:'mGobShaman',ab:'sembuh'}],['nabiOrc','Nabi Perang Orc','A',null,null,1.2,'Ramalannya selalu tentang darah.',{k:'hum',race:'orc',job:'necromancer',ab:'teriak',tint:'#5a1a1a'}]]);
+  add([['ksatriaKutukan','Ksatria Terkutuk','C',null,null,1,'Bersumpah melindungi kastil… selamanya.',{k:'hum',race:'zombie',job:'ksatria',ab:'tegar'}],['paladinJatuh','Paladin Jatuh','A',null,null,1.15,'Dulu suci, kini melayani kegelapan.',{k:'hum',race:'neraka',job:'paladin',ab:'tameng_suci',tint:'#3a1a3a'}]]);
+})();
+/* ---------- gambar kepala prajurit hewan baru & makhluk baru ---------- */
+function drawBeastHead2(P,hd,fur,eye,c,dk,lt){
+  const E=(x,y)=>P(x,y,1,1,eye);
+  if(hd==='gajah'){ P(-6,-26,3,6,dk); P(3,-26,3,6,dk); P(3,-22,2,6,fur); P(4,-17,2,2,fur); P(2,-20,1,2,'#f0f0e0'); E(1,-24); return true; }
+  if(hd==='buaya'){ P(0,-23,8,3,fur); P(1,-21,7,1,'#f0f0e0'); P(1,-21,1,1,fur); P(4,-21,1,1,fur); P(-1,-26,3,2,fur); E(0,-25); return true; }
+  if(hd==='singa'){ P(-6,-28,12,11,'#a8682a'); P(-4,-25,8,7,fur); P(3,-22,3,2,lt); P(5,-22,1,1,'#1a1a1a'); E(1,-24); E(-2,-24); return true; }
+  if(hd==='hiu'){ P(-1,-30,3,5,fur); P(3,-23,4,2,fur); P(2,-21,5,1,'#f0f0e0'); P(-4,-22,8,2,'#e8e8f0'); E(1,-24); return true; }
+  if(hd==='kambing'){ P(-7,-27,3,2,'#c8b890'); P(-7,-25,1,2,'#c8b890'); P(4,-27,3,2,'#c8b890'); P(6,-25,1,2,'#c8b890'); P(3,-21,3,2,lt); P(0,-18,2,3,fur); E(1,-23); return true; }
+  if(hd==='ayam'){ P(-1,-29,4,3,'#e83a2a'); P(4,-23,3,1,'#e8b030'); P(3,-21,2,2,'#e83a2a'); E(1,-24); return true; }
+  if(hd==='kelelawar'){ P(-5,-30,2,5,fur); P(3,-30,2,5,fur); P(1,-21,4,1,'#f0f0e0'); P(1,-20,1,1,'#f0f0e0'); P(4,-20,1,1,'#f0f0e0'); E(-2,-24); E(2,-24); P(-9,-20,3,7,dk); P(6,-20,3,7,dk); return true; }
+  if(hd==='domba'){ P(-6,-27,12,5,'#f8f8f0'); P(-6,-24,2,3,'#f8f8f0'); P(4,-24,2,3,'#f8f8f0'); P(-2,-23,5,4,'#3a3a3a'); P(-1,-22,1,1,'#ffffff'); P(2,-22,1,1,'#ffffff'); return true; }
+  return false;
+}
+function drawJurangMon4(P,m,f){
+  const k=m.k, c=m.c||'#888', eye=m.eye||'#1a1a1a', dk=shade(c,-.3), lt=shade(c,.25), b=f===1?-1:f===3?1:0, lg=f%2;
+  const sh=w=>P(-w/2,0,w,1,'rgba(0,0,0,.25)');
+  if(k==='werewolf'){ sh(12); P(-4,-10,3,10-lg,dk); P(1,-10,3,10,dk); P(-5,-1,4,1,'#2a1a14'); P(1,-1,4,1,'#2a1a14');
+    P(-6,-22,12,12,c); P(-5,-21,10,1,lt); P(-3,-15,6,4,lt); P(-9,-21+b,3,10,c); P(6,-21-b,3,10,c); P(-10,-12+b,3,2,'#f0f0e0'); P(7,-12-b,3,2,'#f0f0e0');
+    P(-4,-29,8,7,c); P(-4,-32,2,3,c); P(2,-32,2,3,c); P(3,-25,5,3,c); P(4,-23,4,1,'#f0f0e0'); P(7,-25,1,1,'#1a1a1a'); P(0,-27,1,1,eye); P(2,-27,1,1,eye); P(-8,-14,3,2,c); return; }
+  if(k==='centaur'){ sh(20); const hc=c; P(-10,-14,15,7,hc); P(-9,-15,13,1,lt); P(-12,-14,3,6,dk); P(-9,-7,2,7-lg,dk); P(-5,-7,2,7,dk); P(0,-7,2,7-lg,dk); P(3,-7,2,7,dk);
+    P(1,-24,6,10,'#e8c09a'); P(0,-24,8,2,'#5a3a1a'); P(1,-30,6,6,'#e8c09a'); P(1,-31,6,2,'#3a2a1a'); P(5,-28,1,1,eye); P(-1,-29,2,6,'#3a2a1a');
+    P(8,-29,1,12,'#8a5a32'); P(7,-29,1,1,'#8a5a32'); P(7,-18,1,1,'#8a5a32'); P(6,-28,1,10,'#e8e0cc'); return; }
+  if(k==='lamia'){ P(-9,0,18,1,'rgba(0,0,0,.25)'); P(-9,-4,14,4,c); P(-9,-4,14,1,lt); P(-11,-3,3,3,c); P(-12,-2,2,2,dk); for(let x=-8;x<4;x+=3) P(x,-2,1,1,dk);
+    P(-2,-14,6,10,c); P(-2,-14,6,1,lt); P(-2,-21,6,8,'#e8d0c0'); P(-2,-21,6,1,'#c83a5a'); P(-2,-19,6,1,'#c83a5a');
+    P(-2,-27,6,6,'#e8d0c0'); P(2,-25,1,1,eye); P(-4,-28,10,3,shade(c,-.1)); for(let i=0;i<4;i++) P(-5+i*3,-30+(i+f)%2,2,3,c); P(-4,-25,1,5,shade(c,-.1)); return; }
+  if(k==='ubur'){ const y=-24+b*2; P(-3,0,6,1,'rgba(0,0,0,.18)'); P(-7,y,14,7,c); P(-6,y-2,12,2,c); P(-5,y-1,4,2,lt); P(-3,y+3,1,1,eye); P(2,y+3,1,1,eye);
+    for(let i=0;i<5;i++){ const x=-6+i*3, l=6+((i+f)%3)*2; P(x,y+7,1,l,shade(c,.15)); } return; }
+  if(k==='tengkorak'){ const y=-20+b*2; P(-3,0,6,1,'rgba(0,0,0,.18)'); for(let i=0;i<4;i++) P(-4+i*2+((f+i)%2),y-6-i%2*2,2,5,eye); P(-5,y-1,10,8,c); P(-4,y+7,8,2,c); P(-3,y+2,2,2,'#1a1a1a'); P(1,y+2,2,2,'#1a1a1a'); P(-3,y+2,1,1,eye); P(2,y+2,1,1,eye); P(0,y+5,1,1,'#1a1a1a'); P(-3,y+8,1,1,'#1a1a1a'); P(-1,y+8,1,1,'#1a1a1a'); P(1,y+8,1,1,'#1a1a1a'); return; }
+  if(k==='lentera'){ const y=-22+b*2; P(-3,0,6,1,'rgba(0,0,0,.18)'); P(-1,y-4,2,3,'#3a3a3a'); P(-4,y-1,8,2,'#4a3a2a'); P(-4,y+1,8,9,c); P(-3,y+2,6,7,eye); P(-1,y+4,1,2,'#3a2a1a'); P(1,y+4,1,2,'#3a2a1a'); P(-1,y+7,3,1,'#3a2a1a'); P(-4,y+10,8,2,'#4a3a2a'); P(-6,y+3+((f%2)?1:0),2,1,'rgba(255,240,180,.5)'); return; }
+  if(k==='belalang'){ sh(12); P(-8,-8,10,4,c); P(-9,-7,2,2,dk); P(1,-14,3,7,c); P(2,-18,4,4,c); P(5,-17,1,1,eye); P(3,-20,1,2,dk); P(5,-20,1,2,dk);
+    P(4,-14,5,1,lt); P(8,-14,1,5,lt); P(9,-10,1,1,lt); P(3,-12+b,4,1,lt); P(6,-12+b,1,4,lt);
+    for(const x of [-6,-3,0]) P(x,-4,1,4-((x+f)%2?1:0),dk); P(-8,-11,7,3,'rgba(200,255,180,.4)'); return; }
+  if(k==='siput'){ sh(16); P(-9,-3,17,3,c); P(-9,-3,17,1,lt); P(5,-8,4,6,c); P(6,-12,1,4,c); P(8,-11,1,3,c); P(6,-13,1,1,eye); P(8,-12,1,1,eye);
+    const s='#8a5a3a'; P(-8,-14,11,11,shade(c,-.15)); P(-7,-15,9,1,shade(c,-.15)); P(-6,-12,7,7,shade(c,.1)); P(-4,-10,3,3,shade(c,-.25)); P(-3,-9,1,1,shade(c,.2)); if(f%2) P(-10,-1,2,1,'rgba(200,230,255,.6)'); return; }
+  return false;
+}
+
+/* =====================================================================
    TAKHTA JURANG — data: elemen, ability, katalog ribuan monster,
    job petualang, nama, ras Raja Iblis, toko
    ===================================================================== */
@@ -891,6 +963,42 @@ const EQ_PRE=['','Retak ','','Tajam ','Terkutuk ','Kuno ','Agung ','Iblis '];
 const BAHAN=['Taring Retak','Kulit Kasar','Bijih Besi','Kristal Mana','Sisik Langka','Inti Naga','Pecahan Bintang'];
 
 /* =====================================================================
+   TAKHTA JURANG — job petualang tambahan
+   ===================================================================== */
+Object.assign(JOBS,{
+  aeromancer:{n:'Aeromancer',spr:'penyihirAngin',hp:36,atk:9,def:2,eva:.08,rng:50,grow:[5,1.8,.4],skill:{n:'Tornado Kecil',cd:9,k:'aoe',m:1.5},front:0,magic:1},
+  geomancer:{n:'Geomancer',spr:'penyihirTanah',hp:44,atk:9,def:5,eva:.04,rng:46,grow:[7,1.7,.7],skill:{n:'Tombak Batu',cd:8,k:'pierce',m:1.8},front:0,magic:1},
+  enchanter:{n:'Enchanter',spr:'enchanter',hp:38,atk:6,def:3,eva:.06,rng:42,grow:[6,1,.5],skill:{n:'Senjata Bercahaya',cd:12,k:'buff'},front:0,magic:1},
+  runeKnight:{n:'Rune Knight',spr:'highEnchanter',hp:62,atk:10,def:8,eva:.04,rng:13,grow:[9,1.6,1.1],skill:{n:'Pedang Rune',cd:8,k:'crit',m:2},front:3,magic:1},
+  beastmaster:{n:'Beastmaster',spr:'beastTamer',hp:50,atk:8,def:4,eva:.08,rng:20,grow:[7,1.5,.6],skill:{n:'Serbuan Kawanan',cd:9,k:'multi',hits:4,m:.7},front:2},
+  saint:{n:'Saint',spr:'santa',hp:44,atk:5,def:4,eva:.05,rng:46,grow:[7,.8,.7],skill:{n:'Mukjizat',cd:12,k:'heal',m:.6},front:0,magic:1,rare:1},
+  hero:{n:'Hero',spr:'pahlawan',hp:72,atk:12,def:8,eva:.08,rng:13,grow:[11,2.1,1.1],skill:{n:'Tebasan Pahlawan',cd:8,k:'aoe',m:2},front:3,rare:1},
+  weaponMaster:{n:'Weapon Master',spr:'weaponMaster',hp:62,atk:11,def:6,eva:.08,rng:13,grow:[9,1.9,.9],skill:{n:'Seribu Senjata',cd:9,k:'multi',hits:5,m:.6},front:2},
+  duelist:{n:'Duelist',spr:'bangsawan',hp:48,atk:10,def:4,eva:.16,rng:12,grow:[7,1.8,.6],skill:{n:'Tusukan Anggun',cd:6,k:'crit',m:2.2},front:2},
+  miner:{n:'Miner',spr:'penambang',hp:56,atk:8,def:6,eva:.03,rng:12,grow:[8,1.4,.9],skill:{n:'Hantaman Beliung',cd:7,k:'pierce',m:1.6},front:2,scout:1},
+  cook:{n:'Cook',spr:'juruMasak',hp:50,atk:6,def:4,eva:.05,rng:14,grow:[8,1.1,.6],skill:{n:'Sup Hangat',cd:10,k:'heal',m:.3},front:1},
+  farmer:{n:'Farmer',spr:'petani',hp:46,atk:7,def:3,eva:.05,rng:13,grow:[7,1.3,.5],skill:{n:'Ayunan Cangkul',cd:7,k:'crit',m:1.8},front:2},
+  monsterHunter:{n:'Monster Hunter',spr:'hunterHV',hp:58,atk:10,def:6,eva:.08,rng:16,grow:[8,1.8,.8],skill:{n:'Tebasan Pemburu',cd:8,k:'snipe',m:2.4},front:2,scout:1},
+  tamer:{n:'Tamer',spr:'tamerHV',hp:46,atk:8,def:4,eva:.08,rng:24,grow:[7,1.5,.6],skill:{n:'Panggil Tunggangan',cd:10,k:'multi',hits:3,m:.9},front:1},
+});
+for(const k of Object.keys(JOBS)) if(!JOB_KEYS.includes(k)) JOB_KEYS.push(k);
+Object.assign(JOB_LINES,{
+  aeromancer:['Angin berpihak padaku.','Rambutku berantakan lagi…'],geomancer:['Batu-batu di sini berbicara padaku.','Tanahnya rapuh. Hati-hati.'],
+  enchanter:['Senjata kalian kubuat bersinar!','Satu mantra kecil untuk keberuntungan.'],runeKnight:['Rune di pedangku menyala!','Sihir dan baja, satu tujuan.'],
+  beastmaster:['Kawananku lapar.','Monster di sini bisa kujinakkan?'],saint:['Semoga semua pulang dengan selamat.','Cahaya tak pernah padam.'],
+  hero:['Aku datang untuk mengakhiri ini.','Takdir membawaku ke singgasanamu.'],weaponMaster:['Senjata apa pun, aku kuasai.','Pilih senjatamu, monster.'],
+  duelist:['En garde!','Satu lawan satu, kalau berani.'],miner:['Dinding ini… ada bijihnya!','Lorong ini mirip tambang lamaku.'],
+  cook:['Bekal sudah siap!','Monster di sini… bisa dimasak?'],farmer:['Aku cuma mau beli sapi baru…','Cangkulku cukup tajam, kok.'],
+  monsterHunter:['Aku memburu monster sejak kecil.','Kepala Raja Iblis, trofi berikutnya.'],tamer:['Tungganganku menunggu di luar.','Jangan takut, aku tidak akan menyakitimu… mungkin.'],
+});
+Object.assign(JOB_EL,{aeromancer:['angin'],geomancer:['tanah','batu'],enchanter:['kristal','cahaya'],runeKnight:['petir','kristal'],saint:['suci','cahaya'],hero:['cahaya','suci'],miner:['tanah']});
+Object.assign(JOB_GEAR,{aeromancer:[['Tongkat Angin'],['Jubah Badai'],['Bulu Elang']],geomancer:[['Tongkat Batu'],['Jubah Bumi'],['Batu Bertuah']],enchanter:[['Tongkat Rune'],['Jubah Enchanter'],['Cincin Rune']],
+  runeKnight:[['Pedang Rune'],['Zirah Rune'],['Lambang Rune']],beastmaster:[['Cambuk Pawang'],['Rompi Kulit'],['Peluit Binatang']],saint:[['Tongkat Suci'],['Jubah Saint'],['Halo Kecil']],
+  hero:[['Pedang Pahlawan'],['Zirah Pahlawan'],['Lambang Pahlawan']],weaponMaster:[['Pedang Master','Tombak Master'],['Zirah Master Senjata'],['Sabuk Senjata']],duelist:[['Rapier'],['Kemeja Bangsawan'],['Sarung Tangan Putih']],
+  miner:[['Beliung'],['Helm Tambang'],['Lampu Tambang']],cook:[['Pisau Dapur','Panci Besi'],['Celemek Koki'],['Topi Koki']],farmer:[['Cangkul'],['Baju Petani'],['Topi Jerami']],
+  monsterHunter:[['Pedang Pemburu Monster'],['Zirah Kulit Monster'],['Trofi Taring']],tamer:[['Cambuk Tamer'],['Pelana Kecil'],['Peluit Tamer']]});
+
+/* =====================================================================
    TAKHTA JURANG — simulasi kastil
    ===================================================================== */
 const FW=200, FH=52, SLOTS=10, DT=1/30, DAY_LEN=120;
@@ -948,6 +1056,16 @@ function genItem(lv,minR,opt){
   else { it.eva=+(.02+r*.012).toFixed(3); it.atk=+(base*.35*mul).toFixed(1); it.hp=Math.round((5+lv*1.5)*mul); }
   G.inv.push(it); return it;
 }
+function itemPreview(slot,lv,r){ const base=1+lv*.5, mul=1+r*.55; const o={s:slot,r,lv:0};
+  if(slot==='senjata') o.atk=+(base*1.1*mul).toFixed(1); else if(slot==='zirah'){ o.hp=Math.round((12+lv*4)*mul); o.def=+((1+lv*.3)*mul).toFixed(1); } else { o.eva=+(.02+r*.012).toFixed(3); o.atk=+(base*.35*mul).toFixed(1); o.hp=Math.round((5+lv*1.5)*mul); } return o; }
+function monDropTable(m){ const s=SPECIES[m.sp]; const T=dropTheme(m.sp); const rk=RANK_ORDER.indexOf(s.rank); const pe=.015+rk*.003, pc=(.1+rk*.008)-pe, pm=.4-(.1+rk*.008); const lv=m.lv+rk*4;
+  const out=[{k:'mat',n:T.mat,p:pm,t:T.tier},{k:'core',n:T.core,p:pc,t:Math.min(6,T.tier+1)}];
+  for(const sl of Object.keys(EQ_SLOT)) for(const n of T.eq[sl]) out.push({k:'eq',n,s:sl,p:pe/3/T.eq[sl].length,r:Math.min(4,T.rar),it:itemPreview(sl,lv,Math.min(4,T.rar))});
+  return out; }
+function advDropTable(p){ const gear=JOB_GEAR[p.job]; const pg=Math.min(.07,.025+p.lv*.0004); const out=[{k:'gold',n:'Emas',v:Math.round(p.gold*.8+p.lv*4),p:1},{k:'mat',n:BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12))],p:.12,t:Math.min(BAHAN.length-1,Math.floor(p.lv/12))}];
+  const r=Math.min(4,Math.floor(p.lv/30)); const sp={senjata:.5,zirah:.35,aksesori:.15};
+  if(gear) for(const sl of Object.keys(EQ_SLOT)){ const names=gear[{senjata:0,zirah:1,aksesori:2}[sl]]; for(const n0 of names){ const n=n0+(p.el?' '+ELEM_BY[p.el].n:''); out.push({k:'eq',n,s:sl,p:pg*sp[sl]/names.length,r,it:itemPreview(sl,p.lv,r)}); } }
+  return out; }
 function itemValue(it){ return Math.round(30*(1+it.r*1.6)*(1+(it.lv||0)*.5)); }
 function equipItem(m,it){ if(!it) return 'Barang tidak ada.'; m.eq=m.eq||{}; if(it.on&&it.on!==m.id){ const o=G.mons.find(x=>x.id===it.on); if(o&&o.eq) delete o.eq[it.s]; }
   const old=m.eq[it.s]&&G.inv.find(x=>x.id===m.eq[it.s]); if(old) old.on=null; m.eq[it.s]=it.id; it.on=m.id; return null; }
@@ -1020,7 +1138,8 @@ function newParty(){
   else if(r<.92){ tier='veteran'; size=ri(3,5); lv=L*rand(1.15,1.5); }
   else { tier='elite'; size=ri(4,5); lv=L*rand(1.5,1.9); }
   const jobs=[]; const core=size>=3?['knight','priest',pick(['mage','archer'])]:[];
-  for(let i=0;i<size;i++) jobs.push(core[i]||pick(JOB_KEYS));
+  const pickJob=()=>{ let k=pick(JOB_KEYS); if(JOBS[k].rare&&rnd()<.85) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); if((k==='farmer'||k==='cook')&&tier!=='baru'&&rnd()<.7) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); return k; };
+  for(let i=0;i<size;i++) jobs.push(core[i]||pickJob());
   const pa={id:nid(),tier,members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:'',quote:''};
   for(const j of jobs){ const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pick(['dualblade','knight','mage','lancer','monk','berserker']):j); p.party=pa.id; pa.members.push(p.id); }
   if(tier==='solo'){ const p=G.people[pa.members[0]]; p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]}`; pa.name=`${p.name} ${p.title}`; }
@@ -2505,7 +2624,8 @@ function drawBeastman(P,m,f){
   const fur=hd==='panda'?'#f4f4f0':hd==='kappa'?'#5a9a4a':hd==='tengu'?'#c83a2a':c;
   P(-4,-25,8,7,fur); P(-4,-25,8,1,shade(fur,.2));
   const E=(x,y)=>P(x,y,1,1,eye);
-  if(hd==='rakun'){ P(-4,-27,2,2,c); P(2,-27,2,2,c); P(-4,-23,8,2,'#2a2a2a'); P(-2,-23,1,1,'#ffffff'); P(1,-23,1,1,'#ffffff'); P(3,-21,2,2,'#e8dcc8'); P(4,-21,1,1,'#1a1a1a'); }
+  if(typeof drawBeastHead2==='function'&&drawBeastHead2(P,hd,fur,eye,c,dk,lt)){}
+  else if(hd==='rakun'){ P(-4,-27,2,2,c); P(2,-27,2,2,c); P(-4,-23,8,2,'#2a2a2a'); P(-2,-23,1,1,'#ffffff'); P(1,-23,1,1,'#ffffff'); P(3,-21,2,2,'#e8dcc8'); P(4,-21,1,1,'#1a1a1a'); }
   else if(hd==='serigala'||hd==='rubah'){ P(-4,-28,2,3,fur); P(2,-28,2,3,fur); P(4,-22,3,2,hd==='rubah'?'#fff4e8':lt); P(6,-22,1,1,'#1a1a1a'); E(1,-23); if(hd==='rubah') P(-3,-27,1,1,'#2a1a1a'); }
   else if(hd==='kera'){ P(-2,-24,5,4,'#e8c0a0'); P(-5,-23,1,2,fur); P(4,-23,1,2,fur); E(-1,-23); E(2,-23); P(0,-21,2,1,'#a06050'); }
   else if(hd==='kappa'){ P(-3,-27,6,2,'#e8e0c8'); P(-4,-26,1,1,'#3a7a3a'); P(3,-26,1,1,'#3a7a3a'); P(4,-22,3,2,'#e8c040'); E(1,-23); }
@@ -2538,7 +2658,7 @@ function drawJurangMon3(P,m,f){
   if(m.k==='dragonE2'){ drawDragon2(P,m,f,true); return; }
   if(m.k==='golemX'){ drawGolem2(P,m,f); return; }
   if(m.k==='beastman'){ drawBeastman(P,m,f); return; }
-  return false;
+  return drawJurangMon4(P,m,f);
 }
 
 /* =====================================================================
@@ -2774,6 +2894,11 @@ function sprBox(spr){ let b=BBOX.get(spr); if(b) return b; const g=spr.getContex
 function iconSpr(cv,spr){ paintIcon(cv,g=>{ const b=sprBox(spr); const k=Math.min(cv.width/b.w,cv.height/b.h); const w=b.w*k,h=b.h*k; g.drawImage(spr,b.x,b.y,b.w,b.h,Math.round((cv.width-w)/2),Math.round(cv.height-h),w,h); }); }
 function iconFix(cv,fx){ const c=document.createElement('canvas'); c.width=32; c.height=48; const g=c.getContext('2d'); drawFix(g,fx,16,44,0); if(fx.t==='rahasia'){ g.fillStyle='#3a3446'; g.globalCompositeOperation='destination-over'; g.fillRect(8,10,16,34); } iconSpr(cv,c); }
 function itemTxt(it){ const s=itemStats(it); const p=[]; if(s.atk) p.push(`+${Math.round(s.atk)} serangan`); if(s.hp) p.push(`+${Math.round(s.hp)} nyawa`); if(s.def) p.push(`+${Math.round(s.def)} pertahanan`); if(s.eva) p.push(`+${Math.round(s.eva*100)}% menghindar`); return p.join(' · '); }
+function pct(p){ return p>=1?'pasti':p>=.1?Math.round(p*100)+'%':(p*100).toFixed(p>=.01?1:2).replace('.',',')+'%'; }
+function dropListHtml(list,note){ return `<div class="sec"><h3>Daftar drop</h3>${note?`<p class="note">${note}</p>`:''}<div class="abl">${list.map(d=>{
+  const tag=d.k==='eq'?`${rarTag(d.r)}<em>${EQ_SLOT[d.s]}</em>`:d.k==='core'?`<em>inti · tingkat ${d.t+1}</em>`:d.k==='mat'?`<em>bahan · tingkat ${d.t+1}</em>`:'';
+  const info=d.k==='eq'?`<br><span class="note">${itemTxt(d.it)} · dijual ±${itemValue(d.it)} emas</span>`:d.k==='core'?'<br><span class="note">Bahan tempa bermutu tinggi.</span>':d.k==='mat'?'<br><span class="note">Bahan untuk menempa perlengkapan.</span>':`<br><span class="note">±${d.v} emas</span>`;
+  return `<div><b>${esc(d.n)}</b> ${tag}<span style="float:right;font-family:var(--display);color:var(--gold)">${pct(d.p)}</span>${info}</div>`; }).join('')}</div></div>`; }
 function itemName(it){ return `${esc(it.n)}${it.lv?` +${it.lv}`:''}`; }
 function rarTag(r){ const n=RARITY[r]; return `<span class="rar" style="background:${RAR_COL[n]}">${n}</span>`; }
 function stars(st,max){ return '◆'.repeat(st)+'◇'.repeat(Math.max(0,max-st)); }
@@ -2874,6 +2999,7 @@ function pMon(){
   if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
     h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemTxt(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
   h+=`</div>`;
+  h+=dropListHtml(monDropTable(m),'Drop dipungut petualang yang menumbangkan monster ini, lalu kembali ke gudang kalau petualang itu tewas di kastil.');
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
     <label class="note">Lantai <select id="mFloor">${`<option value="-1" ${m.floor<0?'selected':''}>Cadangan</option>`+Array.from({length:G.floors},(_,f)=>`<option value="${f}" ${m.floor===f&&!m.secret?'selected':''} ${floorCount(f)>=FLOOR_CAP&&m.floor!==f?'disabled':''}>L${f+1} (${floorCount(f)}/${FLOOR_CAP})</option>`).join('')}</select></label>
     <label class="note">Strategi <select id="mStrat">${Object.entries(STRAT).map(([k,v])=>`<option value="${k}" ${m.strat===k?'selected':''}>${v}</option>`).join('')}</select></label>
@@ -2906,7 +3032,9 @@ function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
   const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${JOBS[p.job].n} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
-  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
+  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`
+  +((p.bag||[]).length?`<div class="sec"><h3>Rampasan dibawa (pasti jatuh)</h3><div class="abl">${p.bag.map(e=>`<div><b>${esc(e.n)}</b>${e.k==='eq'?` ${rarTag(e.r)}<em>${EQ_SLOT[e.s]}</em><br><span class="note">${itemTxt(itemPreview(e.s,e.lv,e.r))}${e.from?` · dari ${esc(e.from)}`:''}</span>`:`<em>${e.k==='core'?'inti':'bahan'} · tingkat ${(e.t||0)+1}</em>`}</div>`).join('')}</div></div>`:'')
+  +dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, Mira memungut barangnya ke gudang.');
   return {t:'Petualang',h};
 }
 /* raja */
