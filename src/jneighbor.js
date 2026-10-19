@@ -12,7 +12,7 @@ function lordTotalExp(L){ let s=L.exp||0; for(let l=1;l<L.lv;l++) s+=Math.round(
 function monValue(m){ const s=SPECIES[m.sp]; return Math.round(120*Math.pow(2.1,s.rar)*(1+(s.stage-1)*1.4)*(1+m.lv*.05)); }
 function nbRaceN(w){ const r=LORD_RACE.find(x=>x.id===w.lord.race); return r?r.n:'Demon'; }
 /* ---------- membuat dungeon tetangga ---------- */
-function nbPickSpecies(f,fl){ const d=f/Math.max(1,fl-1); const r=Math.max(0,Math.min(4,Math.floor(d*2.6+rnd()*1.6))); let sid=pick(GACHA_POOL[RARITY[r]]||GACHA_POOL.N);
+function nbPickSpecies(f,fl){ const d=f/Math.max(1,fl-1); const r=Math.max(0,Math.min(4,Math.floor(d*2.6+rnd()*1.6))); let sid=gachaPick(RARITY[r]);
   if(SPECIES[sid].next&&rnd()<d*.7) sid=SPECIES[sid].next; if(SPECIES[sid].next&&rnd()<d*.25) sid=SPECIES[sid].next; return sid; }
 function nbMakeWorld(id,dname,fl){ NB_MUTE=true; const save=G; let w; const sd=(Math.floor(rnd()*2147480000)+id*7919)%2147480000|1;
   try{ newGame(); srand(sd); w=G; G.lord=null; newLord(true); w.isNeighbor=1; w.wid=id; w.dname=dname; w.themeOff=ri(1,7); w.log=[];

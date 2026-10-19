@@ -371,12 +371,16 @@ function addSecret(f,slot,m){ const fx=G.fix[f][slot]; if(!fx||fx.t!=='rahasia')
 
 /* ---------- gacha ---------- */
 const GACHA_ODDS=[.55,.28,.12,.045,.005];
+// bobot varian: monster polos jauh lebih sering, elemen umum jarang, elemen langka sangat jarang
+function elemWeight(el){ if(!el) return 100; const E=ELEM_BY[el]; if(!E) return 1; if(el==='emas'||el==='hampa') return .03; return E.rar>=1?.15:1; }
+const GACHA_W={}; function gachaPick(tier){ let T=GACHA_W[tier]; if(!T){ const ids=GACHA_POOL[tier]; let acc=0; const cum=ids.map(id=>acc+=elemWeight(SPECIES[id].el)); T=GACHA_W[tier]={ids,cum,tot:acc}; }
+  const r=rnd()*T.tot; let lo=0,hi=T.cum.length-1; while(lo<hi){ const mid=(lo+hi)>>1; if(T.cum[mid]>r) hi=mid; else lo=mid+1; } return T.ids[lo]; }
 function gachaRoll(minR){
   const luck=Math.min(.02,G.aura*.0004);
   let r=rnd(), acc=0, ri_=0; const odds=GACHA_ODDS.slice(); odds[3]+=luck; odds[0]-=luck;
   for(let i=0;i<odds.length;i++){ acc+=odds[i]; if(r<acc){ ri_=i; break; } }
   if(minR!=null) ri_=Math.max(ri_,minR);
-  const pool=GACHA_POOL[RARITY[ri_]]; const sid=pick(pool);
+  const sid=gachaPick(RARITY[ri_]);
   const m=addMonster(sid); G.stats.gacha++;
   autoPlace(m);
   return m;
@@ -387,6 +391,7 @@ function gacha(n,cur){
   if(cur==='gold') G.gold-=cost; else G.jiwa-=cost;
   const out=[]; for(let i=0;i<n;i++) out.push(gachaRoll(n===10&&i===9&&!out.some(m=>SPECIES[m.sp].rar>=2)?2:null));
   const best=out.reduce((a,m)=>SPECIES[m.sp].rar>SPECIES[a.sp].rar?m:a,out[0]);
+  for(const m of out){ const s=SPECIES[m.sp]; const E=s.el&&ELEM_BY[s.el]; if(E&&(E.rar>=1||s.el==='emas'||s.el==='hampa')) log(`✨ Varian langka! ${m.name} si ${s.n} muncul dari lingkaran pemanggilan.`,'evo'); }
   if(SPECIES[best.sp].rar>=3) log(`Lingkaran pemanggilan bersinar ${RARITY[SPECIES[best.sp].rar]}! ${best.name} si ${SPECIES[best.sp].n} bergabung.`,'evo');
   return {out};
 }
