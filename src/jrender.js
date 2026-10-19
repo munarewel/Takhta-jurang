@@ -132,7 +132,7 @@ function render(){
       hpBar(g,m.x,base-24*sc-3,m.hp/monStats(m).hp,'#b07aff',m.lastHit&&G.t-m.lastHit<4);
       if(UI.sel&&UI.sel.k==='m'&&UI.sel.id===m.id){ g.fillStyle='#ffd36a'; g.fillRect(m.x-1,base-30*sc-6,3,2); g.fillRect(m.x,base-30*sc-4,1,1); }
     } else if(it.k==='a'){ const a=u; const p=G.people[a.pid]; if(!p) continue;
-      const mv=(a.walk||0)>0; const spr=advSpr(p,frameOf(a.walk||0,mv)); blit(g,spr,a.x,base,(a.face||fdir(a.floor))<0,1,a.fx.charm>G.t?.7:null);
+      const mv=(a.walk||0)>0; const spr=advSpr(p,frameOf(a.walk||0,mv)); const ox=((a.pid*7)%9-4)*.9; blit(g,spr,a.x+ox,base,(a.face||fdir(a.floor))<0,1,a.fx.charm>G.t?.7:null);
       if(a.fx.sleep>G.t){ g.fillStyle='#d0c0ff'; g.font='5px monospace'; g.fillText('z',a.x+4,base-30-(G.t*4%4)); }
       if(a.fx.stun>G.t){ g.fillStyle='#ffd040'; g.fillRect(a.x-3+Math.round(Math.sin(G.t*8)*3),base-33,2,2); }
       if(a.resting){ g.fillStyle='#9fff9a'; g.fillRect(a.x,base-33-(G.t*6%6),1,2); }

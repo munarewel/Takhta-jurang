@@ -11,8 +11,8 @@ function fdir(f){ return f%2===0?1:-1; }
 function fstart(f){ return f%2===0?10:FW-10; }
 function fend(f){ return f%2===0?FW-10:10; }
 function topF(){ return G.floors-1; }
-function say(x,f,s,c,t){ EFX.push({k:'txt',x,f,s,c:c||'#fff',t:t||1.4,t0:t||1.4}); }
-function fxAt(k,x,f,c,t){ EFX.push({k,x,f,c,t:t||.6,t0:t||.6}); }
+function say(x,f,s,c,t){ if(typeof UI!=='undefined'&&UI.speed>=2&&/^\d+$/.test(s)&&rnd()<(UI.speed>=4?.6:.3)) return; if(EFX.length>200){ const i=EFX.findIndex(e=>e.k==='txt'&&!/"/.test(e.s)); if(i>=0) EFX.splice(i,1); } EFX.push({k:'txt',x,f,s,c:c||'#fff',t:t||1.4,t0:t||1.4}); }
+function fxAt(k,x,f,c,t){ if(EFX.length>300) EFX.shift(); EFX.push({k,x,f,c,t:t||.6,t0:t||.6}); }
 function log(s,c){ G.log.unshift({d:G.day,s,c:c||'n'}); if(G.log.length>160) G.log.pop(); if(typeof onLog==='function') onLog(s,c); }
 function rand(a,b){ return a+rnd()*(b-a); }
 
@@ -41,6 +41,7 @@ function monStats(m){
   let hp=s.hp*2.2*(1+.12*(m.lv-1))*m.boost*lf, atk=s.atk*2*(1+.1*(m.lv-1))*m.boost*lf*(lr==='iblis'?1.1:1)*rg;
   let def=(RANK_ORDER.indexOf(s.rank)*2+m.lv*.6)*(m.abil.includes('kulitBatu')?1.35:1);
   let eva=.03+(m.abil.includes('gesit')?.15:0)+(m.abil.includes('licin')?.1:0)+(s.el==='bayang'?.04:0)+floorKabut(m.floor);
+  for(const ab of m.abil){ const A=ABIL[ab]; if(!A||A.eff!=='stat'&&A.eff!=='elemAtk') continue; if(A.eff==='elemAtk') atk*=1.15; if(A.atk) atk*=1+A.atk; if(A.hp) hp*=1+A.hp; if(A.def) def*=1+A.def; if(A.eva) eva+=A.eva; }
   const E=eqBonus(m); hp+=E.hp; atk+=E.atk; def+=E.def; eva+=E.eva;
   return {hp:Math.round(hp),atk,def,eva,spd:Math.min(1.6,.6+s.spd*.5),rng:s.ranged?40:13};
 }
@@ -73,9 +74,19 @@ function advDrops(p,a,hero){
   // barang bawaan (hasil rampasan dari monster kita) kembali ke kastil
   const got=[]; for(const e of p.bag||[]){ if(e.k==='eq'){ const it=genItem(e.lv,e.r,{s:e.s,n:e.n,from:e.from}); it.r=e.r; got.push(it.n+' ('+RARITY[it.r]+')'); } else { addBahan(e.n,e.t); got.push(e.n); } }
   if(got.length){ out.push(got[0]); if(got.length>1||(p.bag||[]).some(e=>e.k!=='mat')) log(`Dari jasad ${p.name}, Mira memungut ${got.slice(0,4).join(', ')}${got.length>4?', …':''} untuk gudang.`,'evo'); } p.bag=[];
-  if(hero||rnd()<.05+p.lv*.0015){ const it=genItem(p.lv,hero?3:null); out.push(it.n); if(it.r>=3||hero) log(`${p.name} menjatuhkan ${it.n} (${RARITY[it.r]})! Barang masuk ke gudang kastil.`,'evo'); }
+  if(hero||rnd()<.14+p.lv*.002){ const gear=JOB_GEAR[p.job]; const sl=rnd()<.5?'senjata':rnd()<.7?'zirah':'aksesori'; const idx={senjata:0,zirah:1,aksesori:2}[sl];
+    const nm=gear?pick(gear[idx])+(p.el?' '+ELEM_BY[p.el].n:''):null; const it=genItem(p.lv,hero?3:null,{s:sl,n:nm||undefined,from:`${p.name} (${JOBS[p.job].n})`}); out.push(it.n);
+    if(it.r>=2||hero||rnd()<.3) log(`${p.name} (${JOBS[p.job].n}) menjatuhkan ${it.n} (${RARITY[it.r]})! Mira menyimpannya di gudang.`,'evo'); }
   if(out.length) say(a.x,a.floor,'+'+out[out.length-1],'#c8f0a0',1.6);
 }
+function monAtkEl(m){ for(const ab of m.abil){ const A=ABIL[ab]; if(A&&A.eff==='elemAtk') return A.el; } return SPECIES[m.sp].el||(FIRE_MK.has(SPECIES[m.sp].mk)?'api':ICE_MK.has(SPECIES[m.sp].mk)?'es':''); }
+function monDefEl(m){ const s=SPECIES[m.sp]; return s.el||(FIRE_MK.has(s.mk)?'api':ICE_MK.has(s.mk)?'es':''); }
+function applyStatus(a,st,m,d){ const p=G.people[a.pid];
+  if(st==='burn') a.fx.burn=G.t+4; else if(st==='slow') a.fx.slow=G.t+5; else if(st==='stun') a.fx.stun=G.t+1.5; else if(st==='poison') a.fx.poison=G.t+6; else if(st==='curse') a.fx.curse=G.t+8;
+  else if(st==='blind') a.fx.blind=G.t+6; else if(st==='root') a.fx.root=G.t+3; else if(st==='brk') a.fx.brk=G.t+8; else if(st==='sleep') a.fx.sleep=G.t+3; else if(st==='charm') a.fx.charm=G.t+3;
+  else if(st==='drain'&&m){ const ms=monStats(m); m.hp=Math.min(ms.hp,m.hp+(d||0)*.6+ms.hp*.05); }
+  else if(st==='gold'&&p){ const g=Math.round(p.gold*.12); p.gold-=g; G.gold+=g; if(g) say(a.x,a.floor,'+'+g+'G','#ffd36a',1); }
+  else if(st==='mana'&&m){ G.mana+=8+m.lv; } }
 function floorKabut(f){ return G.mons.some(o=>!o.dead&&o.floor===f&&o.abil.includes('kabut'))?.08:0; }
 function lordStats(){ const L=G.lord; const r=L.race;
   return {hp:Math.round((760+L.lv*72)*(1+G.floors*.08)*(r==='orc'?1.4:1)),atk:(20+L.lv*3)*(r==='oni'?1.4:1),def:(4+L.lv*1.1)*(r==='ksatria'?1.5:1),eva:.04,rng:r==='naga'?40:15}; }
@@ -100,7 +111,7 @@ function lordGainExp(n){ const L=G.lord; L.exp+=n; let up=0; while(L.exp>=Math.r
 function fameLv(){ return 1+Math.sqrt(G.pop)*1.45+G.floors*.85+Math.min(30,(G.t-G.lordSince)/DAY_LEN*.6); }
 function newPerson(lv,job,race){
   race=race||pick(ADV_RACES); const {n,sx}=advName(race); const R=RACE[race];
-  const p={id:nid(),name:n,race,sx,job:job||pick(JOB_KEYS),lv:Math.max(1,Math.round(lv)),exp:0,eq:{hp:0,atk:0,def:0},gold:20+Math.round(lv*8),kills:0,alive:true,party:null,title:null,visits:0,
+  const jb=job||pick(JOB_KEYS); const p={id:nid(),name:n,race,sx,job:jb,el:JOB_EL[jb]?pick(JOB_EL[jb]):'',lv:Math.max(1,Math.round(lv)),exp:0,eq:{hp:0,atk:0,def:0},gold:20+Math.round(lv*8),kills:0,alive:true,party:null,title:null,visits:0,
     app:{skin:pick(R.skin),hair:pick(R.hair),eye:pick(R.eye),cloth:pick(CLOTH),cloth2:pick(CLOTH),outfit:sx==='f'&&rnd()<.3?'gaun':pick(OUTFITS),style:sx==='f'&&rnd()<.7?pick(['long','tail','bun','braid']):pick(HAIRSTYLES)}};
   G.people[p.id]=p; return p;
 }
@@ -192,7 +203,8 @@ function dmgCalc(atk,def,mult){ return Math.max(1,atk*mult*rand(.85,1.15)*(1-def
 function hitAdv(a,amt,src,opts){
   opts=opts||{}; const p=G.people[a.pid]; const st=advStats(p);
   if(!opts.sure&&evade(st.eva*(a.fx.slow>G.t?.5:1))){ say(a.x,a.floor,'MISS','#cfd8e8',.8); return 0; }
-  let d=dmgCalc(amt,st.def*(a.fx.guard>G.t?2:1),opts.mult||1);
+  let em=1; { const el=opts.el!=null?opts.el:(src&&src.kind==='m'?monAtkEl(src.u):''); em=elemMult(el,p.el); if(em>1&&rnd()<.35) say(a.x,a.floor-0,'Efektif!','#ffb040',.9); }
+  let d=dmgCalc(amt,st.def*(a.fx.guard>G.t?2:1)*(a.fx.brk>G.t?.6:1),(opts.mult||1)*em);
   if(a.fx.sleep>G.t){ d*=2; a.fx.sleep=0; say(a.x,a.floor,'KOMBO!','#ff9ad0',1.2); }
   if(opts.crit){ d*=src&&src.kind==='m'&&src.u.abil.includes('tajam')?2.4:1.8; }
   d=Math.round(d); a.hp-=d; a.lastHit=G.t;
@@ -223,7 +235,9 @@ function advDie(a,src){
 function hitMon(m,amt,a,opts){
   opts=opts||{}; const st=monStats(m);
   if(!opts.sure&&evade(st.eva)){ say(m.x,m.floor,'MISS','#cfd8e8',.8); return 0; }
-  let d=dmgCalc(amt,st.def,opts.mult||1); if(opts.crit) d*=1.8;
+  const ap=a&&G.people[a.pid]; const ael=ap?ap.el:''; let em=elemMult(ael,monDefEl(m)); if(ael&&m.abil.includes('tameng_'+ael)) em*=.6;
+  let d=dmgCalc(amt,st.def,(opts.mult||1)*em); if(opts.crit) d*=1.8; if(em>1&&rnd()<.3) say(m.x,m.floor,'Lemah!','#9fe0ff',.9);
+  if(a){ m.aggro=a.pid; m.aggroT=G.t; }
   if(m.abil.includes('kulitBaja')) d*=.8;
   if(opts.magic&&m.abil.includes('kebalSihir')) d*=.6;
   if(m.fx.perisai>G.t) d*=.7;
@@ -422,7 +436,7 @@ function advTick(a,dt){
   if(tgt&&td<=st.rng+2&&!charmed){
     a.walk=0; a.face=Math.sign(tgt.u.x-a.x)||dir;
     if(a.cd.sk<=0){ useSkill(a,p,J,tgt,st,pa); a.cd.sk=J.skill.cd; return; }
-    if(a.cd.atk<=0){ a.cd.atk=1.05; const crit=rnd()<.06; const mult=(a.fx.rage>G.t?1.6:1)*(a.fx.buff>G.t?1.25:1)*(a.fx.curse>G.t?.7:1);
+    if(a.cd.atk<=0){ a.cd.atk=1.05; if(a.fx.blind>G.t&&rnd()<.5){ say(a.x,f,'Meleset!','#cfd8e8',.8); return; } const crit=rnd()<.06; const mult=(a.fx.rage>G.t?1.6:1)*(a.fx.buff>G.t?1.25:1)*(a.fx.curse>G.t?.7:1);
       fxAt(J.rng>20?(J.magic?'bolt':'arrow'):'slash',tgt.u.x,f,J.magic?'#9fd0ff':'#ffffff',.25);
       if(tgt.k==='m') hitMon(tgt.u,st.atk,a,{mult,crit,magic:J.magic,ranged:J.rng>20}); else hitLord(st.atk,a,{mult,crit}); }
     return;
@@ -530,7 +544,7 @@ function monTick(m,dt){
   if(m.floor<0) return;
   const st=monStats(m);
   for(const k in m.cd) m.cd[k]-=dt;
-  if(m.abil.includes('regen')&&m.hp<st.hp) m.hp=Math.min(st.hp,m.hp+st.hp*.02*dt);
+  if(m.hp<st.hp){ const rg=(m.abil.includes('regen')?.02:0)+(m.abil.includes('pemulihan')?.01:0); if(rg) m.hp=Math.min(st.hp,m.hp+st.hp*rg*dt); }
   if(m.secret){ const fx=G.fix[m.secret.f]&&G.fix[m.secret.f][m.secret.slot]; if(!fx){ m.secret=null; } else if(!fx.found){ const i=secretMons(fx).indexOf(m); m.x=SLOT_X(m.secret.slot)+(i-1)*7; m.px=m.x; return; } else if(G.t-(fx.foundAt||0)>30&&!G.advs.some(a=>a.floor===m.floor)&&secretMons(fx).every(g=>!g.dead)){ fx.found=false; return; } }
   if(m.fx.stun>G.t) return;
   if(m.hiding){ if(G.t>m.hiding){ m.hiding=0; m.hidden=false; } else { m.hp=Math.min(st.hp,m.hp+st.hp*.05*dt); return; } }
@@ -538,13 +552,15 @@ function monTick(m,dt){
   const f=m.floor; const foes=G.advs.filter(a=>a.floor===f&&!a.resting);
   if(m.strat==='sergap'&&!m.revealed){ m.hidden=true; const near=foes.find(a=>Math.abs(a.x-m.x)<12); if(near){ m.hidden=false; m.revealed=G.t; hitAdv(near,st.atk,{kind:'m',u:m},{mult:2,sure:1}); say(m.x,f,'Sergap!','#ff6060',1.2); } return; }
   if(m.strat==='sergap'&&m.revealed&&!foes.some(a=>Math.abs(a.x-m.x)<60)&&G.t-m.revealed>5){ m.revealed=0; }
-  let range=m.strat==='agresif'?FW:m.strat==='dukung'?50:44;
-  let tgt=null,td=1e9; for(const a of foes){ const anchor=m.strat==='agresif'?m.x:m.px; const da=Math.abs(a.x-anchor); if(da>range) continue; const d=Math.abs(a.x-m.x); if(d<td){ td=d; tgt=a; } }
+  let range=m.strat==='agresif'?FW:m.strat==='dukung'?50:60;
+  let tgt=null,td=1e9;
+  if(m.aggro&&G.t-m.aggroT<5){ const ag=foes.find(a=>a.pid===m.aggro); if(ag){ tgt=ag; td=Math.abs(ag.x-m.x); range=0; } }
+  if(!tgt) for(const a of foes){ const anchor=m.strat==='agresif'?m.x:m.px; const da=Math.abs(a.x-anchor); if(da>range) continue; const d=Math.abs(a.x-m.x); if(d<td){ td=d; tgt=a; } }
   // ability aktif
   if(tgt||m.strat==='dukung') for(const ab of m.abil){ const A=ABIL[ab]; if(A.k!=='a'||(m.cd[ab]||0)>0) continue; if(useMonAbil(m,ab,tgt,st,foes)){ m.cd[ab]=A.cd*rand(.9,1.2); return; } }
   if(tgt){
-    if(td<=st.rng){ m.face=Math.sign(tgt.x-m.x)||1; if((m.cd.atk||0)<=0){ m.cd.atk=1.15/st.spd; const crit=rnd()<.05+(m.abil.includes('elang')?.2:0); const p=G.people[tgt.pid];
-        let mult=(m.fx.teriak>G.t?1.3:1)*(m.abil.includes('semangat')&&G.mons.filter(o=>!o.dead&&o.floor===f).length>=3?1.2:1)*(m.abil.includes('amarah')&&m.hp<st.hp*.4?1.5:1)*(m.fx.curse>G.t?.7:1)*(m.abil.includes('pemburu')&&p&&p.lv<m.lv?1.4:1);
+    if(td<=st.rng){ m.face=Math.sign(tgt.x-m.x)||1; if((m.cd.atk||0)<=0){ m.cd.atk=1.15/st.spd*(m.abil.includes('cepat')?.8:1); const crit=rnd()<.05+(m.abil.includes('elang')?.2:0)+(m.abil.includes('pikiranTajam')?.12:0); const p=G.people[tgt.pid];
+        let mult=(G.mons.some(o=>o!==m&&!o.dead&&o.floor===f&&o.abil.includes('wibawa'))?1.1:1)*(m.fx.teriak>G.t?1.3:1)*(m.abil.includes('semangat')&&G.mons.filter(o=>!o.dead&&o.floor===f).length>=3?1.2:1)*(m.abil.includes('amarah')&&m.hp<st.hp*.4?1.5:1)*(m.fx.curse>G.t?.7:1)*(m.abil.includes('pemburu')&&p&&p.lv<m.lv?1.4:1);
         if(tgt.fx.guard>G.t){ const kn=G.advs.find(x=>x.party===tgt.party&&x.fx.guard>G.t&&x.floor===f); if(kn) tgt=kn; }
         fxAt(st.rng>20?'bolt':'claw',tgt.x,f,'#ff9a9a',.25); hitAdv(tgt,st.atk,{kind:'m',u:m},{mult,crit});
         if(m.abil.includes('auraRacun')&&rnd()<.4) tgt.fx.poison=G.t+5; } }
@@ -560,6 +576,14 @@ function useMonAbil(m,ab,tgt,st,foes){
   const f=m.floor; const src={kind:'m',u:m};
   const inR=r=>foes.filter(a=>Math.abs(a.x-m.x)<r);
   if(ab==='sembuh'){ const hurt=G.mons.filter(o=>!o.dead&&o.floor===f&&o.hp<monStats(o).hp*.7); if(!hurt.length) return false; for(const o of hurt){ const os=monStats(o); o.hp=Math.min(os.hp,o.hp+os.hp*.25); fxAt('heal',o.x,f,'#9fff9a',.8); } say(m.x,f,ABIL[ab].n,'#9fff9a',1); return true; }
+  const A_=ABIL[ab];
+  if(A_&&A_.eff&&A_.k==='a'){ if(!tgt) return false; const T2=foes.filter(a=>Math.abs(a.x-m.x)<(A_.r||40)); if(A_.eff==='aoe'&&!T2.length) return false; if(Math.abs(tgt.x-m.x)>60) return false;
+    say(m.x,f,A_.n,'#ffb0d0',1.1); const ec=(ELEM_BY[A_.el]||{}).c||'#ffffff';
+    if(A_.eff==='hit'){ fxAt('zap',tgt.x,f,ec,.5); hitAdv(tgt,st.atk,src,{mult:A_.m,el:A_.el}); }
+    else if(A_.eff==='aoe'){ fxAt('blast',tgt.x,f,ec,.8); for(const a of T2) hitAdv(a,st.atk,src,{mult:A_.m,el:A_.el}); }
+    else if(A_.eff==='multi'){ fxAt('slash',tgt.x,f,ec,.5); for(let i=0;i<A_.hits;i++) if(tgt.hp>0) hitAdv(tgt,st.atk,src,{mult:A_.m,el:A_.el}); }
+    else if(A_.eff==='status'){ fxAt('curse',tgt.x,f,ec,1); const d_=hitAdv(tgt,st.atk,src,{mult:A_.m,el:A_.el,sure:1}); if(tgt.hp>0) applyStatus(tgt,A_.st,m,d_); }
+    return true; }
   if(!tgt) return false;
   if((ab==='teriak'&&m.fx.teriak>G.t)||(ab==='perisai'&&m.fx.perisai>G.t)) return false;
   const T=inR(40); if(!T.length&&!['gempa','teriak','perisai','meteor'].includes(ab)) return false;
@@ -594,6 +618,9 @@ function lordTick(dt){
   const L=G.lord; if(L.hp<=0) return; const st=lordStats(); const f=topF();
   for(const k in L.cd) L.cd[k]-=dt;
   if(L.hp<st.hp&&!G.advs.some(a=>a.floor===f)) L.hp=Math.min(st.hp,L.hp+st.hp*.05*dt);
+  const home=fend(f); const near=G.advs.filter(a=>a.floor===f&&Math.abs(a.x-home)<95);
+  if(near.length){ const n_=near.sort((a,b)=>Math.abs(a.x-L.x)-Math.abs(b.x-L.x))[0]; const dx=n_.x-L.x; if(Math.abs(dx)>st.rng-2){ const nx=L.x+Math.sign(dx)*16*dt; if(Math.abs(nx-home)<75) L.x=nx; } }
+  else if(Math.abs(L.x-home)>1) L.x+=Math.sign(home-L.x)*Math.min(Math.abs(home-L.x),20*dt);
   const foes=G.advs.filter(a=>a.floor===f&&Math.abs(a.x-L.x)<st.rng+4);
   if(!foes.length) return;
   const src={kind:'l'};
@@ -621,7 +648,6 @@ function step(){
   if(G.mons.some(m=>m.gone)) G.mons=G.mons.filter(m=>!m.gone);
   if(G.lord) lordTick(dt);
   assistTick(dt);
-  for(let i=EFX.length-1;i>=0;i--){ EFX[i].t-=dt; if(EFX[i].t<=0) EFX.splice(i,1); }
 }
 function dailyTick(){
   // kesetiaan pelan-pelan naik dengan aura

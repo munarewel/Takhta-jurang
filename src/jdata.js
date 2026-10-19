@@ -56,7 +56,7 @@ const ABIL={
   bayang:{n:'Bayangan Kembar',k:'a',cd:20,d:'Memanggil bayangan dirinya selama 10 detik.'},
   racunKuat:{n:'Racun Pekat',k:'a',cd:10,d:'Racun kuat yang menggerogoti nyawa 8 detik.'},
 };
-const ABIL_KEYS=Object.keys(ABIL);
+
 /* ---------- kelompok bentuk: menentukan ability yang bisa dipelajari & drop ---------- */
 function monGroup(M){
   const k=M.k, r=M.race;
@@ -78,10 +78,15 @@ const LEARN_POOL={slime:['regen','licin','racunKuat','ledak','serapJiwa','bayang
   prajurit:['tajam','ganda','serbu','teriak','tegar','bayang','elang'],buas:['ganda','amarah','serbu','raung','tajam','semangat'],hum:['tebas','teriak','perisai','tegar','pencuri']};
 function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function learnset(sid){
-  const s=SPECIES[sid]; if(s._learn) return s._learn; const M=MON[s.mk]; const pool=(LEARN_POOL[monGroup(M)]||LEARN_POOL.buas).filter(a=>a!==s.ab);
-  let h=hashStr(sid); const pickd=[]; const p=pool.slice(); const n=s.stage>=3?3:2+(s.rar>=2?1:0);
-  while(pickd.length<n&&p.length){ h=Math.imul(h^(h>>>13),1274126177)>>>0; pickd.push(p.splice(h%p.length,1)[0]); }
-  const cap=STAGE_CAP[s.stage]||25; const fr=[.3,.6,.9];
+  const s=SPECIES[sid]; if(s._learn) return s._learn; const M=MON[s.mk];
+  const STATP=['raksasa','tubuhBesi','langkahAngin','pikiranTajam','kulitTebal','pemulihan','cepat','wibawa'];
+  let pool=(LEARN_POOL[monGroup(M)]||LEARN_POOL.buas).concat(STATP);
+  const el=s.el||(FIRE_MK.has(s.mk)?'api':ICE_MK.has(s.mk)?'es':'');
+  const elPool=el?['tembak_','ledak_','status_','badai_','jiwa_','tameng_'].map(x=>x+el):[];
+  let h=hashStr(sid); const pickd=[]; const n=2+(s.stage>=2?1:0)+(s.rar>=2?1:0);
+  const take=arr=>{ const p=arr.filter(a=>a!==s.ab&&!pickd.includes(a)); if(!p.length) return; h=Math.imul(h^(h>>>13),1274126177)>>>0; pickd.push(p[h%p.length]); };
+  while(pickd.length<n){ const before=pickd.length; take(elPool.length&&pickd.length%2===0?elPool:pool); if(pickd.length===before) take(pool); if(pickd.length===before) break; }
+  const cap=STAGE_CAP[s.stage]||25; const fr=[.2,.45,.7,.92];
   s._learn=[{ab:s.ab,lv:1}].concat(pickd.map((a,i)=>({ab:a,lv:Math.max(2,Math.round(cap*fr[i]))}))); return s._learn;
 }
 /* ---------- drop sesuai monster ---------- */
@@ -129,6 +134,42 @@ const ELEM=[
   {id:'mimpi',n:'Mimpi',c:'#ff9ad0',ab:'goda',w:2,rar:1},
 ];
 const ELEM_BY={}; for(const e of ELEM) ELEM_BY[e.id]=e;
+/* ---------- ability berelemen (6 per elemen) & pasif stat ---------- */
+const ELEM_STATUS={api:['Bakar','burn'],es:['Bekukan','slow'],petir:['Setrum','stun'],racun:['Racuni','poison'],bayang:['Kutukan Bayangan','curse'],cahaya:['Silau','blind'],batu:['Membatu','stun'],angin:['Hempasan','slow'],darah:['Hisap Darah','drain'],kristal:['Belenggu Kristal','root'],baja:['Hancurkan Zirah','brk'],kabut:['Kabut Tidur','sleep'],lava:['Lelehkan','brk'],emas:['Rampas Emas','gold'],hampa:['Hisap Mana','mana'],air:['Tenggelamkan','slow'],tanah:['Jebakan Tanah','root'],daun:['Akar Pengikat','root'],tulang:['Kutukan Tulang','curse'],bulan:['Nina Bulan','sleep'],surya:['Sinar Surya','blind'],pasir:['Badai Pasir','blind'],neraka:['Api Neraka','burn'],suci:['Penghakiman','stun'],mimpi:['Mimpi Buruk','charm']};
+const STATUS_D={burn:'membakar',slow:'memperlambat',stun:'membuat pingsan',poison:'meracuni',curse:'melemahkan serangan',blind:'membutakan (serangan sering meleset)',drain:'menghisap nyawa',root:'menjerat',brk:'menghancurkan pertahanan',sleep:'menidurkan',gold:'mencuri emas',mana:'menyerap mana untuk kastil',charm:'memikat'};
+for(const E of ELEM){ if(!E.id) continue; const S=ELEM_STATUS[E.id]||['Kutukan '+E.n,'curse'];
+  ABIL['tembak_'+E.id]={n:`Tembakan ${E.n}`,k:'a',cd:7,eff:'hit',m:1.9,el:E.id,d:`Serangan ${E.n} terfokus (190%).`};
+  ABIL['ledak_'+E.id]={n:`Ledakan ${E.n}`,k:'a',cd:11,eff:'aoe',m:1.4,r:40,el:E.id,d:`Ledakan ${E.n} ke semua petualang di dekatnya (140%).`};
+  ABIL['status_'+E.id]={n:S[0],k:'a',cd:10,eff:'status',st:S[1],m:.7,el:E.id,d:`Serangan ${E.n} yang ${STATUS_D[S[1]]}.`};
+  ABIL['badai_'+E.id]={n:`Badai ${E.n}`,k:'a',cd:9,eff:'multi',hits:3,m:.7,el:E.id,d:`Tiga serangan ${E.n} beruntun.`};
+  ABIL['jiwa_'+E.id]={n:`Jiwa ${E.n}`,k:'p',eff:'elemAtk',el:E.id,d:`Serangan biasa berelemen ${E.n} dan +15% kerusakan.`};
+  ABIL['tameng_'+E.id]={n:`Perisai ${E.n}`,k:'p',eff:'res',el:E.id,d:`Kerusakan elemen ${E.n} yang diterima -40%.`};
+}
+Object.assign(ABIL,{
+  raksasa:{n:'Kekuatan Raksasa',k:'p',eff:'stat',atk:.2,d:'Serangan +20%.'},
+  tubuhBesi:{n:'Tubuh Besi',k:'p',eff:'stat',hp:.25,d:'Nyawa maksimal +25%.'},
+  langkahAngin:{n:'Langkah Angin',k:'p',eff:'stat',eva:.1,d:'Menghindar +10%.'},
+  pikiranTajam:{n:'Pikiran Tajam',k:'p',eff:'stat',crit:.12,d:'Peluang kritikal +12%.'},
+  kulitTebal:{n:'Kulit Tebal',k:'p',eff:'stat',def:.3,d:'Pertahanan +30%.'},
+  pemulihan:{n:'Pemulihan',k:'p',eff:'stat',regen:.01,d:'Memulihkan 1% nyawa tiap detik.'},
+  cepat:{n:'Gerak Kilat',k:'p',eff:'stat',spd:.25,d:'Kecepatan serangan +25%.'},
+  wibawa:{n:'Wibawa Raja',k:'p',eff:'stat',aura:1,d:'Monster lain di lantai ini +10% serangan.'},
+});
+/* kuat ⇒ x1,5 · lemah ⇒ x0,7 */
+const ELEM_STRONG={api:['daun','es','baja'],air:['api','lava','pasir'],es:['daun','angin','air'],petir:['air','baja','angin'],tanah:['petir','racun','lava'],daun:['air','tanah','batu'],angin:['daun','kabut','pasir'],batu:['petir','api','angin'],racun:['daun','air','darah'],
+  cahaya:['bayang','neraka','hampa'],bayang:['bulan','mimpi','cahaya'],neraka:['suci','daun','es'],suci:['neraka','bayang','tulang'],tulang:['darah'],bulan:['bayang','mimpi'],surya:['es','bulan','kabut'],pasir:['petir','api'],kristal:['kabut','hampa'],baja:['batu','kristal','es'],lava:['es','baja','daun'],emas:[],hampa:['kristal','cahaya','emas'],mimpi:['kabut','tulang'],darah:['tulang','daun'],kabut:['cahaya','surya']};
+function elemMult(a,dEl){ if(!a||!dEl) return 1; if((ELEM_STRONG[a]||[]).includes(dEl)) return 1.5; if((ELEM_STRONG[dEl]||[]).includes(a)) return .7; return 1; }
+const JOB_EL={mage:['api','es','petir'],priest:['cahaya'],cleric:['cahaya'],paladin:['cahaya'],necro:['bayang'],darkmage:['bayang','neraka'],druid:['daun'],hydromancer:['air'],sage:['api','es','petir','cahaya','angin'],dragoon:['api'],ninja:['angin','bayang'],summoner:['bulan','cahaya'],alkemis:['racun','api'],ranger:['angin'],hunter:['tanah']};
+const JOB_GEAR={knight:[['Pedang Ksatria','Pedang Panjang'],['Zirah Ksatria','Perisai Besar'],['Lencana Ksatria']],mage:[['Tongkat Sihir'],['Jubah Penyihir'],['Cincin Mana']],priest:[['Gada Suci'],['Jubah Pendeta'],['Rosario Perak']],
+  archer:[['Busur Panjang'],['Rompi Pemanah'],['Sarung Tangan Pemanah']],thief:[['Belati Pencuri'],['Jubah Gelap'],['Kunci Ajaib']],dualblade:[['Pedang Kembar'],['Zirah Ringan'],['Ikat Pinggang Pedang']],
+  lancer:[['Tombak Panjang'],['Zirah Lancer'],['Panji Kecil']],monk:[['Sarung Tinju'],['Baju Biksu'],['Tasbih Kayu']],berserker:[['Kapak Raksasa'],['Kulit Binatang'],['Kalung Taring']],
+  paladin:[['Pedang Suci'],['Zirah Suci','Perisai Suci'],['Liontin Cahaya']],ranger:[['Busur Ranger'],['Jubah Hutan'],['Peta Lusuh']],bard:[['Kecapi'],['Baju Penyair'],['Topi Bulu']],
+  samurai:[['Katana'],['Zirah Samurai'],['Jimat Kuil']],ninja:[['Shuriken','Kunai'],['Baju Ninja'],['Ikat Kepala Ninja']],necro:[['Tongkat Tengkorak'],['Jubah Kematian'],['Grimoire Hitam']],
+  druid:[['Tongkat Akar'],['Jubah Daun'],['Mahkota Ranting']],alkemis:[['Bom Ramuan'],['Celemek Alkemis'],['Tas Botol']],summoner:[['Tongkat Pemanggil'],['Jubah Roh'],['Batu Kontrak']],
+  sage:[['Tongkat Bijak'],['Jubah Agung'],['Kitab Kuno']],dragoon:[['Tombak Naga'],['Zirah Naga'],['Lambang Naga']],swordmaster:[['Pedang Pusaka'],['Zirah Master'],['Sabuk Juara']],
+  sniper:[['Busur Penembak Jitu'],['Rompi Kamuflase'],['Teropong']],axeman:[['Kapak Perang'],['Zirah Rantai'],['Gelang Besi']],darkmage:[['Tongkat Kegelapan'],['Jubah Hitam'],['Bola Kristal Gelap']],
+  hunter:[['Busur Pemburu'],['Jaket Kulit'],['Kalung Taring Buruan']],cleric:[['Tongkat Penyembuh'],['Jubah Putih'],['Botol Ramuan Suci']],hydromancer:[['Tongkat Ombak'],['Jubah Laut'],['Mutiara Biru']]};
+const ABIL_KEYS=Object.keys(ABIL);
 // ability bawaan menurut bentuk tubuh
 const SHAPE_AB={slime:'regen',wolf:'ganda',hound:'ganda',bat:'haus',spider:'jaring',mimic:'pemburu',wyvern:'api',boar:'tebas',ghost:'gesit',bear:'amarah',imp:'kutuk',salamander:'api',cockatrice:'kutuk',harpy:'gesit',basilisk:'kutuk',pegasus:'kedip',treant:'regen',yeti:'raung',griffin:'kedip',manticore:'auraRacun',chimera:'api',cerberus:'raung',hydra:'regen',dodo:'untung',horseman:'raung',mudHand:'jaring',cryingDemon:'kutuk',hedgehog:'duri',drone:'petir',robot:'kulitBaja',snowman:'beku',penguin:'gesit',kaktus:'duri',bunga:'jaring',kura:'kulitBatu',labu:'ledak',rusa:'sembuh',kraken:'jaring',shark:'haus',seaSerpent:'beku',neko:'gesit',dragonE:'kulitBatu',jamur:'kutuk',kodok:'jaring',kepiting:'kulitBaja',ular:'auraRacun',gagak:'gesit',kalajengking:'auraRacun',rubah:'goda',tikus:'panggil',kumbang:'kulitBatu',boneka:'kutuk',mata:'petir',cacing:'tebas',zirah:'berani',peri:'sembuh',kelinci:'ganda',gurita:'jaring',raptor:'ganda',raptorA:'ganda',batroww:'haus',nulleye:'kutuk',dragonW:'api',tyrvern:'raung',kong:'raung',bee:'auraRacun',beeQ:'panggil',agroo:'tebas',kangaroo:'ganda',tiger:'ganda',dinoV:'ledak',dinoT:'raung',unicorn:'sembuh',phoenix:'regen',kitsune:'goda',dragonE:'kulitBatu',griffinK:'kedip',fenrir:'raung',behemoth:'kulitBaja',thunderbird:'petir'};
 const RACE_AB={kobold:'panggil',goblin:'pemburu',hobgoblin:'tebas',zombie:'berani',skeleton:'berani',lizard:'duri',orc:'amarah',troll:'regen',ogre:'tebas',golem:'kulitBaja',minotaur:'raung',succubus:'goda',mumi:'kutuk',cyborg:'petir',iblis:'amarah',neraka:'amarah',jenderal:'raung'};
