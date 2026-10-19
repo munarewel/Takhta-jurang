@@ -57,5 +57,5 @@ function drawJurangMon2(P,m,f){
   if(k==='rusa'){ sh(14); const lg=f%2; P(-7,-13,12,5,c); P(-6,-9,10,1,lt); P(-5,-12,1,1,lt); P(-1,-11,1,1,lt); P(4,-18,3,6,c); P(5,-21,5,4,c); P(10,-19,1,1,eye); P(8,-20,1,1,'#1a1a1a');
     P(5,-26,1,5,'#e8dcc8'); P(3,-26,2,1,'#e8dcc8'); P(4,-28,1,2,'#e8dcc8'); P(8,-25,1,4,'#e8dcc8'); P(9,-27,2,1,'#e8dcc8'); P(-8,-13,2,2,lt);
     P(-6,-8,1,8-lg,dk); P(-3,-8,1,8,dk); P(1,-8,1,8-lg,dk); P(3,-8,1,8,dk); return; }
-  return false;
+  return drawJurangMon3(P,m,f);
 }

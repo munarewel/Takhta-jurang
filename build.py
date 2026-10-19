@@ -1,4 +1,4 @@
-parts=['data.js','monbase.js','jmon2.js','jmon3.js','jdata.js','jsim.js','sprites.js','sprites6.js','sprites7.js','jspr3.js','jrender.js','jui.js']
+parts=['data.js','monbase.js','jmon2.js','jmon3.js','jmon4.js','jdata.js','jsim.js','sprites.js','sprites6.js','sprites7.js','jspr3.js','jspr4.js','jrender.js','jui.js']
 js="'use strict';\n"+"\n".join(open('src/'+p).read().replace("'use strict';","") for p in parts)
 shell=open('src/shell.html').read()
 open('index.html','w').write(shell.replace('/*SCRIPT*/',js))

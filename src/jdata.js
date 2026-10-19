@@ -39,8 +39,65 @@ const ABIL={
   kutuk:{n:'Kutukan',k:'a',cd:12,d:'Serangan target -30% selama 8 detik.'},
   tebas:{n:'Tebasan Kuat',k:'a',cd:6,d:'Pukulan keras 180%.'},
   goda:{n:'Pikatan',k:'a',cd:16,d:'Satu petualang terpikat dan berhenti menyerang 4 detik.'},
+  tajam:{n:'Bilah Tajam',k:'p',d:'Kerusakan kritikal +60%.'},
+  tegar:{n:'Tegar',k:'p',d:'Bertahan dengan 1 nyawa saat terkena pukulan mematikan (sekali tiap 30 detik).'},
+  kebalSihir:{n:'Kebal Sihir',k:'p',d:'Kerusakan sihir yang diterima -40%.'},
+  serapJiwa:{n:'Serap Jiwa',k:'p',d:'Pulih 30% nyawa setiap membunuh petualang.'},
+  semangat:{n:'Semangat Kawanan',k:'p',d:'Serangan +20% saat ada 3 monster atau lebih di lantai yang sama.'},
+  licin:{n:'Tubuh Licin',k:'p',d:'Menghindar +10%, kebal jerat.'},
+  pencuri:{n:'Tangan Usil',k:'p',d:'Setiap pukulan mencuri 3 emas dari petualang.'},
+  gempa:{n:'Gempa',k:'a',cd:18,d:'Mengguncang lantai: semua petualang di lantai ini pingsan 1,5 detik.'},
+  tornado:{n:'Tornado',k:'a',cd:12,d:'Angin puyuh: kerusakan area dan mendorong mundur.'},
+  meteor:{n:'Meteor',k:'a',cd:22,d:'Batu api jatuh dari langit-langit: kerusakan area 260%.'},
+  teriak:{n:'Teriakan Perang',k:'a',cd:16,d:'Monster di lantai ini +30% serangan selama 8 detik.'},
+  perisai:{n:'Perisai Sihir',k:'a',cd:15,d:'Monster di lantai ini menerima kerusakan -30% selama 6 detik.'},
+  tidur:{n:'Nina Bobo',k:'a',cd:12,d:'Menidurkan satu petualang 3 detik. Kombo dengan serangan berikutnya.'},
+  serbu:{n:'Serbuan',k:'a',cd:8,d:'Menerjang target dengan kekuatan 200%.'},
+  bayang:{n:'Bayangan Kembar',k:'a',cd:20,d:'Memanggil bayangan dirinya selama 10 detik.'},
+  racunKuat:{n:'Racun Pekat',k:'a',cd:10,d:'Racun kuat yang menggerogoti nyawa 8 detik.'},
 };
 const ABIL_KEYS=Object.keys(ABIL);
+/* ---------- kelompok bentuk: menentukan ability yang bisa dipelajari & drop ---------- */
+function monGroup(M){
+  const k=M.k, r=M.race;
+  if(k==='slime') return 'slime';
+  if(k==='hum'){ if(r==='skeleton') return 'skel'; if(r==='zombie'||r==='mumi') return 'mayat'; if(['goblin','hobgoblin','kobold'].includes(r)) return 'goblin'; if(['orc','ogre','troll','minotaur'].includes(r)) return 'orc'; if(['succubus','neraka','jenderal','iblis'].includes(r)) return 'iblis'; if(r==='cyborg') return 'mesin'; return 'hum'; }
+  if(['dragon2','dragonE2','wyvern','tyrvern','hydra','dinoV','dinoT','seaSerpent','ular'].includes(k)) return 'naga';
+  if(['golemX','robot','drone'].includes(k)) return 'mesin';
+  if(['ghost','imp','cryingDemon','labu','mata','boneka','horseman','mudHand'].includes(k)) return 'roh';
+  if(['bat','batroww','harpy','griffin','griffinK','gagak','agroo','bee','beeQ','phoenix','thunderbird','pegasus','peri','cockatrice'].includes(k)) return 'terbang';
+  if(['treant','bunga','jamur','kaktus'].includes(k)) return 'tanaman';
+  if(['spider','kumbang','kalajengking','kepiting','mimic'].includes(k)) return 'cangkang';
+  if(k==='beastman') return 'prajurit';
+  return 'buas';
+}
+const LEARN_POOL={slime:['regen','licin','racunKuat','ledak','serapJiwa','bayang'],skel:['tebas','tegar','kebalSihir','teriak','perisai','tajam'],mayat:['kutuk','tegar','serapJiwa','tidur','racunKuat'],
+  goblin:['pencuri','ganda','panggil','teriak','semangat','licin'],orc:['amarah','serbu','teriak','tegar','tebas','gempa'],iblis:['kutuk','goda','api','serapJiwa','amarah','meteor'],
+  naga:['api','meteor','kulitBaja','raung','tajam','tegar'],mesin:['kulitBaja','petir','perisai','gempa','kebalSihir','meteor'],roh:['kutuk','tidur','kedip','serapJiwa','kebalSihir','bayang'],
+  terbang:['gesit','kedip','tornado','elang','ganda'],tanaman:['regen','jaring','duri','racunKuat','tidur'],cangkang:['kulitBatu','duri','racunKuat','jaring','pelindung'],
+  prajurit:['tajam','ganda','serbu','teriak','tegar','bayang','elang'],buas:['ganda','amarah','serbu','raung','tajam','semangat'],hum:['tebas','teriak','perisai','tegar','pencuri']};
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function learnset(sid){
+  const s=SPECIES[sid]; if(s._learn) return s._learn; const M=MON[s.mk]; const pool=(LEARN_POOL[monGroup(M)]||LEARN_POOL.buas).filter(a=>a!==s.ab);
+  let h=hashStr(sid); const pickd=[]; const p=pool.slice(); const n=s.stage>=3?3:2+(s.rar>=2?1:0);
+  while(pickd.length<n&&p.length){ h=Math.imul(h^(h>>>13),1274126177)>>>0; pickd.push(p.splice(h%p.length,1)[0]); }
+  const cap=STAGE_CAP[s.stage]||25; const fr=[.3,.6,.9];
+  s._learn=[{ab:s.ab,lv:1}].concat(pickd.map((a,i)=>({ab:a,lv:Math.max(2,Math.round(cap*fr[i]))}))); return s._learn;
+}
+/* ---------- drop sesuai monster ---------- */
+const FIRE_MK=new Set(['redDragon','nagaMerahTua','salamander','salamanderLava','phoenix','volcanosaur','impApi','iblisApi','anjingLava','anjingMagma','kura','kuraVulkan','kuraTitan','golemMagma','golemInti','bayiNaga','nagaRemaja','nagaDewasa','nagaPurba']);
+const ICE_MK=new Set(['nagaEs','nagaEsPurba','golemEs','golemGletser','yeti','yetiRaja','serigalaSalju','serigalaEs','snowman','snowmanRaksasa','rajaSalju','penguin','penguinKaisar']);
+const DROP_NAMES={slime:['Pecahan Slime','Inti Slime',['Cambuk Lendir'],['Zirah Lendir'],['Cincin Slime']],skel:['Tulang Tua','Inti Kerangka',['Pedang Besi','Kapak Besi'],['Zirah Besi','Perisai Tulang'],['Kalung Tulang']],
+  mayat:['Kain Kafan','Inti Mayat',['Belati Karat'],['Jubah Kafan'],['Jimat Makam']],goblin:['Telinga Goblin','Inti Goblin',['Belati Goblin','Gada Goblin'],['Zirah Kulit Goblin'],['Kalung Gigi']],
+  orc:['Taring Orc','Inti Orc',['Kapak Besar','Gada Duri'],['Zirah Kulit Tebal'],['Gelang Prajurit']],iblis:['Tanduk Iblis','Inti Iblis',['Sabit Neraka','Cambuk Neraka'],['Zirah Neraka'],['Mahkota Duri']],
+  naga:['Sisik Naga','Inti Naga',['Pedang Naga','Tombak Taring Naga'],['Zirah Sisik Naga'],['Taring Naga']],mesin:['Baut Logam','Inti Mesin',['Pedang Laser','Gada Batu'],['Zirah Mesin','Zirah Batu'],['Chip Kuno','Cincin Rune']],
+  roh:['Debu Roh','Inti Roh',['Sabit Roh'],['Jubah Roh'],['Liontin Roh']],terbang:['Bulu Langka','Inti Angin',['Busur Bulu'],['Jubah Bulu'],['Anting Bulu']],tanaman:['Getah Hutan','Inti Hutan',['Tongkat Akar'],['Zirah Kulit Kayu'],['Mahkota Daun']],
+  cangkang:['Pecahan Cangkang','Inti Serangga',['Tombak Sengat'],['Zirah Cangkang'],['Jimat Racun']],prajurit:['Sabuk Pendekar','Inti Ksatria',['Katana','Tongkat Sakti'],['Baju Pendekar'],['Ikat Kepala']],
+  buas:['Taring Buas','Inti Buas',['Cakar Buas','Gada Taring'],['Jubah Bulu Buas'],['Kalung Taring']],hum:['Lencana Rusak','Inti Jiwa',['Pedang Tua'],['Zirah Rantai'],['Cincin Tembaga']]};
+function dropTheme(sid){ const s=SPECIES[sid], M=MON[s.mk]; const g=monGroup(M); const D=DROP_NAMES[g]||DROP_NAMES.buas;
+  const el=s.el?ELEM_BY[s.el].n:FIRE_MK.has(s.mk)?'Api':ICE_MK.has(s.mk)?'Es':'';
+  const tier=Math.min(6,RANK_ORDER.indexOf(s.rank)); const base=M.n;
+  return {mat:(D[0]+(el?' '+el:'')),core:`Inti ${base}`,eq:{senjata:D[2].map(n=>n+(el?' '+el:'')),zirah:D[3].map(n=>n+(el?' '+el:'')),aksesori:D[4].map(n=>n+(el?' '+el:''))},tier,rar:Math.min(4,s.rar),from:s.n}; }
 
 /* ---------- elemen (pengali variasi spesies) ---------- */
 const ELEM=[
@@ -187,7 +244,7 @@ const LORD_RACE=[
   {id:'lich',n:'Lich',mon:{k:'hum',race:'skeleton',job:'mLich'},d:'Biaya kebangkitan monster -40%.'},
   {id:'orc',n:'Orc',mon:{k:'hum',race:'orc',job:'mOrcLord'},d:'Nyawa Raja +40%.'},
   {id:'succubus',n:'Succubus',mon:{k:'hum',race:'succubus',job:'mSuccubus'},d:'Kadang memikat petualang hingga berhenti menyerang.'},
-  {id:'naga',n:'Naga',mon:{k:'dragonW',c:'#8a1a2a',eye:'#ffd040'},sc:1.4,d:'Napas api ke seluruh party di ruang singgasana.'},
+  {id:'naga',n:'Naga',mon:{k:'dragon2',c:'#8a1a2a',eye:'#ffd040'},sc:1.25,d:'Napas api ke seluruh party di ruang singgasana.'},
   {id:'oni',n:'Oni',mon:{k:'hum',race:'ogre',job:'mOgre'},tint:'#c82a2a',d:'Serangan Raja +40%.'},
   {id:'elfGelap',n:'Elf Gelap',race:'elf',skin:'#7a6a9a',hair:'#e8e6f0',job:'rajaIblis',d:'Regenerasi mana kastil +50%.'},
   {id:'ksatria',n:'Ksatria Neraka',mon:{k:'hum',race:'neraka',job:'mHellKnight'},d:'Pertahanan Raja +50%.'},

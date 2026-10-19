@@ -12,10 +12,11 @@ function tintCanvas(spr,col,key,a){
   g.drawImage(spr,0,0); g.globalCompositeOperation='source-atop'; g.globalAlpha=a||.45; g.fillStyle=col; g.fillRect(0,0,c.width,c.height);
   if(RC.tint.size>3000) RC.tint.clear(); RC.tint.set(key,c); return c;
 }
+function humDir(race){ const R=SPR(race); return R&&(R.hw||6)>=8?'down':'side'; }
 function frameOf(walk,moving){ return moving?Math.floor(walk*7)%4:0; }
 function monSpr(sid,f){
   const s=SPECIES[sid]; const M=MON[s.mk];
-  const base=monSprite({k:M.k,c:M.c,race:M.race,job:M.job,king:M.king,eye:M.eye,dir:M.k==='hum'?'side':undefined},f);
+  const base=monSprite({k:M.k,c:M.c,race:M.race,job:M.job,king:M.king,eye:M.eye,dir:M.k==='hum'?humDir(M.race):undefined},f);
   const E=ELEM_BY[s.el]; let out=base;
   if(M.tint) out=tintCanvas(out,M.tint,'T|'+s.mk+'|'+f,.42);
   if(E&&E.c) out=tintCanvas(out,E.c,'E|'+sid+'|'+f,E.id==='hampa'?.55:.4);
@@ -23,7 +24,7 @@ function monSpr(sid,f){
 }
 function advSpr(p,f){ return sprite({race:p.race,stage:'dewasa',job:JOBS[p.job].spr,sex:p.sx,skin:p.app.skin,hair:p.app.hair,eye:p.app.eye,cloth:p.app.cloth,cloth2:p.app.cloth2,outfit:p.app.outfit,style:p.app.style},'side',f); }
 function lordSpr(f){ const r=lordRace(), L=G.lord;
-  if(r.mon){ let c=monSprite(Object.assign({dir:r.mon.k==='hum'?'side':undefined},r.mon),f); if(r.tint) c=tintCanvas(c,r.tint,'L|'+r.id+f,.4); return c; }
+  if(r.mon){ let c=monSprite(Object.assign({dir:r.mon.k==='hum'?humDir(r.mon.race):undefined},r.mon),f); if(r.tint) c=tintCanvas(c,r.tint,'L|'+r.id+f,.4); return c; }
   return sprite({race:r.race,stage:'dewasa',job:'rajaIblis',sex:'m',skin:L.app.skin,hair:L.app.hair,eye:L.app.eye,cloth:L.app.cloth,cloth2:L.app.cloth2,outfit:'mantel',style:'long'},'side',f); }
 function assistSpr(f){ return monSprite({k:'hum',race:'succubus',job:'mSuccubus',dir:'side'},f); }
 function blit(g,spr,x,y,flip,sc,alpha){
