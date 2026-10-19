@@ -72,23 +72,12 @@ function equipItem(m,it){ if(!it) return 'Barang tidak ada.'; m.eq=m.eq||{}; if(
 function unequip(m,slot){ if(!m.eq||!m.eq[slot]) return; const it=G.inv.find(x=>x.id===m.eq[slot]); if(it) it.on=null; delete m.eq[slot]; }
 function tierOf(n){ G.bahanT=G.bahanT||{}; if(G.bahanT[n]!=null) return G.bahanT[n]; const i=BAHAN.indexOf(n); return i>=0?i:0; }
 function addBahan(n,t){ G.bahan[n]=(G.bahan[n]||0)+1; G.bahanT=G.bahanT||{}; if(t!=null) G.bahanT[n]=t; }
-function forgeCost(it){ return {gold:Math.round(60*(it.lv+1)*(it.r+1)),tier:Math.min(6,it.r+Math.floor(it.lv/4)),n:1+Math.floor(it.lv/2)}; }
-function bahanAvail(t){ return Object.entries(G.bahan).filter(([n,c])=>c>0&&tierOf(n)>=t).reduce((s,[n,c])=>s+c,0); }
-function forgeItem(it){ if(it.lv>=10) return 'Sudah +10.'; const c=forgeCost(it); if(G.gold<c.gold) return `Emas kurang (butuh ${c.gold}).`; if(bahanAvail(c.tier)<c.n) return `Butuh ${c.n} bahan tingkat ${c.tier+1} ke atas.`;
-  G.gold-=c.gold; let need=c.n; for(const [n] of Object.entries(G.bahan).filter(([n,v])=>v>0&&tierOf(n)>=c.tier).sort((a,b)=>tierOf(a[0])-tierOf(b[0]))){ while(need>0&&G.bahan[n]>0){ G.bahan[n]--; need--; } if(!need) break; } it.lv++; return null; }
+function forgeCost(it){ return {gold:Math.round(80*(it.lv+1)*(it.r+1)),mana:Math.round(20*(it.lv+1)*(1+it.r*.5))}; }
+function forgeItem(it){ if(it.lv>=10) return 'Sudah +10.'; const c=forgeCost(it); if(G.gold<c.gold) return `Emas kurang (butuh ${c.gold}).`; if(G.mana<c.mana) return `Mana kurang (butuh ${c.mana}).`;
+  G.gold-=c.gold; G.mana-=c.mana; it.lv++; return null; }
 function sellItem(it){ if(it.on){ const m=G.mons.find(x=>x.id===it.on); if(m) unequip(m,it.s); } G.inv=G.inv.filter(x=>x!==it); G.gold+=itemValue(it); }
 function buyItem(){ const c=250; if(G.gold<c) return `Emas kurang (butuh ${c}).`; G.gold-=c; return genItem(Math.max(1,fameLv()*.6)); }
-function advDrops(p,a,hero){
-  const out=[];
-  if(rnd()<.12){ const b=BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12)+(rnd()<.15?1:0))]; addBahan(b); out.push(b); }
-  // barang bawaan (hasil rampasan dari monster kita) kembali ke kastil
-  const got=[]; for(const e of p.bag||[]){ if(e.k==='eq'){ const it=genItem(e.lv,e.r,{s:e.s,n:e.n,from:e.from}); it.r=e.r; got.push(it.n+' ('+RARITY[it.r]+')'); } else { addBahan(e.n,e.t); got.push(e.n); } }
-  if(got.length){ out.push(got[0]); if(got.length>1||(p.bag||[]).some(e=>e.k!=='mat')) log(`Dari jasad ${p.name}, Mira memungut ${got.slice(0,4).join(', ')}${got.length>4?', …':''} untuk gudang.`,'evo'); } p.bag=[];
-  if(hero||rnd()<Math.min(.07,.025+p.lv*.0004)){ const gear=JOB_GEAR[p.job]; const sl=rnd()<.5?'senjata':rnd()<.7?'zirah':'aksesori'; const idx={senjata:0,zirah:1,aksesori:2}[sl];
-    const nm=gear?pick(gear[idx])+(p.el?' '+ELEM_BY[p.el].n:''):null; const it=genItem(p.lv,hero?3:null,{s:sl,n:nm||undefined,from:`${p.name} (${JOBS[p.job].n})`}); out.push(it.n);
-    if(it.r>=2||hero||rnd()<.3) log(`${p.name} (${JOBS[p.job].n}) menjatuhkan ${it.n} (${RARITY[it.r]})! Mira menyimpannya di gudang.`,'evo'); }
-  if(out.length) say(a.x,a.floor,'+'+out[out.length-1],'#c8f0a0',1.6);
-}
+function advDrops(p){ p.bag=[]; }
 function monAtkEl(m){ for(const ab of m.abil){ const A=ABIL[ab]; if(A&&A.eff==='elemAtk') return A.el; } return SPECIES[m.sp].el||(FIRE_MK.has(SPECIES[m.sp].mk)?'api':ICE_MK.has(SPECIES[m.sp].mk)?'es':''); }
 function monDefEl(m){ const s=SPECIES[m.sp]; return s.el||(FIRE_MK.has(s.mk)?'api':ICE_MK.has(s.mk)?'es':''); }
 function applyStatus(a,st,m,d){ const p=G.people[a.pid];
@@ -100,7 +89,7 @@ function applyStatus(a,st,m,d){ const p=G.people[a.pid];
 function floorKabut(f){ return G.mons.some(o=>!o.dead&&o.floor===f&&o.abil.includes('kabut'))?.08:0; }
 function lordStats(){ const L=G.lord; const r=L.race;
   return {hp:Math.round((760+L.lv*72)*(1+G.floors*.08)*(r==='orc'?1.4:1)),atk:(20+L.lv*3)*(r==='oni'?1.4:1),def:(4+L.lv*1.1)*(r==='ksatria'?1.5:1),eva:.04,rng:r==='naga'?40:15}; }
-function advStats(p){ const J=JOBS[p.job]; return {hp:Math.round(J.hp+J.grow[0]*(p.lv-1)+p.eq.hp),atk:J.atk+J.grow[1]*(p.lv-1)+p.eq.atk,def:J.def+J.grow[2]*(p.lv-1)+p.eq.def,eva:J.eva+Math.min(.12,p.lv*.0012),rng:J.rng}; }
+function advStats(p){ const J=JOBS[p.job]; const k=STAR_MUL[J.star||2]; return {hp:Math.round((J.hp+J.grow[0]*(p.lv-1))*k+p.eq.hp),atk:(J.atk+J.grow[1]*(p.lv-1))*k+p.eq.atk,def:(J.def+J.grow[2]*(p.lv-1))*k+p.eq.def,eva:J.eva+Math.min(.12,p.lv*.0012),rng:J.rng}; }
 function monCap(m){ return STAGE_CAP[SPECIES[m.sp].stage]||100; }
 function monNeed(m){ return Math.round(14*Math.pow(m.lv,1.35)); }
 function reviveCost(m){ return Math.round((10+m.lv*2+(SPECIES[m.sp].stage-1)*25)*(G.lord.race==='lich'?.6:1)); }
@@ -138,11 +127,11 @@ function newParty(){
   else if(r<.92){ tier='veteran'; size=ri(3,5); lv=L*rand(1.15,1.5); }
   else { tier='elite'; size=ri(4,5); lv=L*rand(1.5,1.9); }
   const jobs=[]; const core=size>=3?['knight','priest',pick(['mage','archer'])]:[];
-  const pickJob=()=>{ let k=pick(JOB_KEYS); if(JOBS[k].rare&&rnd()<.85) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); if((k==='farmer'||k==='cook')&&tier!=='baru'&&rnd()<.7) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); return k; };
+  const pickJob=()=>pickJobStar(tier);
   for(let i=0;i<size;i++) jobs.push(core[i]||pickJob());
   const pa={id:nid(),tier,members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:'',quote:''};
-  for(const j of jobs){ const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pick(['dualblade','knight','mage','lancer','monk','berserker']):j); p.party=pa.id; pa.members.push(p.id); }
-  if(tier==='solo'){ const p=G.people[pa.members[0]]; p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]}`; pa.name=`${p.name} ${p.title}`; }
+  for(const j of jobs){ const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pickJobStar('solo'):j); p.party=pa.id; pa.members.push(p.id); }
+  if(tier==='solo'){ const p=G.people[pa.members[0]]; p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]||JOBS[p.job].n}`; pa.name=`${p.name} ${p.title}`; }
   else if(tier==='baru') pa.name=rnd()<.5?'Newcomer Party':`Party ${pick(PARTY_A)} ${pick(PARTY_B)}`;
   else pa.name=`${pick(PARTY_A)} ${pick(PARTY_B)}`;
   G.parties.push(pa); return pa;
@@ -164,7 +153,7 @@ function enterDungeon(pa){
   say(lead.x,f,`"${pa.quote}"`,famous?'#ffd36a':'#ffe8c0',3.2);
   const talkers=G.advs.filter(a=>a.party===pa.id).sort(()=>rnd()-.5).slice(0,famous?2:1);
   talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
-  log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${JOBS[p.job].n} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
+  log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${jobTag(p.job)} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
 }
 function heroTick(){
   const days=(G.t-G.lordSince)/DAY_LEN; G.heroN=G.heroN||0;
@@ -234,7 +223,7 @@ function advDie(a,src){
   fxAt('soul',a.x,a.floor,'#c08aff',1);
   say(a.x,a.floor,`+${Math.round(gold)}G`,'#ffd36a',1.4);
   lordGainExp(p.lv*6+10);
-  advDrops(p,a,pa&&pa.hero);
+  p.bag=[];
   let killer='jebakan';
   if(src&&src.kind==='m'){ const m=src.u; m.kills++; if(m.abil.includes('serapJiwa')){ const ms=monStats(m); m.hp=Math.min(ms.hp,m.hp+ms.hp*.3); } m.loy=Math.min(100,m.loy+1); monGainExp(m,p.lv*14+20); killer=`${m.name} (${SPECIES[m.sp].n})`; }
   else if(src&&src.kind==='l'){ G.lord.kills++; killer=`Raja Iblis ${G.lord.name}`; }
@@ -273,7 +262,6 @@ function monLoot(m,a){
   if(p.bag.length>12) p.bag.shift();
 }
 function monDie(m,a){
-  monLoot(m,a);
   m.dead=true; m.hp=0; m.reviveAt=G.t+60; m.loy=Math.max(0,m.loy-3); m.fx={};
   fxAt('poof',m.x,m.floor,'#a89ab8',.8);
   if(a){ const p=G.people[a.pid]; if(p){ p.kills++; p.exp+=m.lv*10+20; } }
@@ -533,8 +521,8 @@ function openChest(a,pa){
   for(const p of mem){ p.eq.atk+=1+v*1.4; p.eq.def+=.6+v*.9; p.eq.hp+=4+v*6; p.gold+=Math.round(gold/mem.length); }
   if(pa){ pa.loot+=gold; pa.greed=(pa.greed||0)+1+v; }
   G.pop+=1.5+v*1.8; fxAt('chest',SLOT_X(i),f,'#ffd36a',1);
-  say(SLOT_X(i),f,`Peti ${fx.r}!`,'#ffd36a',1.6);
-  if(v>=4||rnd()<.25) log(`${pa?pa.name:G.people[a.pid].name} membuka Peti ${fx.r} di lantai ${f+1} dan mendapat perlengkapan bagus. Mereka makin bersemangat naik!`,'adv');
+  say(SLOT_X(i),f,`Chest ${fx.r}!`,'#ffd36a',1.6);
+  if(v>=4||rnd()<.25) log(`${pa?pa.name:G.people[a.pid].name} membuka Chest ${fx.r} di lantai ${f+1} dan mendapat perlengkapan bagus. Mereka makin bersemangat naik!`,'adv');
   if(G.settings.autoChest&&G.gold>=chestCost(fx.r)) orderPlace(f,i,{t:'chest',r:fx.r});
 }
 function partyTick(pa){

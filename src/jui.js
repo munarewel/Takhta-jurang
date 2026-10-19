@@ -72,7 +72,7 @@ function pBangun(){
   const item=(fx,name,sub,cost,cls)=>`<button class="card" data-buy='${JSON.stringify(fx)}'><canvas class="ic" width="32" height="36" data-fix='${JSON.stringify(fx)}'></canvas><span class="t"><b>${name}</b><span>${sub}</span><span class="cost ${cls||''}">${cost}</span></span></button>`;
   let h=`<p class="note">Pilih barang, lalu ketuk petak kosong di lantai. Mira yang akan memasangnya${tg}.</p>`;
   h+=`<div class="sec"><h3>Lantai</h3><div class="btns"><button class="btn pri" data-act="floor" ${G.floors>=MAX_FLOORS?'disabled':''}>Tambah lantai ke-${G.floors+1} · ${fmt(floorCost())} emas</button></div><p class="note">Kastil bisa ditinggikan sampai 100 lantai. Singgasana selalu di lantai teratas. Tema berganti tiap 10 lantai.</p></div>`;
-  h+=`<div class="sec"><h3>Peti Harta</h3><div class="grid">${CHEST_RANK.map(r=>item({t:'chest',r},`Peti ${r}`,['Recehan','Biasa','Lumayan','Bagus','Langka','Epik','Legenda','Mitos','Dewa'][chestValue(r)],fmt(chestCost(r))+' emas')).join('')}</div>
+  h+=`<div class="sec"><h3>Peti Harta</h3><div class="grid">${CHEST_RANK.map(r=>item({t:'chest',r},`Chest ${r}`,['Recehan','Biasa','Lumayan','Bagus','Langka','Epik','Legenda','Mitos','Dewa'][chestValue(r)],fmt(chestCost(r))+' emas')).join('')}</div>
     <label class="note" style="display:flex;gap:6px;align-items:center;margin-top:6px"><input type="checkbox" id="autoChest" ${G.settings.autoChest?'checked':''}> Isi ulang peti otomatis setelah dijarah</label></div>`;
   for(const [cat,title] of [['jebakan','Jebakan'],['fasilitas','Fasilitas'],['dekor','Dekorasi (Aura Seram)']]){
     h+=`<div class="sec"><h3>${title}</h3><div class="grid">${Object.entries(FIX).filter(([k,v])=>v.cat===cat).map(([k,v])=>item({t:k},v.n,v.d,fmt(v.cost)+' emas')).join('')}</div></div>`; }
@@ -88,14 +88,12 @@ function pMonList(){
 }
 /* gudang perlengkapan */
 function pGudang(){
-  const bh=Object.entries(G.bahan).filter(([k,v])=>v>0);
   let h=`<div class="btns"><button class="btn" data-act="tabMon">Monster</button><button class="btn pri">Gudang</button></div>
-  <p class="note">Petualang yang tewas kadang menjatuhkan bahan, dan lebih jarang lagi senjata, zirah, atau aksesori. Pasang perlengkapan dari halaman detail monster.</p>
-  <div class="sec"><h3>Bahan</h3>${bh.length?`<div class="abl">${bh.sort((a,b)=>tierOf(b[0])-tierOf(a[0])).map(([k,v])=>`<div><b>${esc(k)}</b> ×${v}<em>tingkat ${tierOf(k)+1}</em></div>`).join('')}</div>`:'<p class="note">Belum ada bahan.</p>'}</div>
+  <p class="note">Perlengkapan dibeli dari pedagang, lalu ditempa dengan emas dan mana. Pasang dari halaman detail monster.</p>
   <div class="btns"><button class="btn pri" data-act="buyItem">Beli perlengkapan acak · 250 emas</button></div>`;
   const list=G.inv.slice().sort((a,b)=>b.r-a.r||b.lv-a.lv);
   h+=`<div class="sec"><h3>Perlengkapan (${list.length})</h3>${list.length?'':'<p class="note">Gudang masih kosong.</p>'}<div class="abl">${list.map(it=>{ const w=it.on&&G.mons.find(m=>m.id===it.on); const c=forgeCost(it);
-    return `<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}${it.from?` · asal: ${esc(it.from)}`:''}</span><div class="btns" style="margin-top:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.n} bahan tk.${c.tier+1}+</button><button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></div></div>`; }).join('')}</div></div>`;
+    return `<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}${it.from?` · asal: ${esc(it.from)}`:''}</span><div class="btns" style="margin-top:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.mana} mana</button><button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></div></div>`; }).join('')}</div></div>`;
   return {t:'Gudang Kastil',h};
 }
 /* detail monster */
@@ -118,7 +116,6 @@ function pMon(){
   if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
     h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemTxt(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
   h+=`</div>`;
-  h+=dropListHtml(monDropTable(m),'Drop dipungut petualang yang menumbangkan monster ini, lalu kembali ke gudang kalau petualang itu tewas di kastil.');
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
     <label class="note">Lantai <select id="mFloor">${`<option value="-1" ${m.floor<0?'selected':''}>Cadangan</option>`+Array.from({length:G.floors},(_,f)=>`<option value="${f}" ${m.floor===f&&!m.secret?'selected':''} ${floorCount(f)>=FLOOR_CAP&&m.floor!==f?'disabled':''}>L${f+1} (${floorCount(f)}/${FLOOR_CAP})</option>`).join('')}</select></label>
     <label class="note">Strategi <select id="mStrat">${Object.entries(STRAT).map(([k,v])=>`<option value="${k}" ${m.strat===k?'selected':''}>${v}</option>`).join('')}</select></label>
@@ -142,7 +139,7 @@ function pGacha(){
 function pAdv(){
   const inside=G.parties.filter(p=>p.state==='in');
   let h=`<div class="sec"><h3>Di dalam kastil (${inside.length})</h3>${inside.length?inside.map(pa=>{ const mem=G.advs.filter(a=>a.party===pa.id);
-    return `<div class="party"><b>${esc(pa.name)}${pa.hero?' <span style="color:var(--gold)">★ Pahlawan</span>':''}</b><span class="note">"${esc(pa.quote)}" · titik simpan L${pa.saveFloor+1}${pa.loot?` · harta ${pa.loot}`:''}</span><div class="mem">${mem.map(a=>{ const p=G.people[a.pid]; const s=advStats(p); return `<span class="link" data-adv="${p.id}" role="button" tabindex="0" style="cursor:pointer;color:var(--bone)">${esc(p.name)}</span> <span>${JOBS[p.job].n} Lv${p.lv} · L${a.floor+1} · ${Math.max(0,Math.round(a.hp/s.hp*100))}%</span>`; }).join(' ')}</div></div>`; }).join(''):'<p class="note">Sepi. Petualang berikutnya sedang dalam perjalanan.</p>'}</div>`;
+    return `<div class="party"><b>${esc(pa.name)}${pa.hero?' <span style="color:var(--gold)">★ Pahlawan</span>':''}</b><span class="note">"${esc(pa.quote)}" · titik simpan L${pa.saveFloor+1}${pa.loot?` · harta ${pa.loot}`:''}</span><div class="mem">${mem.map(a=>{ const p=G.people[a.pid]; const s=advStats(p); return `<span class="link" data-adv="${p.id}" role="button" tabindex="0" style="cursor:pointer;color:var(--bone)">${esc(p.name)}</span> <span>${jobTag(p.job)} Lv${p.lv} · L${a.floor+1} · ${Math.max(0,Math.round(a.hp/s.hp*100))}%</span>`; }).join(' ')}</div></div>`; }).join(''):'<p class="note">Sepi. Petualang berikutnya sedang dalam perjalanan.</p>'}</div>`;
   h+=`<div class="sec"><h3>Pembunuh Raja Iblis</h3>${G.hall.length?`<ul class="log">${G.hall.slice(0,12).map(x=>`<li class="lord">Hari ${x.d}: ${esc(x.lord)} (Lv${x.lv}) tumbang oleh ${esc(x.by)}, pukulan terakhir ${esc(x.hero)}. Bertahan ${Math.round(x.lived/DAY_LEN*10)/10} hari.</li>`).join('')}</ul>`:'<p class="note">Belum ada. Semoga tetap begitu.</p>'}</div>`;
   h+=`<div class="sec"><h3>Catatan kastil</h3><ul class="log">${G.log.slice(0,60).map(l=>`<li class="${l.c}">H${l.d}: ${esc(l.s)}</li>`).join('')}</ul></div>`;
   return {t:'Petualang',h};
@@ -150,10 +147,8 @@ function pAdv(){
 function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
-  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${JOBS[p.job].n} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
-  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`
-  +((p.bag||[]).length?`<div class="sec"><h3>Rampasan dibawa (pasti jatuh)</h3><div class="abl">${p.bag.map(e=>`<div><b>${esc(e.n)}</b>${e.k==='eq'?` ${rarTag(e.r)}<em>${EQ_SLOT[e.s]}</em><br><span class="note">${itemTxt(itemPreview(e.s,e.lv,e.r))}${e.from?` · dari ${esc(e.from)}`:''}</span>`:`<em>${e.k==='core'?'inti':'bahan'} · tingkat ${(e.t||0)+1}</em>`}</div>`).join('')}</div></div>`:'')
-  +dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, Mira memungut barangnya ke gudang.');
+  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
+  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
   return {t:'Petualang',h};
 }
 /* raja */
@@ -169,7 +164,7 @@ function pRaja(){
 /* fasilitas terpasang */
 function pFix(){
   const {f,i}=UI.sel; const fx=G.fix[f]&&G.fix[f][i]; if(!fx) return {t:'Petak',h:'<p class="note">Petak kosong.</p>'};
-  const name=fx.t==='chest'?`Peti ${fx.r}`:FIX[fx.t].n;
+  const name=fx.t==='chest'?`Chest ${fx.r}`:FIX[fx.t].n;
   let h=`<div class="mhead"><canvas width="32" height="36" data-fix='${JSON.stringify(fx)}'></canvas><div class="nm"><b>${name}</b><span class="note">Lantai ${f+1} · petak ${i+1}</span></div></div>`;
   if(fx.t==='rest'){ const here=G.advs.filter(a=>a.floor===f&&a.resting); const saved=f>0?G.parties.filter(p=>p.state!=='gone'&&p.saveFloor===f&&partyMembers(p).length):[];
     h+=`<p class="note">${FIX.rest.d} Biaya ${8+f*4} emas per orang.</p><dl class="kv"><dt>Dipakai</dt><dd>${fx.uses||0} kali</dd><dt>Pemasukan</dt><dd>${fmt(fx.earn||0)} emas</dd><dt>Tamu terakhir</dt><dd>${fx.last?esc(fx.last):'-'}</dd></dl>
@@ -227,7 +222,7 @@ function onCanvasTap(hit){
 }
 function startPlacing(fx){
   if(UI.target){ const t=UI.target; UI.target=null; const err=orderPlace(t.f,t.i,fx); if(err) toast(err); else toast('Mira berangkat memasang!'); closePanel(); return; }
-  UI.placing=fx; closePanel(); $('placebar').hidden=false; $('placeTxt').textContent=`Ketuk petak kosong untuk ${fx.t==='chest'?'Peti '+fx.r:FIX[fx.t].n} (${fmt(fixCost(fx))} emas). Bisa beberapa kali.`;
+  UI.placing=fx; closePanel(); $('placebar').hidden=false; $('placeTxt').textContent=`Ketuk petak kosong untuk ${fx.t==='chest'?'Chest '+fx.r:FIX[fx.t].n} (${fmt(fixCost(fx))} emas). Bisa beberapa kali.`;
 }
 function stopPlacing(){ UI.placing=null; $('placebar').hidden=true; }
 /* ---------- pengikat event ---------- */

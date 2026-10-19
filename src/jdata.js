@@ -10,51 +10,51 @@ const STAGE_CAP=[0,25,50,75,100];
 /* ---------- ability ---------- */
 // k: 'p' pasif, 'a' aktif (cd dalam detik)
 const ABIL={
-  regen:{n:'Regenerasi',k:'p',d:'Memulihkan 2% nyawa tiap detik.'},
-  kulitBatu:{n:'Kulit Batu',k:'p',d:'Pertahanan +35%.'},
-  kulitBaja:{n:'Kulit Baja',k:'p',d:'Kerusakan yang diterima -20%.'},
-  gesit:{n:'Gesit',k:'p',d:'Peluang menghindar +15%.'},
-  haus:{n:'Haus Darah',k:'p',d:'Menyerap 20% kerusakan menjadi nyawa.'},
-  amarah:{n:'Amarah',k:'p',d:'Serangan +50% saat nyawa di bawah 40%.'},
-  duri:{n:'Duri',k:'p',d:'Memantulkan 20% kerusakan jarak dekat.'},
-  auraRacun:{n:'Aura Racun',k:'p',d:'Petualang di dekatnya keracunan.'},
-  berani:{n:'Tak Kenal Takut',k:'p',d:'Kebal pingsan dan tidur.'},
-  elang:{n:'Mata Elang',k:'p',d:'Peluang kritikal +20%.'},
-  untung:{n:'Keberuntungan',k:'p',d:'Korban yang dibunuhnya menjatuhkan 50% emas lebih banyak.'},
-  pemburu:{n:'Pemburu Pemula',k:'p',d:'+40% kerusakan ke petualang berlevel lebih rendah.'},
-  pelindung:{n:'Pelindung',k:'p',d:'Monster lain di lantai yang sama menerima kerusakan -12%.'},
-  pantul:{n:'Pantulan Sihir',k:'p',d:'Memantulkan 30% kerusakan sihir.'},
-  kabut:{n:'Selubung Kabut',k:'p',d:'Semua monster di lantai ini +8% menghindar.'},
-  api:{n:'Semburan Api',k:'a',cd:9,d:'Membakar semua petualang di depannya.'},
-  beku:{n:'Napas Beku',k:'a',cd:9,d:'Kerusakan dingin dan membuat lambat.'},
-  petir:{n:'Sambaran Petir',k:'a',cd:10,d:'Satu sambaran besar (240%).'},
-  raung:{n:'Raungan',k:'a',cd:14,d:'Membuat petualang di dekatnya pingsan 2 detik.'},
-  jaring:{n:'Jaring',k:'a',cd:8,d:'Menjerat satu petualang 3 detik.'},
-  ganda:{n:'Serangan Ganda',k:'a',cd:5,d:'Menyerang dua kali berturut-turut.'},
-  sembuh:{n:'Penyembuhan',k:'a',cd:12,d:'Memulihkan 25% nyawa monster di sekitarnya.'},
-  panggil:{n:'Panggil Kroco',k:'a',cd:20,d:'Memanggil 2 kroco sementara.'},
-  ledak:{n:'Ledakan',k:'a',cd:18,d:'Ledakan besar, tapi melukai diri sendiri 25%.'},
-  kedip:{n:'Kedip',k:'a',cd:11,d:'Berpindah ke barisan belakang dan menyerang penyembuh.'},
-  serapMana:{n:'Serap Mana',k:'a',cd:10,d:'Menyerang dan menyerap mana untuk kastil.'},
-  kutuk:{n:'Kutukan',k:'a',cd:12,d:'Serangan target -30% selama 8 detik.'},
-  tebas:{n:'Tebasan Kuat',k:'a',cd:6,d:'Pukulan keras 180%.'},
-  goda:{n:'Pikatan',k:'a',cd:16,d:'Satu petualang terpikat dan berhenti menyerang 4 detik.'},
-  tajam:{n:'Bilah Tajam',k:'p',d:'Kerusakan kritikal +60%.'},
-  tegar:{n:'Tegar',k:'p',d:'Bertahan dengan 1 nyawa saat terkena pukulan mematikan (sekali tiap 30 detik).'},
-  kebalSihir:{n:'Kebal Sihir',k:'p',d:'Kerusakan sihir yang diterima -40%.'},
-  serapJiwa:{n:'Serap Jiwa',k:'p',d:'Pulih 30% nyawa setiap membunuh petualang.'},
-  semangat:{n:'Semangat Kawanan',k:'p',d:'Serangan +20% saat ada 3 monster atau lebih di lantai yang sama.'},
-  licin:{n:'Tubuh Licin',k:'p',d:'Menghindar +10%, kebal jerat.'},
-  pencuri:{n:'Tangan Usil',k:'p',d:'Setiap pukulan mencuri 3 emas dari petualang.'},
-  gempa:{n:'Gempa',k:'a',cd:18,d:'Mengguncang lantai: semua petualang di lantai ini pingsan 1,5 detik.'},
+  regen:{n:'Regeneration',k:'p',d:'Memulihkan 2% nyawa tiap detik.'},
+  kulitBatu:{n:'Stone Skin',k:'p',d:'Pertahanan +35%.'},
+  kulitBaja:{n:'Steel Skin',k:'p',d:'Kerusakan yang diterima -20%.'},
+  gesit:{n:'Agility',k:'p',d:'Peluang menghindar +15%.'},
+  haus:{n:'Bloodthirst',k:'p',d:'Menyerap 20% kerusakan menjadi nyawa.'},
+  amarah:{n:'Fury',k:'p',d:'Serangan +50% saat nyawa di bawah 40%.'},
+  duri:{n:'Thorns',k:'p',d:'Memantulkan 20% kerusakan jarak dekat.'},
+  auraRacun:{n:'Poison Aura',k:'p',d:'Petualang di dekatnya keracunan.'},
+  berani:{n:'Fearless',k:'p',d:'Kebal pingsan dan tidur.'},
+  elang:{n:'Eagle Eye',k:'p',d:'Peluang kritikal +20%.'},
+  untung:{n:'Fortune',k:'p',d:'Korban yang dibunuhnya menjatuhkan 50% emas lebih banyak.'},
+  pemburu:{n:'Rookie Hunter',k:'p',d:'+40% kerusakan ke petualang berlevel lebih rendah.'},
+  pelindung:{n:'Guardian',k:'p',d:'Monster lain di lantai yang sama menerima kerusakan -12%.'},
+  pantul:{n:'Spell Reflect',k:'p',d:'Memantulkan 30% kerusakan sihir.'},
+  kabut:{n:'Mist Veil',k:'p',d:'Semua monster di lantai ini +8% menghindar.'},
+  api:{n:'Fire Breath',k:'a',cd:9,d:'Membakar semua petualang di depannya.'},
+  beku:{n:'Frost Breath',k:'a',cd:9,d:'Kerusakan dingin dan membuat lambat.'},
+  petir:{n:'Lightning Strike',k:'a',cd:10,d:'Satu sambaran besar (240%).'},
+  raung:{n:'Roar',k:'a',cd:14,d:'Membuat petualang di dekatnya pingsan 2 detik.'},
+  jaring:{n:'Web',k:'a',cd:8,d:'Menjerat satu petualang 3 detik.'},
+  ganda:{n:'Double Strike',k:'a',cd:5,d:'Menyerang dua kali berturut-turut.'},
+  sembuh:{n:'Heal',k:'a',cd:12,d:'Memulihkan 25% nyawa monster di sekitarnya.'},
+  panggil:{n:'Call Minions',k:'a',cd:20,d:'Memanggil 2 kroco sementara.'},
+  ledak:{n:'Self Destruct',k:'a',cd:18,d:'Ledakan besar, tapi melukai diri sendiri 25%.'},
+  kedip:{n:'Blink',k:'a',cd:11,d:'Berpindah ke barisan belakang dan menyerang penyembuh.'},
+  serapMana:{n:'Mana Siphon',k:'a',cd:10,d:'Menyerang dan menyerap mana untuk kastil.'},
+  kutuk:{n:'Curse',k:'a',cd:12,d:'Serangan target -30% selama 8 detik.'},
+  tebas:{n:'Power Slash',k:'a',cd:6,d:'Pukulan keras 180%.'},
+  goda:{n:'Charm',k:'a',cd:16,d:'Satu petualang terpikat dan berhenti menyerang 4 detik.'},
+  tajam:{n:'Keen Edge',k:'p',d:'Kerusakan kritikal +60%.'},
+  tegar:{n:'Endure',k:'p',d:'Bertahan dengan 1 nyawa saat terkena pukulan mematikan (sekali tiap 30 detik).'},
+  kebalSihir:{n:'Magic Immunity',k:'p',d:'Kerusakan sihir yang diterima -40%.'},
+  serapJiwa:{n:'Soul Eater',k:'p',d:'Pulih 30% nyawa setiap membunuh petualang.'},
+  semangat:{n:'Pack Spirit',k:'p',d:'Serangan +20% saat ada 3 monster atau lebih di lantai yang sama.'},
+  licin:{n:'Slippery Body',k:'p',d:'Menghindar +10%, kebal jerat.'},
+  pencuri:{n:'Sticky Fingers',k:'p',d:'Setiap pukulan mencuri 3 emas dari petualang.'},
+  gempa:{n:'Earthquake',k:'a',cd:18,d:'Mengguncang lantai: semua petualang di lantai ini pingsan 1,5 detik.'},
   tornado:{n:'Tornado',k:'a',cd:12,d:'Angin puyuh: kerusakan area dan mendorong mundur.'},
   meteor:{n:'Meteor',k:'a',cd:22,d:'Batu api jatuh dari langit-langit: kerusakan area 260%.'},
-  teriak:{n:'Teriakan Perang',k:'a',cd:16,d:'Monster di lantai ini +30% serangan selama 8 detik.'},
-  perisai:{n:'Perisai Sihir',k:'a',cd:15,d:'Monster di lantai ini menerima kerusakan -30% selama 6 detik.'},
-  tidur:{n:'Nina Bobo',k:'a',cd:12,d:'Menidurkan satu petualang 3 detik. Kombo dengan serangan berikutnya.'},
-  serbu:{n:'Serbuan',k:'a',cd:8,d:'Menerjang target dengan kekuatan 200%.'},
-  bayang:{n:'Bayangan Kembar',k:'a',cd:20,d:'Memanggil bayangan dirinya selama 10 detik.'},
-  racunKuat:{n:'Racun Pekat',k:'a',cd:10,d:'Racun kuat yang menggerogoti nyawa 8 detik.'},
+  teriak:{n:'War Cry',k:'a',cd:16,d:'Monster di lantai ini +30% serangan selama 8 detik.'},
+  perisai:{n:'Magic Barrier',k:'a',cd:15,d:'Monster di lantai ini menerima kerusakan -30% selama 6 detik.'},
+  tidur:{n:'Lullaby',k:'a',cd:12,d:'Menidurkan satu petualang 3 detik. Kombo dengan serangan berikutnya.'},
+  serbu:{n:'Charge',k:'a',cd:8,d:'Menerjang target dengan kekuatan 200%.'},
+  bayang:{n:'Shadow Clone',k:'a',cd:20,d:'Memanggil bayangan dirinya selama 10 detik.'},
+  racunKuat:{n:'Deadly Venom',k:'a',cd:10,d:'Racun kuat yang menggerogoti nyawa 8 detik.'},
 };
 
 /* ---------- kelompok bentuk: menentukan ability yang bisa dipelajari & drop ---------- */
@@ -107,53 +107,53 @@ function dropTheme(sid){ const s=SPECIES[sid], M=MON[s.mk]; const g=monGroup(M);
 /* ---------- elemen (pengali variasi spesies) ---------- */
 const ELEM=[
   {id:'',n:'',c:null,ab:null,w:30,rar:0},
-  {id:'api',n:'Api',c:'#ff6a2a',ab:'api',w:7,rar:0},
-  {id:'es',n:'Es',c:'#7fd8ff',ab:'beku',w:7,rar:0},
-  {id:'petir',n:'Petir',c:'#ffe040',ab:'petir',w:6,rar:0},
-  {id:'racun',n:'Racun',c:'#9ad04a',ab:'auraRacun',w:7,rar:0},
-  {id:'bayang',n:'Bayangan',c:'#6a4aaa',ab:'gesit',w:5,rar:0},
-  {id:'cahaya',n:'Cahaya',c:'#fff2a0',ab:'sembuh',w:4,rar:1},
-  {id:'batu',n:'Batu',c:'#a89070',ab:'kulitBatu',w:7,rar:0},
-  {id:'angin',n:'Angin',c:'#bff0d0',ab:'ganda',w:6,rar:0},
-  {id:'darah',n:'Darah',c:'#c8203a',ab:'haus',w:4,rar:1},
-  {id:'kristal',n:'Kristal',c:'#c0a0ff',ab:'pantul',w:4,rar:1},
-  {id:'baja',n:'Baja',c:'#b8c0c8',ab:'kulitBaja',w:5,rar:0},
-  {id:'kabut',n:'Kabut',c:'#c8c8d8',ab:'kabut',w:5,rar:0},
+  {id:'api',n:'Fire',c:'#ff6a2a',ab:'api',w:7,rar:0},
+  {id:'es',n:'Ice',c:'#7fd8ff',ab:'beku',w:7,rar:0},
+  {id:'petir',n:'Thunder',c:'#ffe040',ab:'petir',w:6,rar:0},
+  {id:'racun',n:'Poison',c:'#9ad04a',ab:'auraRacun',w:7,rar:0},
+  {id:'bayang',n:'Shadow',c:'#6a4aaa',ab:'gesit',w:5,rar:0},
+  {id:'cahaya',n:'Light',c:'#fff2a0',ab:'sembuh',w:4,rar:1},
+  {id:'batu',n:'Stone',c:'#a89070',ab:'kulitBatu',w:7,rar:0},
+  {id:'angin',n:'Wind',c:'#bff0d0',ab:'ganda',w:6,rar:0},
+  {id:'darah',n:'Blood',c:'#c8203a',ab:'haus',w:4,rar:1},
+  {id:'kristal',n:'Crystal',c:'#c0a0ff',ab:'pantul',w:4,rar:1},
+  {id:'baja',n:'Steel',c:'#b8c0c8',ab:'kulitBaja',w:5,rar:0},
+  {id:'kabut',n:'Mist',c:'#c8c8d8',ab:'kabut',w:5,rar:0},
   {id:'lava',n:'Lava',c:'#ff3a1a',ab:'ledak',w:3,rar:1},
-  {id:'emas',n:'Emas',c:'#ffd040',ab:'untung',w:2,rar:1},
-  {id:'hampa',n:'Hampa',c:'#3a1a5a',ab:'serapMana',w:1,rar:2},
-  {id:'air',n:'Air',c:'#3a8ad8',ab:'regen',w:6,rar:0},
-  {id:'tanah',n:'Tanah',c:'#8a6a3a',ab:'kulitBatu',w:6,rar:0},
-  {id:'daun',n:'Daun',c:'#5ac85a',ab:'regen',w:6,rar:0},
-  {id:'tulang',n:'Tulang',c:'#e8e0c8',ab:'berani',w:5,rar:0},
-  {id:'bulan',n:'Bulan',c:'#c8d8ff',ab:'gesit',w:3,rar:1},
-  {id:'surya',n:'Surya',c:'#ffb030',ab:'api',w:3,rar:1},
-  {id:'pasir',n:'Pasir',c:'#e0c890',ab:'kabut',w:5,rar:0},
-  {id:'neraka',n:'Neraka',c:'#a01a1a',ab:'amarah',w:2,rar:1},
-  {id:'suci',n:'Suci',c:'#fffde0',ab:'pelindung',w:2,rar:1},
-  {id:'mimpi',n:'Mimpi',c:'#ff9ad0',ab:'goda',w:2,rar:1},
+  {id:'emas',n:'Golden',c:'#ffd040',ab:'untung',w:2,rar:1},
+  {id:'hampa',n:'Void',c:'#3a1a5a',ab:'serapMana',w:1,rar:2},
+  {id:'air',n:'Water',c:'#3a8ad8',ab:'regen',w:6,rar:0},
+  {id:'tanah',n:'Earth',c:'#8a6a3a',ab:'kulitBatu',w:6,rar:0},
+  {id:'daun',n:'Leaf',c:'#5ac85a',ab:'regen',w:6,rar:0},
+  {id:'tulang',n:'Bone',c:'#e8e0c8',ab:'berani',w:5,rar:0},
+  {id:'bulan',n:'Moon',c:'#c8d8ff',ab:'gesit',w:3,rar:1},
+  {id:'surya',n:'Sun',c:'#ffb030',ab:'api',w:3,rar:1},
+  {id:'pasir',n:'Sand',c:'#e0c890',ab:'kabut',w:5,rar:0},
+  {id:'neraka',n:'Hell',c:'#a01a1a',ab:'amarah',w:2,rar:1},
+  {id:'suci',n:'Holy',c:'#fffde0',ab:'pelindung',w:2,rar:1},
+  {id:'mimpi',n:'Dream',c:'#ff9ad0',ab:'goda',w:2,rar:1},
 ];
 const ELEM_BY={}; for(const e of ELEM) ELEM_BY[e.id]=e;
 /* ---------- ability berelemen (6 per elemen) & pasif stat ---------- */
-const ELEM_STATUS={api:['Bakar','burn'],es:['Bekukan','slow'],petir:['Setrum','stun'],racun:['Racuni','poison'],bayang:['Kutukan Bayangan','curse'],cahaya:['Silau','blind'],batu:['Membatu','stun'],angin:['Hempasan','slow'],darah:['Hisap Darah','drain'],kristal:['Belenggu Kristal','root'],baja:['Hancurkan Zirah','brk'],kabut:['Kabut Tidur','sleep'],lava:['Lelehkan','brk'],emas:['Rampas Emas','gold'],hampa:['Hisap Mana','mana'],air:['Tenggelamkan','slow'],tanah:['Jebakan Tanah','root'],daun:['Akar Pengikat','root'],tulang:['Kutukan Tulang','curse'],bulan:['Nina Bulan','sleep'],surya:['Sinar Surya','blind'],pasir:['Badai Pasir','blind'],neraka:['Api Neraka','burn'],suci:['Penghakiman','stun'],mimpi:['Mimpi Buruk','charm']};
+const ELEM_STATUS={api:['Ignite','burn'],es:['Freeze','slow'],petir:['Shock','stun'],racun:['Envenom','poison'],bayang:['Shadow Curse','curse'],cahaya:['Flash','blind'],batu:['Petrify','stun'],angin:['Gust','slow'],darah:['Blood Drain','drain'],kristal:['Crystal Bind','root'],baja:['Armor Break','brk'],kabut:['Sleep Mist','sleep'],lava:['Meltdown','brk'],emas:['Gold Snatch','gold'],hampa:['Mana Drain','mana'],air:['Drown','slow'],tanah:['Earth Trap','root'],daun:['Binding Roots','root'],tulang:['Bone Curse','curse'],bulan:['Moon Lullaby','sleep'],surya:['Sunbeam','blind'],pasir:['Sandstorm','blind'],neraka:['Hellfire','burn'],suci:['Judgment','stun'],mimpi:['Nightmare','charm']};
 const STATUS_D={burn:'membakar',slow:'memperlambat',stun:'membuat pingsan',poison:'meracuni',curse:'melemahkan serangan',blind:'membutakan (serangan sering meleset)',drain:'menghisap nyawa',root:'menjerat',brk:'menghancurkan pertahanan',sleep:'menidurkan',gold:'mencuri emas',mana:'menyerap mana untuk kastil',charm:'memikat'};
-for(const E of ELEM){ if(!E.id) continue; const S=ELEM_STATUS[E.id]||['Kutukan '+E.n,'curse'];
-  ABIL['tembak_'+E.id]={n:`Tembakan ${E.n}`,k:'a',cd:7,eff:'hit',m:1.9,el:E.id,d:`Serangan ${E.n} terfokus (190%).`};
-  ABIL['ledak_'+E.id]={n:`Ledakan ${E.n}`,k:'a',cd:11,eff:'aoe',m:1.4,r:40,el:E.id,d:`Ledakan ${E.n} ke semua petualang di dekatnya (140%).`};
+for(const E of ELEM){ if(!E.id) continue; const S=ELEM_STATUS[E.id]||[E.n+' Curse','curse'];
+  ABIL['tembak_'+E.id]={n:`${E.n} Shot`,k:'a',cd:7,eff:'hit',m:1.9,el:E.id,d:`Serangan ${E.n} terfokus (190%).`};
+  ABIL['ledak_'+E.id]={n:`${E.n} Blast`,k:'a',cd:11,eff:'aoe',m:1.4,r:40,el:E.id,d:`Ledakan ${E.n} ke semua petualang di dekatnya (140%).`};
   ABIL['status_'+E.id]={n:S[0],k:'a',cd:10,eff:'status',st:S[1],m:.7,el:E.id,d:`Serangan ${E.n} yang ${STATUS_D[S[1]]}.`};
-  ABIL['badai_'+E.id]={n:`Badai ${E.n}`,k:'a',cd:9,eff:'multi',hits:3,m:.7,el:E.id,d:`Tiga serangan ${E.n} beruntun.`};
-  ABIL['jiwa_'+E.id]={n:`Jiwa ${E.n}`,k:'p',eff:'elemAtk',el:E.id,d:`Serangan biasa berelemen ${E.n} dan +15% kerusakan.`};
-  ABIL['tameng_'+E.id]={n:`Perisai ${E.n}`,k:'p',eff:'res',el:E.id,d:`Kerusakan elemen ${E.n} yang diterima -40%.`};
+  ABIL['badai_'+E.id]={n:`${E.n} Storm`,k:'a',cd:9,eff:'multi',hits:3,m:.7,el:E.id,d:`Tiga serangan ${E.n} beruntun.`};
+  ABIL['jiwa_'+E.id]={n:`${E.n} Soul`,k:'p',eff:'elemAtk',el:E.id,d:`Serangan biasa berelemen ${E.n} dan +15% kerusakan.`};
+  ABIL['tameng_'+E.id]={n:`${E.n} Ward`,k:'p',eff:'res',el:E.id,d:`Kerusakan elemen ${E.n} yang diterima -40%.`};
 }
 Object.assign(ABIL,{
-  raksasa:{n:'Kekuatan Raksasa',k:'p',eff:'stat',atk:.2,d:'Serangan +20%.'},
-  tubuhBesi:{n:'Tubuh Besi',k:'p',eff:'stat',hp:.25,d:'Nyawa maksimal +25%.'},
-  langkahAngin:{n:'Langkah Angin',k:'p',eff:'stat',eva:.1,d:'Menghindar +10%.'},
-  pikiranTajam:{n:'Pikiran Tajam',k:'p',eff:'stat',crit:.12,d:'Peluang kritikal +12%.'},
-  kulitTebal:{n:'Kulit Tebal',k:'p',eff:'stat',def:.3,d:'Pertahanan +30%.'},
-  pemulihan:{n:'Pemulihan',k:'p',eff:'stat',regen:.01,d:'Memulihkan 1% nyawa tiap detik.'},
-  cepat:{n:'Gerak Kilat',k:'p',eff:'stat',spd:.25,d:'Kecepatan serangan +25%.'},
-  wibawa:{n:'Wibawa Raja',k:'p',eff:'stat',aura:1,d:'Monster lain di lantai ini +10% serangan.'},
+  raksasa:{n:'Giant Strength',k:'p',eff:'stat',atk:.2,d:'Serangan +20%.'},
+  tubuhBesi:{n:'Iron Body',k:'p',eff:'stat',hp:.25,d:'Nyawa maksimal +25%.'},
+  langkahAngin:{n:'Wind Step',k:'p',eff:'stat',eva:.1,d:'Menghindar +10%.'},
+  pikiranTajam:{n:'Sharp Mind',k:'p',eff:'stat',crit:.12,d:'Peluang kritikal +12%.'},
+  kulitTebal:{n:'Thick Hide',k:'p',eff:'stat',def:.3,d:'Pertahanan +30%.'},
+  pemulihan:{n:'Recovery',k:'p',eff:'stat',regen:.01,d:'Memulihkan 1% nyawa tiap detik.'},
+  cepat:{n:'Haste',k:'p',eff:'stat',spd:.25,d:'Kecepatan serangan +25%.'},
+  wibawa:{n:"King's Presence",k:'p',eff:'stat',aura:1,d:'Monster lain di lantai ini +10% serangan.'},
 });
 /* kuat ⇒ x1,5 · lemah ⇒ x0,7 */
 const ELEM_STRONG={api:['daun','es','baja'],air:['api','lava','pasir'],es:['daun','angin','air'],petir:['air','baja','angin'],tanah:['petir','racun','lava'],daun:['air','tanah','batu'],angin:['daun','kabut','pasir'],batu:['petir','api','angin'],racun:['daun','air','darah'],
@@ -187,7 +187,7 @@ function spId(k,el){ return el?k+'.'+el:k; }
 function makeSpecies(k,el){
   const id=spId(k,el); if(SPECIES[id]) return SPECIES[id];
   const m=MON[k], E=ELEM_BY[el||''];
-  const s={id,mk:k,el:el||'',n:E.n?`${m.n} ${E.n}`:m.n,stage:monStage(k),rank:m.rank,
+  const s={id,mk:k,el:el||'',n:E.n?`${E.n} ${m.n}`:m.n,stage:monStage(k),rank:m.rank,
     hp:Math.round(m.hp*(E.id==='batu'||E.id==='baja'?1.2:1)),atk:+(m.atk*(E.id==='api'||E.id==='petir'||E.id==='lava'?1.15:1)).toFixed(1),
     spd:m.spd||1,ranged:!!m.ranged,legend:!!m.legend,
     rar:Math.min(4,rankRar(m.rank)+E.rar+(m.legend?1:0)),ab:E.ab||baseAbil(m),next:null};
@@ -280,52 +280,52 @@ const ADV_RACES=['manusia','manusia','manusia','elf','dwarf','beastkin','halfelf
 
 /* ---------- ras Raja Iblis ---------- */
 const LORD_RACE=[
-  {id:'iblis',n:'Iblis',race:'iblis',job:'rajaIblis',d:'Semua monster +10% serangan.'},
-  {id:'vampir',n:'Vampir',race:'manusia',skin:'#e8e0f0',hair:'#1a1a2a',job:'rajaIblis',d:'Raja menyerap 30% kerusakan menjadi nyawa.'},
+  {id:'iblis',n:'Demon',race:'iblis',job:'rajaIblis',d:'Semua monster +10% serangan.'},
+  {id:'vampir',n:'Vampire',race:'manusia',skin:'#e8e0f0',hair:'#1a1a2a',job:'rajaIblis',d:'Raja menyerap 30% kerusakan menjadi nyawa.'},
   {id:'lich',n:'Lich',mon:{k:'hum',race:'skeleton',job:'mLich'},d:'Biaya kebangkitan monster -40%.'},
   {id:'orc',n:'Orc',mon:{k:'hum',race:'orc',job:'mOrcLord'},d:'Nyawa Raja +40%.'},
   {id:'succubus',n:'Succubus',mon:{k:'hum',race:'succubus',job:'mSuccubus'},d:'Kadang memikat petualang hingga berhenti menyerang.'},
-  {id:'naga',n:'Naga',mon:{k:'dragon2',c:'#8a1a2a',eye:'#ffd040'},sc:1.25,d:'Napas api ke seluruh party di ruang singgasana.'},
+  {id:'naga',n:'Dragon',mon:{k:'dragon2',c:'#8a1a2a',eye:'#ffd040'},sc:1.25,d:'Napas api ke seluruh party di ruang singgasana.'},
   {id:'oni',n:'Oni',mon:{k:'hum',race:'ogre',job:'mOgre'},tint:'#c82a2a',d:'Serangan Raja +40%.'},
-  {id:'elfGelap',n:'Elf Gelap',race:'elf',skin:'#7a6a9a',hair:'#e8e6f0',job:'rajaIblis',d:'Regenerasi mana kastil +50%.'},
-  {id:'ksatria',n:'Ksatria Neraka',mon:{k:'hum',race:'neraka',job:'mHellKnight'},d:'Pertahanan Raja +50%.'},
+  {id:'elfGelap',n:'Dark Elf',race:'elf',skin:'#7a6a9a',hair:'#e8e6f0',job:'rajaIblis',d:'Regenerasi mana kastil +50%.'},
+  {id:'ksatria',n:'Hell Knight',mon:{k:'hum',race:'neraka',job:'mHellKnight'},d:'Pertahanan Raja +50%.'},
 ];
 
 /* ---------- fasilitas (dipasang di petak lantai) ---------- */
 const CHEST_RANK=['F','E','D','C','B','A','S','SS','SSS'];
 const FIX={
-  chest:{n:'Peti Harta',cat:'peti'},
-  duri:{n:'Jebakan Duri',cat:'jebakan',cost:60,dmg:.12,d:'Duri mencuat dari lantai.'},
-  panah:{n:'Celah Panah',cat:'jebakan',cost:110,dmg:.16,d:'Panah melesat dari dinding.'},
-  gas:{n:'Gas Tidur',cat:'jebakan',cost:160,sleep:3,d:'Party tertidur 3 detik. Kombo dengan jebakan lain.'},
-  baskom:{n:'Baskom Jatuh',cat:'jebakan',cost:90,dmg:.1,stun:1.2,d:'Baskom besi jatuh ke kepala. Pingsan sebentar.'},
-  licin:{n:'Lantai Licin',cat:'jebakan',cost:140,slip:1,d:'Petualang terpeleset jatuh ke lantai bawah.'},
-  lubang:{n:'Lubang Jatuh',cat:'jebakan',cost:220,dmg:.18,fall:1,d:'Jatuh ke lantai bawah sambil terluka.'},
-  apiT:{n:'Semburan Api',cat:'jebakan',cost:260,dmg:.2,burn:1,d:'Pipa api menyembur. Membakar.'},
-  jaringT:{n:'Jaring Jerat',cat:'jebakan',cost:180,root:3,d:'Menjerat satu petualang 3 detik.'},
-  mimik:{n:'Peti Mimik',cat:'jebakan',cost:240,d:'Terlihat seperti peti harta. Saat dibuka, menggigit keras dan mencuri emas pembukanya.'},
-  rest:{n:'Tempat Istirahat',cat:'fasilitas',cost:300,d:'Petualang membayar emas untuk memulihkan diri dan menyimpan kemajuan.'},
-  rahasia:{n:'Dinding Retak',cat:'fasilitas',cost:450,d:'Jalan rahasia menuju ruang monster rahasia. Hanya Thief/Ranger yang bisa menemukannya.'},
-  obor:{n:'Obor Ungu',cat:'dekor',cost:40,aura:2,d:'Menambah Aura Seram.'},
-  patung:{n:'Patung Gargoyle',cat:'dekor',cost:120,aura:5,d:'Menambah Aura Seram.'},
-  tengkorak:{n:'Tumpukan Tengkorak',cat:'dekor',cost:80,aura:4,d:'Menambah Aura Seram.'},
+  chest:{n:'Treasure Chest',cat:'peti'},
+  duri:{n:'Spike Trap',cat:'jebakan',cost:60,dmg:.12,d:'Duri mencuat dari lantai.'},
+  panah:{n:'Arrow Slit',cat:'jebakan',cost:110,dmg:.16,d:'Panah melesat dari dinding.'},
+  gas:{n:'Sleep Gas',cat:'jebakan',cost:160,sleep:3,d:'Party tertidur 3 detik. Kombo dengan jebakan lain.'},
+  baskom:{n:'Falling Bucket',cat:'jebakan',cost:90,dmg:.1,stun:1.2,d:'Baskom besi jatuh ke kepala. Pingsan sebentar.'},
+  licin:{n:'Slippery Floor',cat:'jebakan',cost:140,slip:1,d:'Petualang terpeleset jatuh ke lantai bawah.'},
+  lubang:{n:'Pit Trap',cat:'jebakan',cost:220,dmg:.18,fall:1,d:'Jatuh ke lantai bawah sambil terluka.'},
+  apiT:{n:'Fire Jet',cat:'jebakan',cost:260,dmg:.2,burn:1,d:'Pipa api menyembur. Membakar.'},
+  jaringT:{n:'Snare Net',cat:'jebakan',cost:180,root:3,d:'Menjerat satu petualang 3 detik.'},
+  mimik:{n:'Mimic Chest',cat:'jebakan',cost:240,d:'Terlihat seperti peti harta. Saat dibuka, menggigit keras dan mencuri emas pembukanya.'},
+  rest:{n:'Rest Spot',cat:'fasilitas',cost:300,d:'Petualang membayar emas untuk memulihkan diri dan menyimpan kemajuan.'},
+  rahasia:{n:'Cracked Wall',cat:'fasilitas',cost:450,d:'Jalan rahasia menuju ruang monster rahasia. Hanya Thief/Ranger yang bisa menemukannya.'},
+  obor:{n:'Purple Torch',cat:'dekor',cost:40,aura:2,d:'Menambah Aura Seram.'},
+  patung:{n:'Gargoyle Statue',cat:'dekor',cost:120,aura:5,d:'Menambah Aura Seram.'},
+  tengkorak:{n:'Skull Pile',cat:'dekor',cost:80,aura:4,d:'Menambah Aura Seram.'},
 };
 function chestCost(r){ return Math.round(40*Math.pow(2.05,CHEST_RANK.indexOf(r))); }
 function chestValue(r){ return CHEST_RANK.indexOf(r); }
 const THEMES=[
-  {n:'Gua Batu',wall:'#3a3446',wall2:'#2e2a3a',floor:'#5a4e5e',acc:'#7a6a7e'},
-  {n:'Makam Tua',wall:'#3e3a34',wall2:'#322e2a',floor:'#6a5e4a',acc:'#a89a7a'},
-  {n:'Hutan Jamur',wall:'#28383a',wall2:'#1e2e30',floor:'#3a5a4a',acc:'#9ae0c0'},
-  {n:'Gua Kristal',wall:'#2a2e4a',wall2:'#222640',floor:'#4a4e7a',acc:'#b0a0ff'},
-  {n:'Kawah Lava',wall:'#3e2420',wall2:'#301a18',floor:'#6a3a2a',acc:'#ff7a3a'},
-  {n:'Lorong Es',wall:'#2e3e4e',wall2:'#243444',floor:'#5a7a8e',acc:'#c8f0ff'},
-  {n:'Istana Hitam',wall:'#24182a',wall2:'#1c1222',floor:'#4a2e4a',acc:'#e3b75e'},
-  {n:'Jurang Hampa',wall:'#140e1e',wall2:'#0e0a16',floor:'#2e2240',acc:'#d060ff'},
+  {n:'Stone Cave',wall:'#3a3446',wall2:'#2e2a3a',floor:'#5a4e5e',acc:'#7a6a7e'},
+  {n:'Old Tomb',wall:'#3e3a34',wall2:'#322e2a',floor:'#6a5e4a',acc:'#a89a7a'},
+  {n:'Mushroom Forest',wall:'#28383a',wall2:'#1e2e30',floor:'#3a5a4a',acc:'#9ae0c0'},
+  {n:'Crystal Cave',wall:'#2a2e4a',wall2:'#222640',floor:'#4a4e7a',acc:'#b0a0ff'},
+  {n:'Lava Crater',wall:'#3e2420',wall2:'#301a18',floor:'#6a3a2a',acc:'#ff7a3a'},
+  {n:'Ice Corridor',wall:'#2e3e4e',wall2:'#243444',floor:'#5a7a8e',acc:'#c8f0ff'},
+  {n:'Black Palace',wall:'#24182a',wall2:'#1c1222',floor:'#4a2e4a',acc:'#e3b75e'},
+  {n:'Void Abyss',wall:'#140e1e',wall2:'#0e0a16',floor:'#2e2240',acc:'#d060ff'},
 ];
 function themeOf(f){ return THEMES[Math.floor(f/10)%THEMES.length]; }
 
 /* ---------- perlengkapan monster & bahan ---------- */
-const EQ_SLOT={senjata:'Senjata',zirah:'Zirah',aksesori:'Aksesori'};
-const EQ_NAMES={senjata:['Taring','Cakar Besi','Pedang Karat','Gada Tulang','Tombak Hitam','Kapak Neraka','Sabit Jiwa','Tanduk Baja'],zirah:['Zirah Kulit','Sisik Naga','Jubah Bayangan','Cangkang Batu','Rantai Besi','Zirah Tulang'],aksesori:['Cincin Darah','Kalung Taring','Jimat Kutukan','Mahkota Duri','Anting Bulan','Gelang Roh']};
-const EQ_PRE=['','Retak ','','Tajam ','Terkutuk ','Kuno ','Agung ','Iblis '];
+const EQ_SLOT={senjata:'Weapon',zirah:'Armor',aksesori:'Accessory'};
+const EQ_NAMES={senjata:['Fang Blade','Iron Claw','Rusty Sword','Bone Club','Black Spear','Hell Axe','Soul Scythe','Steel Horn','Bone Dagger','War Hammer'],zirah:['Leather Armor','Dragon Scale','Shadow Cloak','Stone Shell','Chainmail','Bone Armor','Iron Plate','Dark Robe'],aksesori:['Blood Ring','Fang Necklace','Cursed Charm','Thorn Crown','Moon Earring','Spirit Bracelet','Skull Amulet','Demon Eye']};
+const EQ_PRE=['','Cracked ','','Sharp ','Cursed ','Ancient ','Grand ','Demonic '];
 const BAHAN=['Taring Retak','Kulit Kasar','Bijih Besi','Kristal Mana','Sisik Langka','Inti Naga','Pecahan Bintang'];

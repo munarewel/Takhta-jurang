@@ -631,6 +631,18 @@ function drawJurangMon4(P,m,f){
 }
 
 /* =====================================================================
+   TAKHTA JURANG — nama monster dalam bahasa Inggris
+   ===================================================================== */
+const MON_EN={slime:'Slime',kelelawar:'Cave Bat',kobold:'Kobold',slimeAir:'Water Slime',babi:'Wild Boar',wolf:'Wolf',goblin:'Goblin',zombie:'Zombie',slimeRacun:'Poison Slime',slimeApi:'Fire Slime',serigalaSalju:'Snow Wolf',spider:'Venom Spider',gobShaman:'Goblin Shaman',hob:'Hobgoblin',skel:'Skeleton Knight',shadowWolf:'Shadow Wolf',beruang:'Ironclaw Bear',lizard:'Lizardman',orc:'Orc',mimic:'Mimic',orcLord:'Orc Warlord',troll:'Troll',ogre:'Ogre',golem:'Stone Golem',rajaSlime:'King Slime',minotaur:'Minotaur',wyvern:'Wyvern',nagaBayangan:'Shadow Dragon',arwah:'Wandering Spirit',imp:'Imp',anjingNeraka:'Hellhound',succubus:'Succubus',gargoyle:'Gargoyle',ksatriaNeraka:'Hell Knight',lichIblis:'Demon Lich',jenderal:'Demon General',salamander:'Salamander',cockatrice:'Cockatrice',harpy:'Harpy',basilisk:'Basilisk',pegasus:'Pegasus',treant:'Treant',yeti:'Yeti',griffin:'Griffin',manticore:'Manticore',chimera:'Chimera',cerberus:'Cerberus',hydra:'Hydra',ularLaut:'Sea Serpent',volcanosaur:'Volcanosaur',tyrant:'Tyrant',unicorn:'Unicorn',phoenix:'Phoenix',kitsune:'Kitsune',nagaBumi:'Earth Dragon',griffinKaisar:'Griffin Emperor',fenrir:'Fenrir',behemoth:'Behemoth',thunderbird:'Thunderbird',kraken:'Kraken',megalodon:'Megalodon',dodo:'Dodo',speedprey:'Speedprey',speedoraptor:'Speedoraptor',batroww:'Batroww',nulleye:'Nulleye Cavern',shadowWyvern:'Shadow Wyvern',redDragon:'Red Dragon',greenDragon:'Green Dragon',tyrvern:'Tyrvern',superKong:'Super Kong',neko:'Neko',bee:'Bee',queenBee:'Queen Bee',pickleDragon:'Pickle Dragon',greatBear:'Great Bear',agrooBird:'Agroo Bird',jugglerKangaroo:'Juggler Kangaroo',martialTiger:'Martial Tiger',elemSlime:'Elemental Slime',chaoticDragon:'Chaotic Dragon',
+  slimeKaisar:'Slime Emperor',slimeDewa:'Slime God',slimeOmbak:'Tide Slime',slimeWabah:'Plague Slime',slimeMagma:'Magma Slime',slimePrisma:'Prism Slime',vampirBat:'Vampire Bat',koboldPrajurit:'Kobold Soldier',koboldRaja:'Kobold King',hobLord:'Hobgoblin Lord',goblinKaisar:'Goblin Emperor',gobSage:'Goblin Sage',deathKnight:'Death Knight',rajaMayat:'Lord of the Dead',babiBaja:'Steeltusk Boar',rajaBabi:'Boar King',serigalaAlfa:'Alpha Wolf',serigalaBulan:'Moon Wolf',serigalaEs:'Ancient Ice Wolf',serigalaHantu:'Ghost Wolf',ratuLaba:'Spider Queen',arachne:'Arachne',beruangPurba:'Primeval Bear',kadalNaga:'Drake Lizard',manusiaNaga:'Dragonkin',rajaOrc:'Orc King',kaisarOrc:'Orc Emperor',mimikRaja:'Mimic King',trollGunung:'Mountain Troll',oni:'Oni',rajaOni:'Oni King',golemBesi:'Iron Golem',golemMithril:'Mithril Golem',minotaurRaja:'Minotaur King',nagaMerahTua:'Elder Red Dragon',banshee:'Banshee',wraithRaja:'Wraith King',salamanderLava:'Lava Salamander',basiliskRaja:'Basilisk King',ratuHarpy:'Harpy Queen',pegasusLangit:'Sky Pegasus',treantPurba:'Elder Treant',penjagaHutan:'Ancient Forest Warden',yetiRaja:'Yeti King',griffinPerang:'War Griffin',manticoreRaja:'Manticore King',chimeraPurba:'Ancient Chimera',cerberusNeraka:'Infernal Cerberus',hydraKuno:'Ancient Hydra',agrooRaja:'Agroo King',raptorAlfa:'Alpha Raptor',nulleyePurba:'Ancient Nulleye',nagaHijauTua:'Elder Green Dragon',kongRaja:'Kong King',kaisarLebah:'Bee Empress',pickleDewasa:'Adult Pickle Dragon',kangarooJuara:'Champion Kangaroo',harimauGrandmaster:'Grandmaster Tiger',
+  jamur:'Walking Mushroom',jamurRaksasa:'Giant Mushroom',rajaJamur:'Mushroom King',kodok:'Swamp Frog',kodokRacun:'Giant Poison Toad',rajaKodok:'Frog King',kepiting:'Rock Crab',kepitingBaja:'Steel Crab',kepitingBenteng:'Fortress Crab',ular:'Forest Snake',piton:'Python',ularNaga:'Dragon Serpent',leviathan:'Land Leviathan',gagak:'Night Crow',gagakMaut:'Death Crow',kalajengking:'Desert Scorpion',kalaRaja:'Scorpion King',kalaKaisar:'Scorpion Emperor',rubah:'Two-Tailed Fox',rubahLima:'Five-Tailed Fox',rubahSembilan:'Nine-Tailed Fox',tikus:'Sewer Rat',tikusRaksasa:'Giant Rat',kumbang:'Horned Beetle',kumbangBaja:'Steel Beetle',kumbangTitan:'Titan Beetle',boneka:'Cursed Doll',bonekaPembunuh:'Killer Doll',mata:'Floating Eye',mataSeribu:'Thousand Eyes',cacing:'Sandworm',cacingRaksasa:'Giant Worm',penghancurGurun:'Desert Devourer',zirah:'Living Armor',zirahHampa:'Hollow Knight',jenderalZirah:'Armor General',peri:'Dark Fairy',periBayang:'Shadow Fairy',ratuPeri:'Dark Fairy Queen',kelinci:'Horned Rabbit',kelinciPembantai:'Killer Rabbit',gurita:'Cave Octopus',guritaRaksasa:'Giant Octopus',
+  kura:'Volcano Turtle',kuraVulkan:'Volcanic Tortoise',kuraTitan:'Lava Titan Tortoise',golemMagma:'Magma Golem',golemInti:'Core Golem',impApi:'Fire Imp',iblisApi:'Fire Demon',anjingLava:'Lava Hound',anjingMagma:'Magma Hound',bayiNaga:'Baby Dragon',nagaRemaja:'Young Dragon',nagaDewasa:'Adult Dragon',nagaPurba:'Ancient Dragon',nagaEs:'Ice Dragon',nagaEsPurba:'Ancient Ice Dragon',nagaPetir:'Thunder Dragon',nagaBadai:'Storm Dragon',nagaTulang:'Bone Dragon',nagaTulangRaja:'Bone Dragon King',nagaEmas:'Golden Dragon',nagaEmasAgung:'Great Golden Dragon',wyvernRacun:'Venom Wyvern',wyvernRacunRaja:'Venom Wyvern King',bunga:'Man-Eating Flower',bungaRaksasa:'Giant Flower',ratuBunga:'Flower Queen',beruangLumut:'Moss Bear',beruangPurbaHutan:'Ancient Forest Bear',rusa:'Mystic Deer',rusaRoh:'Spirit Deer',rusaDewa:'Forest God Deer',snowman:'Snowman',snowmanRaksasa:'Giant Snowman',rajaSalju:'Snow King',penguin:'Ice Penguin',penguinKaisar:'Emperor Penguin',golemEs:'Ice Golem',golemGletser:'Glacier Golem',kaktus:'Thorny Cactus',kaktusRaksasa:'Giant Cactus',rajaKaktus:'Cactus King',mumi:'Mummy',mumiBangsawan:'Noble Mummy',firaun:'Pharaoh',scarab:'Scarab',scarabEmas:'Golden Scarab',drone:'Scout Drone',droneTempur:'Battle Drone',droneInduk:'Mother Drone',robot:'Guard Robot',robotPerang:'War Robot',mechaTitan:'Mecha Titan',cyborg:'Cyborg',cyborgElite:'Elite Cyborg',serigalaCyber:'Cyber Wolf',serigalaMecha:'Mecha Wolf',bajakTulang:'Skeleton Pirate',kaptenTulang:'Skeleton Captain',laksamanaHantu:'Ghost Admiral',beo:'Parrot',beoBajak:'Pirate Parrot',kepitingBajak:'Pirate Crab',kepitingMeriam:'Cannon Crab',santaGelap:'Dark Santa',santaKegelapan:'Santa of Darkness',rusaKutub:'Red-Nosed Reindeer',rusaKutubTerbang:'Flying Reindeer',kadoMimik:'Gift Mimic',kadoMimikRaksasa:'Giant Gift Mimic',labu:'Pumpkin Ghost',labuPenyihir:'Pumpkin Witch',rajaLabu:'Pumpkin King',
+  headless:'Headless Horseman',headlessRaja:'Headless Overlord',heroSkel:'Hero Skeleton',heroSkelLegenda:'Legendary Hero Skeleton',mudHand:'Hand Mud',mudHandRaksasa:'Giant Mud Hand',cryingDemon:'Crying Demon',iblisRatapan:'Wailing Demon',iblisAirMataDarah:'Blood-Tear Demon',kickerOrc:'Kicker Orc',kickerOrcJuara:'Champion Kicker Orc',hedgehog:'Dunk Hedgehog',hedgehogSlam:'Slam Dunk Hedgehog',
+  ninjaRakun:'Ninja Raccoon',rakunBayangan:'Shadow Ninja Raccoon',rakunAgung:'Grand Ninja Raccoon',samuraiWolf:'Samurai Wolf',serigalaRonin:'Ronin Wolf',shogunSerigala:'Wolf Shogun',keraBiksu:'Monk Monkey',rajaKera:'Monkey King',keraSakti:'Sage Monkey King',kappa:'Kappa',kappaPendekar:'Kappa Warrior',tengu:'Mountain Tengu',rajaTengu:'Tengu Lord',pandaKungfu:'Kung Fu Panda',pandaGrandmaster:'Grandmaster Panda',beruangSumo:'Sumo Bear',yokozunaBeruang:'Yokozuna Bear',kucingRonin:'Ronin Cat',kucingBulan:'Moonblade Cat',rajaKucingRonin:'Ronin Cat King',kodokNinja:'Ninja Frog',kodokNinjaRacun:'Venom Ninja Frog',bantengGladiator:'Gladiator Bull',bantengJuara:'Arena Champion Bull',kelinciPemanah:'Archer Rabbit',kelinciBulan:'Moon Archer Rabbit',hantuPenyihir:'Owl Wizard',hantuArkanis:'Arcane Owl',sageHantu:'Owl Sage',babiBarbar:'Barbarian Pig',kepalaSukuBabi:'Pig Chieftain',rubahPenyihir:'Fox Sorcerer',rubahPenyihirAgung:'Fox Archsorcerer',emperorGriffin:'Emperor Griffin',
+  gajahPenjaga:'Elephant Guard',gajahPerang:'War Elephant',buayaGladiator:'Crocodile Gladiator',rajaBuaya:'Swamp Croc King',singaKsatria:'Lion Knight',rajaSinga:'Lion King',manusiaHiu:'Sharkman',hiuPanglima:'Shark Commander',kambingIblis:'Demon Goat',baphomet:'Baphomet',ayamPetarung:'Fighting Rooster',ayamJago:'Legendary Rooster',manusiaKelelawar:'Batman',bangsawanMalam:'Night Noble',domba:'Sheep Mage',dombaAgung:'Arcane Sheep',werewolf:'Werewolf',werewolfAlfa:'Alpha Werewolf',werewolfBulan:'Blood Moon Werewolf',centaur:'Centaur Archer',centaurPanglima:'Centaur General',lamia:'Lamia',medusa:'Medusa',ratuGorgon:'Gorgon Queen',ubur:'Ghost Jellyfish',uburRaja:'Giant Jellyfish',tengkorakApi:'Flying Skull',tengkorakIblis:'Demon Skull',lentera:'Lantern Ghost',lenteraJiwa:'Soul Lantern',belalang:'Mantis',belalangRaja:'Blade Mantis',belalangKaisar:'Mantis Emperor',siput:'Giant Snail',siputBaja:'Steelshell Snail',siputBenteng:'Fortress Snail',ksatriaGoblin:'Goblin Knight',jenderalGoblin:'Goblin General',elfGelap:'Dark Elf Archer',elfGelapRatu:'Dark Elf Queen',vampirBangsawan:'Vampire Noble',vampirLord:'Vampire Lord',dukunOrc:'Orc Shaman',nabiOrc:'Orc War Prophet',ksatriaKutukan:'Cursed Knight',paladinJatuh:'Fallen Paladin'};
+for(const k in MON_EN) if(MON[k]) MON[k].n=MON_EN[k];
+
+/* =====================================================================
    TAKHTA JURANG — data: elemen, ability, katalog ribuan monster,
    job petualang, nama, ras Raja Iblis, toko
    ===================================================================== */
@@ -642,51 +654,51 @@ const STAGE_CAP=[0,25,50,75,100];
 /* ---------- ability ---------- */
 // k: 'p' pasif, 'a' aktif (cd dalam detik)
 const ABIL={
-  regen:{n:'Regenerasi',k:'p',d:'Memulihkan 2% nyawa tiap detik.'},
-  kulitBatu:{n:'Kulit Batu',k:'p',d:'Pertahanan +35%.'},
-  kulitBaja:{n:'Kulit Baja',k:'p',d:'Kerusakan yang diterima -20%.'},
-  gesit:{n:'Gesit',k:'p',d:'Peluang menghindar +15%.'},
-  haus:{n:'Haus Darah',k:'p',d:'Menyerap 20% kerusakan menjadi nyawa.'},
-  amarah:{n:'Amarah',k:'p',d:'Serangan +50% saat nyawa di bawah 40%.'},
-  duri:{n:'Duri',k:'p',d:'Memantulkan 20% kerusakan jarak dekat.'},
-  auraRacun:{n:'Aura Racun',k:'p',d:'Petualang di dekatnya keracunan.'},
-  berani:{n:'Tak Kenal Takut',k:'p',d:'Kebal pingsan dan tidur.'},
-  elang:{n:'Mata Elang',k:'p',d:'Peluang kritikal +20%.'},
-  untung:{n:'Keberuntungan',k:'p',d:'Korban yang dibunuhnya menjatuhkan 50% emas lebih banyak.'},
-  pemburu:{n:'Pemburu Pemula',k:'p',d:'+40% kerusakan ke petualang berlevel lebih rendah.'},
-  pelindung:{n:'Pelindung',k:'p',d:'Monster lain di lantai yang sama menerima kerusakan -12%.'},
-  pantul:{n:'Pantulan Sihir',k:'p',d:'Memantulkan 30% kerusakan sihir.'},
-  kabut:{n:'Selubung Kabut',k:'p',d:'Semua monster di lantai ini +8% menghindar.'},
-  api:{n:'Semburan Api',k:'a',cd:9,d:'Membakar semua petualang di depannya.'},
-  beku:{n:'Napas Beku',k:'a',cd:9,d:'Kerusakan dingin dan membuat lambat.'},
-  petir:{n:'Sambaran Petir',k:'a',cd:10,d:'Satu sambaran besar (240%).'},
-  raung:{n:'Raungan',k:'a',cd:14,d:'Membuat petualang di dekatnya pingsan 2 detik.'},
-  jaring:{n:'Jaring',k:'a',cd:8,d:'Menjerat satu petualang 3 detik.'},
-  ganda:{n:'Serangan Ganda',k:'a',cd:5,d:'Menyerang dua kali berturut-turut.'},
-  sembuh:{n:'Penyembuhan',k:'a',cd:12,d:'Memulihkan 25% nyawa monster di sekitarnya.'},
-  panggil:{n:'Panggil Kroco',k:'a',cd:20,d:'Memanggil 2 kroco sementara.'},
-  ledak:{n:'Ledakan',k:'a',cd:18,d:'Ledakan besar, tapi melukai diri sendiri 25%.'},
-  kedip:{n:'Kedip',k:'a',cd:11,d:'Berpindah ke barisan belakang dan menyerang penyembuh.'},
-  serapMana:{n:'Serap Mana',k:'a',cd:10,d:'Menyerang dan menyerap mana untuk kastil.'},
-  kutuk:{n:'Kutukan',k:'a',cd:12,d:'Serangan target -30% selama 8 detik.'},
-  tebas:{n:'Tebasan Kuat',k:'a',cd:6,d:'Pukulan keras 180%.'},
-  goda:{n:'Pikatan',k:'a',cd:16,d:'Satu petualang terpikat dan berhenti menyerang 4 detik.'},
-  tajam:{n:'Bilah Tajam',k:'p',d:'Kerusakan kritikal +60%.'},
-  tegar:{n:'Tegar',k:'p',d:'Bertahan dengan 1 nyawa saat terkena pukulan mematikan (sekali tiap 30 detik).'},
-  kebalSihir:{n:'Kebal Sihir',k:'p',d:'Kerusakan sihir yang diterima -40%.'},
-  serapJiwa:{n:'Serap Jiwa',k:'p',d:'Pulih 30% nyawa setiap membunuh petualang.'},
-  semangat:{n:'Semangat Kawanan',k:'p',d:'Serangan +20% saat ada 3 monster atau lebih di lantai yang sama.'},
-  licin:{n:'Tubuh Licin',k:'p',d:'Menghindar +10%, kebal jerat.'},
-  pencuri:{n:'Tangan Usil',k:'p',d:'Setiap pukulan mencuri 3 emas dari petualang.'},
-  gempa:{n:'Gempa',k:'a',cd:18,d:'Mengguncang lantai: semua petualang di lantai ini pingsan 1,5 detik.'},
+  regen:{n:'Regeneration',k:'p',d:'Memulihkan 2% nyawa tiap detik.'},
+  kulitBatu:{n:'Stone Skin',k:'p',d:'Pertahanan +35%.'},
+  kulitBaja:{n:'Steel Skin',k:'p',d:'Kerusakan yang diterima -20%.'},
+  gesit:{n:'Agility',k:'p',d:'Peluang menghindar +15%.'},
+  haus:{n:'Bloodthirst',k:'p',d:'Menyerap 20% kerusakan menjadi nyawa.'},
+  amarah:{n:'Fury',k:'p',d:'Serangan +50% saat nyawa di bawah 40%.'},
+  duri:{n:'Thorns',k:'p',d:'Memantulkan 20% kerusakan jarak dekat.'},
+  auraRacun:{n:'Poison Aura',k:'p',d:'Petualang di dekatnya keracunan.'},
+  berani:{n:'Fearless',k:'p',d:'Kebal pingsan dan tidur.'},
+  elang:{n:'Eagle Eye',k:'p',d:'Peluang kritikal +20%.'},
+  untung:{n:'Fortune',k:'p',d:'Korban yang dibunuhnya menjatuhkan 50% emas lebih banyak.'},
+  pemburu:{n:'Rookie Hunter',k:'p',d:'+40% kerusakan ke petualang berlevel lebih rendah.'},
+  pelindung:{n:'Guardian',k:'p',d:'Monster lain di lantai yang sama menerima kerusakan -12%.'},
+  pantul:{n:'Spell Reflect',k:'p',d:'Memantulkan 30% kerusakan sihir.'},
+  kabut:{n:'Mist Veil',k:'p',d:'Semua monster di lantai ini +8% menghindar.'},
+  api:{n:'Fire Breath',k:'a',cd:9,d:'Membakar semua petualang di depannya.'},
+  beku:{n:'Frost Breath',k:'a',cd:9,d:'Kerusakan dingin dan membuat lambat.'},
+  petir:{n:'Lightning Strike',k:'a',cd:10,d:'Satu sambaran besar (240%).'},
+  raung:{n:'Roar',k:'a',cd:14,d:'Membuat petualang di dekatnya pingsan 2 detik.'},
+  jaring:{n:'Web',k:'a',cd:8,d:'Menjerat satu petualang 3 detik.'},
+  ganda:{n:'Double Strike',k:'a',cd:5,d:'Menyerang dua kali berturut-turut.'},
+  sembuh:{n:'Heal',k:'a',cd:12,d:'Memulihkan 25% nyawa monster di sekitarnya.'},
+  panggil:{n:'Call Minions',k:'a',cd:20,d:'Memanggil 2 kroco sementara.'},
+  ledak:{n:'Self Destruct',k:'a',cd:18,d:'Ledakan besar, tapi melukai diri sendiri 25%.'},
+  kedip:{n:'Blink',k:'a',cd:11,d:'Berpindah ke barisan belakang dan menyerang penyembuh.'},
+  serapMana:{n:'Mana Siphon',k:'a',cd:10,d:'Menyerang dan menyerap mana untuk kastil.'},
+  kutuk:{n:'Curse',k:'a',cd:12,d:'Serangan target -30% selama 8 detik.'},
+  tebas:{n:'Power Slash',k:'a',cd:6,d:'Pukulan keras 180%.'},
+  goda:{n:'Charm',k:'a',cd:16,d:'Satu petualang terpikat dan berhenti menyerang 4 detik.'},
+  tajam:{n:'Keen Edge',k:'p',d:'Kerusakan kritikal +60%.'},
+  tegar:{n:'Endure',k:'p',d:'Bertahan dengan 1 nyawa saat terkena pukulan mematikan (sekali tiap 30 detik).'},
+  kebalSihir:{n:'Magic Immunity',k:'p',d:'Kerusakan sihir yang diterima -40%.'},
+  serapJiwa:{n:'Soul Eater',k:'p',d:'Pulih 30% nyawa setiap membunuh petualang.'},
+  semangat:{n:'Pack Spirit',k:'p',d:'Serangan +20% saat ada 3 monster atau lebih di lantai yang sama.'},
+  licin:{n:'Slippery Body',k:'p',d:'Menghindar +10%, kebal jerat.'},
+  pencuri:{n:'Sticky Fingers',k:'p',d:'Setiap pukulan mencuri 3 emas dari petualang.'},
+  gempa:{n:'Earthquake',k:'a',cd:18,d:'Mengguncang lantai: semua petualang di lantai ini pingsan 1,5 detik.'},
   tornado:{n:'Tornado',k:'a',cd:12,d:'Angin puyuh: kerusakan area dan mendorong mundur.'},
   meteor:{n:'Meteor',k:'a',cd:22,d:'Batu api jatuh dari langit-langit: kerusakan area 260%.'},
-  teriak:{n:'Teriakan Perang',k:'a',cd:16,d:'Monster di lantai ini +30% serangan selama 8 detik.'},
-  perisai:{n:'Perisai Sihir',k:'a',cd:15,d:'Monster di lantai ini menerima kerusakan -30% selama 6 detik.'},
-  tidur:{n:'Nina Bobo',k:'a',cd:12,d:'Menidurkan satu petualang 3 detik. Kombo dengan serangan berikutnya.'},
-  serbu:{n:'Serbuan',k:'a',cd:8,d:'Menerjang target dengan kekuatan 200%.'},
-  bayang:{n:'Bayangan Kembar',k:'a',cd:20,d:'Memanggil bayangan dirinya selama 10 detik.'},
-  racunKuat:{n:'Racun Pekat',k:'a',cd:10,d:'Racun kuat yang menggerogoti nyawa 8 detik.'},
+  teriak:{n:'War Cry',k:'a',cd:16,d:'Monster di lantai ini +30% serangan selama 8 detik.'},
+  perisai:{n:'Magic Barrier',k:'a',cd:15,d:'Monster di lantai ini menerima kerusakan -30% selama 6 detik.'},
+  tidur:{n:'Lullaby',k:'a',cd:12,d:'Menidurkan satu petualang 3 detik. Kombo dengan serangan berikutnya.'},
+  serbu:{n:'Charge',k:'a',cd:8,d:'Menerjang target dengan kekuatan 200%.'},
+  bayang:{n:'Shadow Clone',k:'a',cd:20,d:'Memanggil bayangan dirinya selama 10 detik.'},
+  racunKuat:{n:'Deadly Venom',k:'a',cd:10,d:'Racun kuat yang menggerogoti nyawa 8 detik.'},
 };
 
 /* ---------- kelompok bentuk: menentukan ability yang bisa dipelajari & drop ---------- */
@@ -739,53 +751,53 @@ function dropTheme(sid){ const s=SPECIES[sid], M=MON[s.mk]; const g=monGroup(M);
 /* ---------- elemen (pengali variasi spesies) ---------- */
 const ELEM=[
   {id:'',n:'',c:null,ab:null,w:30,rar:0},
-  {id:'api',n:'Api',c:'#ff6a2a',ab:'api',w:7,rar:0},
-  {id:'es',n:'Es',c:'#7fd8ff',ab:'beku',w:7,rar:0},
-  {id:'petir',n:'Petir',c:'#ffe040',ab:'petir',w:6,rar:0},
-  {id:'racun',n:'Racun',c:'#9ad04a',ab:'auraRacun',w:7,rar:0},
-  {id:'bayang',n:'Bayangan',c:'#6a4aaa',ab:'gesit',w:5,rar:0},
-  {id:'cahaya',n:'Cahaya',c:'#fff2a0',ab:'sembuh',w:4,rar:1},
-  {id:'batu',n:'Batu',c:'#a89070',ab:'kulitBatu',w:7,rar:0},
-  {id:'angin',n:'Angin',c:'#bff0d0',ab:'ganda',w:6,rar:0},
-  {id:'darah',n:'Darah',c:'#c8203a',ab:'haus',w:4,rar:1},
-  {id:'kristal',n:'Kristal',c:'#c0a0ff',ab:'pantul',w:4,rar:1},
-  {id:'baja',n:'Baja',c:'#b8c0c8',ab:'kulitBaja',w:5,rar:0},
-  {id:'kabut',n:'Kabut',c:'#c8c8d8',ab:'kabut',w:5,rar:0},
+  {id:'api',n:'Fire',c:'#ff6a2a',ab:'api',w:7,rar:0},
+  {id:'es',n:'Ice',c:'#7fd8ff',ab:'beku',w:7,rar:0},
+  {id:'petir',n:'Thunder',c:'#ffe040',ab:'petir',w:6,rar:0},
+  {id:'racun',n:'Poison',c:'#9ad04a',ab:'auraRacun',w:7,rar:0},
+  {id:'bayang',n:'Shadow',c:'#6a4aaa',ab:'gesit',w:5,rar:0},
+  {id:'cahaya',n:'Light',c:'#fff2a0',ab:'sembuh',w:4,rar:1},
+  {id:'batu',n:'Stone',c:'#a89070',ab:'kulitBatu',w:7,rar:0},
+  {id:'angin',n:'Wind',c:'#bff0d0',ab:'ganda',w:6,rar:0},
+  {id:'darah',n:'Blood',c:'#c8203a',ab:'haus',w:4,rar:1},
+  {id:'kristal',n:'Crystal',c:'#c0a0ff',ab:'pantul',w:4,rar:1},
+  {id:'baja',n:'Steel',c:'#b8c0c8',ab:'kulitBaja',w:5,rar:0},
+  {id:'kabut',n:'Mist',c:'#c8c8d8',ab:'kabut',w:5,rar:0},
   {id:'lava',n:'Lava',c:'#ff3a1a',ab:'ledak',w:3,rar:1},
-  {id:'emas',n:'Emas',c:'#ffd040',ab:'untung',w:2,rar:1},
-  {id:'hampa',n:'Hampa',c:'#3a1a5a',ab:'serapMana',w:1,rar:2},
-  {id:'air',n:'Air',c:'#3a8ad8',ab:'regen',w:6,rar:0},
-  {id:'tanah',n:'Tanah',c:'#8a6a3a',ab:'kulitBatu',w:6,rar:0},
-  {id:'daun',n:'Daun',c:'#5ac85a',ab:'regen',w:6,rar:0},
-  {id:'tulang',n:'Tulang',c:'#e8e0c8',ab:'berani',w:5,rar:0},
-  {id:'bulan',n:'Bulan',c:'#c8d8ff',ab:'gesit',w:3,rar:1},
-  {id:'surya',n:'Surya',c:'#ffb030',ab:'api',w:3,rar:1},
-  {id:'pasir',n:'Pasir',c:'#e0c890',ab:'kabut',w:5,rar:0},
-  {id:'neraka',n:'Neraka',c:'#a01a1a',ab:'amarah',w:2,rar:1},
-  {id:'suci',n:'Suci',c:'#fffde0',ab:'pelindung',w:2,rar:1},
-  {id:'mimpi',n:'Mimpi',c:'#ff9ad0',ab:'goda',w:2,rar:1},
+  {id:'emas',n:'Golden',c:'#ffd040',ab:'untung',w:2,rar:1},
+  {id:'hampa',n:'Void',c:'#3a1a5a',ab:'serapMana',w:1,rar:2},
+  {id:'air',n:'Water',c:'#3a8ad8',ab:'regen',w:6,rar:0},
+  {id:'tanah',n:'Earth',c:'#8a6a3a',ab:'kulitBatu',w:6,rar:0},
+  {id:'daun',n:'Leaf',c:'#5ac85a',ab:'regen',w:6,rar:0},
+  {id:'tulang',n:'Bone',c:'#e8e0c8',ab:'berani',w:5,rar:0},
+  {id:'bulan',n:'Moon',c:'#c8d8ff',ab:'gesit',w:3,rar:1},
+  {id:'surya',n:'Sun',c:'#ffb030',ab:'api',w:3,rar:1},
+  {id:'pasir',n:'Sand',c:'#e0c890',ab:'kabut',w:5,rar:0},
+  {id:'neraka',n:'Hell',c:'#a01a1a',ab:'amarah',w:2,rar:1},
+  {id:'suci',n:'Holy',c:'#fffde0',ab:'pelindung',w:2,rar:1},
+  {id:'mimpi',n:'Dream',c:'#ff9ad0',ab:'goda',w:2,rar:1},
 ];
 const ELEM_BY={}; for(const e of ELEM) ELEM_BY[e.id]=e;
 /* ---------- ability berelemen (6 per elemen) & pasif stat ---------- */
-const ELEM_STATUS={api:['Bakar','burn'],es:['Bekukan','slow'],petir:['Setrum','stun'],racun:['Racuni','poison'],bayang:['Kutukan Bayangan','curse'],cahaya:['Silau','blind'],batu:['Membatu','stun'],angin:['Hempasan','slow'],darah:['Hisap Darah','drain'],kristal:['Belenggu Kristal','root'],baja:['Hancurkan Zirah','brk'],kabut:['Kabut Tidur','sleep'],lava:['Lelehkan','brk'],emas:['Rampas Emas','gold'],hampa:['Hisap Mana','mana'],air:['Tenggelamkan','slow'],tanah:['Jebakan Tanah','root'],daun:['Akar Pengikat','root'],tulang:['Kutukan Tulang','curse'],bulan:['Nina Bulan','sleep'],surya:['Sinar Surya','blind'],pasir:['Badai Pasir','blind'],neraka:['Api Neraka','burn'],suci:['Penghakiman','stun'],mimpi:['Mimpi Buruk','charm']};
+const ELEM_STATUS={api:['Ignite','burn'],es:['Freeze','slow'],petir:['Shock','stun'],racun:['Envenom','poison'],bayang:['Shadow Curse','curse'],cahaya:['Flash','blind'],batu:['Petrify','stun'],angin:['Gust','slow'],darah:['Blood Drain','drain'],kristal:['Crystal Bind','root'],baja:['Armor Break','brk'],kabut:['Sleep Mist','sleep'],lava:['Meltdown','brk'],emas:['Gold Snatch','gold'],hampa:['Mana Drain','mana'],air:['Drown','slow'],tanah:['Earth Trap','root'],daun:['Binding Roots','root'],tulang:['Bone Curse','curse'],bulan:['Moon Lullaby','sleep'],surya:['Sunbeam','blind'],pasir:['Sandstorm','blind'],neraka:['Hellfire','burn'],suci:['Judgment','stun'],mimpi:['Nightmare','charm']};
 const STATUS_D={burn:'membakar',slow:'memperlambat',stun:'membuat pingsan',poison:'meracuni',curse:'melemahkan serangan',blind:'membutakan (serangan sering meleset)',drain:'menghisap nyawa',root:'menjerat',brk:'menghancurkan pertahanan',sleep:'menidurkan',gold:'mencuri emas',mana:'menyerap mana untuk kastil',charm:'memikat'};
-for(const E of ELEM){ if(!E.id) continue; const S=ELEM_STATUS[E.id]||['Kutukan '+E.n,'curse'];
-  ABIL['tembak_'+E.id]={n:`Tembakan ${E.n}`,k:'a',cd:7,eff:'hit',m:1.9,el:E.id,d:`Serangan ${E.n} terfokus (190%).`};
-  ABIL['ledak_'+E.id]={n:`Ledakan ${E.n}`,k:'a',cd:11,eff:'aoe',m:1.4,r:40,el:E.id,d:`Ledakan ${E.n} ke semua petualang di dekatnya (140%).`};
+for(const E of ELEM){ if(!E.id) continue; const S=ELEM_STATUS[E.id]||[E.n+' Curse','curse'];
+  ABIL['tembak_'+E.id]={n:`${E.n} Shot`,k:'a',cd:7,eff:'hit',m:1.9,el:E.id,d:`Serangan ${E.n} terfokus (190%).`};
+  ABIL['ledak_'+E.id]={n:`${E.n} Blast`,k:'a',cd:11,eff:'aoe',m:1.4,r:40,el:E.id,d:`Ledakan ${E.n} ke semua petualang di dekatnya (140%).`};
   ABIL['status_'+E.id]={n:S[0],k:'a',cd:10,eff:'status',st:S[1],m:.7,el:E.id,d:`Serangan ${E.n} yang ${STATUS_D[S[1]]}.`};
-  ABIL['badai_'+E.id]={n:`Badai ${E.n}`,k:'a',cd:9,eff:'multi',hits:3,m:.7,el:E.id,d:`Tiga serangan ${E.n} beruntun.`};
-  ABIL['jiwa_'+E.id]={n:`Jiwa ${E.n}`,k:'p',eff:'elemAtk',el:E.id,d:`Serangan biasa berelemen ${E.n} dan +15% kerusakan.`};
-  ABIL['tameng_'+E.id]={n:`Perisai ${E.n}`,k:'p',eff:'res',el:E.id,d:`Kerusakan elemen ${E.n} yang diterima -40%.`};
+  ABIL['badai_'+E.id]={n:`${E.n} Storm`,k:'a',cd:9,eff:'multi',hits:3,m:.7,el:E.id,d:`Tiga serangan ${E.n} beruntun.`};
+  ABIL['jiwa_'+E.id]={n:`${E.n} Soul`,k:'p',eff:'elemAtk',el:E.id,d:`Serangan biasa berelemen ${E.n} dan +15% kerusakan.`};
+  ABIL['tameng_'+E.id]={n:`${E.n} Ward`,k:'p',eff:'res',el:E.id,d:`Kerusakan elemen ${E.n} yang diterima -40%.`};
 }
 Object.assign(ABIL,{
-  raksasa:{n:'Kekuatan Raksasa',k:'p',eff:'stat',atk:.2,d:'Serangan +20%.'},
-  tubuhBesi:{n:'Tubuh Besi',k:'p',eff:'stat',hp:.25,d:'Nyawa maksimal +25%.'},
-  langkahAngin:{n:'Langkah Angin',k:'p',eff:'stat',eva:.1,d:'Menghindar +10%.'},
-  pikiranTajam:{n:'Pikiran Tajam',k:'p',eff:'stat',crit:.12,d:'Peluang kritikal +12%.'},
-  kulitTebal:{n:'Kulit Tebal',k:'p',eff:'stat',def:.3,d:'Pertahanan +30%.'},
-  pemulihan:{n:'Pemulihan',k:'p',eff:'stat',regen:.01,d:'Memulihkan 1% nyawa tiap detik.'},
-  cepat:{n:'Gerak Kilat',k:'p',eff:'stat',spd:.25,d:'Kecepatan serangan +25%.'},
-  wibawa:{n:'Wibawa Raja',k:'p',eff:'stat',aura:1,d:'Monster lain di lantai ini +10% serangan.'},
+  raksasa:{n:'Giant Strength',k:'p',eff:'stat',atk:.2,d:'Serangan +20%.'},
+  tubuhBesi:{n:'Iron Body',k:'p',eff:'stat',hp:.25,d:'Nyawa maksimal +25%.'},
+  langkahAngin:{n:'Wind Step',k:'p',eff:'stat',eva:.1,d:'Menghindar +10%.'},
+  pikiranTajam:{n:'Sharp Mind',k:'p',eff:'stat',crit:.12,d:'Peluang kritikal +12%.'},
+  kulitTebal:{n:'Thick Hide',k:'p',eff:'stat',def:.3,d:'Pertahanan +30%.'},
+  pemulihan:{n:'Recovery',k:'p',eff:'stat',regen:.01,d:'Memulihkan 1% nyawa tiap detik.'},
+  cepat:{n:'Haste',k:'p',eff:'stat',spd:.25,d:'Kecepatan serangan +25%.'},
+  wibawa:{n:"King's Presence",k:'p',eff:'stat',aura:1,d:'Monster lain di lantai ini +10% serangan.'},
 });
 /* kuat ⇒ x1,5 · lemah ⇒ x0,7 */
 const ELEM_STRONG={api:['daun','es','baja'],air:['api','lava','pasir'],es:['daun','angin','air'],petir:['air','baja','angin'],tanah:['petir','racun','lava'],daun:['air','tanah','batu'],angin:['daun','kabut','pasir'],batu:['petir','api','angin'],racun:['daun','air','darah'],
@@ -819,7 +831,7 @@ function spId(k,el){ return el?k+'.'+el:k; }
 function makeSpecies(k,el){
   const id=spId(k,el); if(SPECIES[id]) return SPECIES[id];
   const m=MON[k], E=ELEM_BY[el||''];
-  const s={id,mk:k,el:el||'',n:E.n?`${m.n} ${E.n}`:m.n,stage:monStage(k),rank:m.rank,
+  const s={id,mk:k,el:el||'',n:E.n?`${E.n} ${m.n}`:m.n,stage:monStage(k),rank:m.rank,
     hp:Math.round(m.hp*(E.id==='batu'||E.id==='baja'?1.2:1)),atk:+(m.atk*(E.id==='api'||E.id==='petir'||E.id==='lava'?1.15:1)).toFixed(1),
     spd:m.spd||1,ranged:!!m.ranged,legend:!!m.legend,
     rar:Math.min(4,rankRar(m.rank)+E.rar+(m.legend?1:0)),ab:E.ab||baseAbil(m),next:null};
@@ -912,54 +924,54 @@ const ADV_RACES=['manusia','manusia','manusia','elf','dwarf','beastkin','halfelf
 
 /* ---------- ras Raja Iblis ---------- */
 const LORD_RACE=[
-  {id:'iblis',n:'Iblis',race:'iblis',job:'rajaIblis',d:'Semua monster +10% serangan.'},
-  {id:'vampir',n:'Vampir',race:'manusia',skin:'#e8e0f0',hair:'#1a1a2a',job:'rajaIblis',d:'Raja menyerap 30% kerusakan menjadi nyawa.'},
+  {id:'iblis',n:'Demon',race:'iblis',job:'rajaIblis',d:'Semua monster +10% serangan.'},
+  {id:'vampir',n:'Vampire',race:'manusia',skin:'#e8e0f0',hair:'#1a1a2a',job:'rajaIblis',d:'Raja menyerap 30% kerusakan menjadi nyawa.'},
   {id:'lich',n:'Lich',mon:{k:'hum',race:'skeleton',job:'mLich'},d:'Biaya kebangkitan monster -40%.'},
   {id:'orc',n:'Orc',mon:{k:'hum',race:'orc',job:'mOrcLord'},d:'Nyawa Raja +40%.'},
   {id:'succubus',n:'Succubus',mon:{k:'hum',race:'succubus',job:'mSuccubus'},d:'Kadang memikat petualang hingga berhenti menyerang.'},
-  {id:'naga',n:'Naga',mon:{k:'dragon2',c:'#8a1a2a',eye:'#ffd040'},sc:1.25,d:'Napas api ke seluruh party di ruang singgasana.'},
+  {id:'naga',n:'Dragon',mon:{k:'dragon2',c:'#8a1a2a',eye:'#ffd040'},sc:1.25,d:'Napas api ke seluruh party di ruang singgasana.'},
   {id:'oni',n:'Oni',mon:{k:'hum',race:'ogre',job:'mOgre'},tint:'#c82a2a',d:'Serangan Raja +40%.'},
-  {id:'elfGelap',n:'Elf Gelap',race:'elf',skin:'#7a6a9a',hair:'#e8e6f0',job:'rajaIblis',d:'Regenerasi mana kastil +50%.'},
-  {id:'ksatria',n:'Ksatria Neraka',mon:{k:'hum',race:'neraka',job:'mHellKnight'},d:'Pertahanan Raja +50%.'},
+  {id:'elfGelap',n:'Dark Elf',race:'elf',skin:'#7a6a9a',hair:'#e8e6f0',job:'rajaIblis',d:'Regenerasi mana kastil +50%.'},
+  {id:'ksatria',n:'Hell Knight',mon:{k:'hum',race:'neraka',job:'mHellKnight'},d:'Pertahanan Raja +50%.'},
 ];
 
 /* ---------- fasilitas (dipasang di petak lantai) ---------- */
 const CHEST_RANK=['F','E','D','C','B','A','S','SS','SSS'];
 const FIX={
-  chest:{n:'Peti Harta',cat:'peti'},
-  duri:{n:'Jebakan Duri',cat:'jebakan',cost:60,dmg:.12,d:'Duri mencuat dari lantai.'},
-  panah:{n:'Celah Panah',cat:'jebakan',cost:110,dmg:.16,d:'Panah melesat dari dinding.'},
-  gas:{n:'Gas Tidur',cat:'jebakan',cost:160,sleep:3,d:'Party tertidur 3 detik. Kombo dengan jebakan lain.'},
-  baskom:{n:'Baskom Jatuh',cat:'jebakan',cost:90,dmg:.1,stun:1.2,d:'Baskom besi jatuh ke kepala. Pingsan sebentar.'},
-  licin:{n:'Lantai Licin',cat:'jebakan',cost:140,slip:1,d:'Petualang terpeleset jatuh ke lantai bawah.'},
-  lubang:{n:'Lubang Jatuh',cat:'jebakan',cost:220,dmg:.18,fall:1,d:'Jatuh ke lantai bawah sambil terluka.'},
-  apiT:{n:'Semburan Api',cat:'jebakan',cost:260,dmg:.2,burn:1,d:'Pipa api menyembur. Membakar.'},
-  jaringT:{n:'Jaring Jerat',cat:'jebakan',cost:180,root:3,d:'Menjerat satu petualang 3 detik.'},
-  mimik:{n:'Peti Mimik',cat:'jebakan',cost:240,d:'Terlihat seperti peti harta. Saat dibuka, menggigit keras dan mencuri emas pembukanya.'},
-  rest:{n:'Tempat Istirahat',cat:'fasilitas',cost:300,d:'Petualang membayar emas untuk memulihkan diri dan menyimpan kemajuan.'},
-  rahasia:{n:'Dinding Retak',cat:'fasilitas',cost:450,d:'Jalan rahasia menuju ruang monster rahasia. Hanya Thief/Ranger yang bisa menemukannya.'},
-  obor:{n:'Obor Ungu',cat:'dekor',cost:40,aura:2,d:'Menambah Aura Seram.'},
-  patung:{n:'Patung Gargoyle',cat:'dekor',cost:120,aura:5,d:'Menambah Aura Seram.'},
-  tengkorak:{n:'Tumpukan Tengkorak',cat:'dekor',cost:80,aura:4,d:'Menambah Aura Seram.'},
+  chest:{n:'Treasure Chest',cat:'peti'},
+  duri:{n:'Spike Trap',cat:'jebakan',cost:60,dmg:.12,d:'Duri mencuat dari lantai.'},
+  panah:{n:'Arrow Slit',cat:'jebakan',cost:110,dmg:.16,d:'Panah melesat dari dinding.'},
+  gas:{n:'Sleep Gas',cat:'jebakan',cost:160,sleep:3,d:'Party tertidur 3 detik. Kombo dengan jebakan lain.'},
+  baskom:{n:'Falling Bucket',cat:'jebakan',cost:90,dmg:.1,stun:1.2,d:'Baskom besi jatuh ke kepala. Pingsan sebentar.'},
+  licin:{n:'Slippery Floor',cat:'jebakan',cost:140,slip:1,d:'Petualang terpeleset jatuh ke lantai bawah.'},
+  lubang:{n:'Pit Trap',cat:'jebakan',cost:220,dmg:.18,fall:1,d:'Jatuh ke lantai bawah sambil terluka.'},
+  apiT:{n:'Fire Jet',cat:'jebakan',cost:260,dmg:.2,burn:1,d:'Pipa api menyembur. Membakar.'},
+  jaringT:{n:'Snare Net',cat:'jebakan',cost:180,root:3,d:'Menjerat satu petualang 3 detik.'},
+  mimik:{n:'Mimic Chest',cat:'jebakan',cost:240,d:'Terlihat seperti peti harta. Saat dibuka, menggigit keras dan mencuri emas pembukanya.'},
+  rest:{n:'Rest Spot',cat:'fasilitas',cost:300,d:'Petualang membayar emas untuk memulihkan diri dan menyimpan kemajuan.'},
+  rahasia:{n:'Cracked Wall',cat:'fasilitas',cost:450,d:'Jalan rahasia menuju ruang monster rahasia. Hanya Thief/Ranger yang bisa menemukannya.'},
+  obor:{n:'Purple Torch',cat:'dekor',cost:40,aura:2,d:'Menambah Aura Seram.'},
+  patung:{n:'Gargoyle Statue',cat:'dekor',cost:120,aura:5,d:'Menambah Aura Seram.'},
+  tengkorak:{n:'Skull Pile',cat:'dekor',cost:80,aura:4,d:'Menambah Aura Seram.'},
 };
 function chestCost(r){ return Math.round(40*Math.pow(2.05,CHEST_RANK.indexOf(r))); }
 function chestValue(r){ return CHEST_RANK.indexOf(r); }
 const THEMES=[
-  {n:'Gua Batu',wall:'#3a3446',wall2:'#2e2a3a',floor:'#5a4e5e',acc:'#7a6a7e'},
-  {n:'Makam Tua',wall:'#3e3a34',wall2:'#322e2a',floor:'#6a5e4a',acc:'#a89a7a'},
-  {n:'Hutan Jamur',wall:'#28383a',wall2:'#1e2e30',floor:'#3a5a4a',acc:'#9ae0c0'},
-  {n:'Gua Kristal',wall:'#2a2e4a',wall2:'#222640',floor:'#4a4e7a',acc:'#b0a0ff'},
-  {n:'Kawah Lava',wall:'#3e2420',wall2:'#301a18',floor:'#6a3a2a',acc:'#ff7a3a'},
-  {n:'Lorong Es',wall:'#2e3e4e',wall2:'#243444',floor:'#5a7a8e',acc:'#c8f0ff'},
-  {n:'Istana Hitam',wall:'#24182a',wall2:'#1c1222',floor:'#4a2e4a',acc:'#e3b75e'},
-  {n:'Jurang Hampa',wall:'#140e1e',wall2:'#0e0a16',floor:'#2e2240',acc:'#d060ff'},
+  {n:'Stone Cave',wall:'#3a3446',wall2:'#2e2a3a',floor:'#5a4e5e',acc:'#7a6a7e'},
+  {n:'Old Tomb',wall:'#3e3a34',wall2:'#322e2a',floor:'#6a5e4a',acc:'#a89a7a'},
+  {n:'Mushroom Forest',wall:'#28383a',wall2:'#1e2e30',floor:'#3a5a4a',acc:'#9ae0c0'},
+  {n:'Crystal Cave',wall:'#2a2e4a',wall2:'#222640',floor:'#4a4e7a',acc:'#b0a0ff'},
+  {n:'Lava Crater',wall:'#3e2420',wall2:'#301a18',floor:'#6a3a2a',acc:'#ff7a3a'},
+  {n:'Ice Corridor',wall:'#2e3e4e',wall2:'#243444',floor:'#5a7a8e',acc:'#c8f0ff'},
+  {n:'Black Palace',wall:'#24182a',wall2:'#1c1222',floor:'#4a2e4a',acc:'#e3b75e'},
+  {n:'Void Abyss',wall:'#140e1e',wall2:'#0e0a16',floor:'#2e2240',acc:'#d060ff'},
 ];
 function themeOf(f){ return THEMES[Math.floor(f/10)%THEMES.length]; }
 
 /* ---------- perlengkapan monster & bahan ---------- */
-const EQ_SLOT={senjata:'Senjata',zirah:'Zirah',aksesori:'Aksesori'};
-const EQ_NAMES={senjata:['Taring','Cakar Besi','Pedang Karat','Gada Tulang','Tombak Hitam','Kapak Neraka','Sabit Jiwa','Tanduk Baja'],zirah:['Zirah Kulit','Sisik Naga','Jubah Bayangan','Cangkang Batu','Rantai Besi','Zirah Tulang'],aksesori:['Cincin Darah','Kalung Taring','Jimat Kutukan','Mahkota Duri','Anting Bulan','Gelang Roh']};
-const EQ_PRE=['','Retak ','','Tajam ','Terkutuk ','Kuno ','Agung ','Iblis '];
+const EQ_SLOT={senjata:'Weapon',zirah:'Armor',aksesori:'Accessory'};
+const EQ_NAMES={senjata:['Fang Blade','Iron Claw','Rusty Sword','Bone Club','Black Spear','Hell Axe','Soul Scythe','Steel Horn','Bone Dagger','War Hammer'],zirah:['Leather Armor','Dragon Scale','Shadow Cloak','Stone Shell','Chainmail','Bone Armor','Iron Plate','Dark Robe'],aksesori:['Blood Ring','Fang Necklace','Cursed Charm','Thorn Crown','Moon Earring','Spirit Bracelet','Skull Amulet','Demon Eye']};
+const EQ_PRE=['','Cracked ','','Sharp ','Cursed ','Ancient ','Grand ','Demonic '];
 const BAHAN=['Taring Retak','Kulit Kasar','Bijih Besi','Kristal Mana','Sisik Langka','Inti Naga','Pecahan Bintang'];
 
 /* =====================================================================
@@ -997,6 +1009,45 @@ Object.assign(JOB_GEAR,{aeromancer:[['Tongkat Angin'],['Jubah Badai'],['Bulu Ela
   hero:[['Pedang Pahlawan'],['Zirah Pahlawan'],['Lambang Pahlawan']],weaponMaster:[['Pedang Master','Tombak Master'],['Zirah Master Senjata'],['Sabuk Senjata']],duelist:[['Rapier'],['Kemeja Bangsawan'],['Sarung Tangan Putih']],
   miner:[['Beliung'],['Helm Tambang'],['Lampu Tambang']],cook:[['Pisau Dapur','Panci Besi'],['Celemek Koki'],['Topi Koki']],farmer:[['Cangkul'],['Baju Petani'],['Topi Jerami']],
   monsterHunter:[['Pedang Pemburu Monster'],['Zirah Kulit Monster'],['Trofi Taring']],tamer:[['Cambuk Tamer'],['Pelana Kecil'],['Peluit Tamer']]});
+
+/* =====================================================================
+   TAKHTA JURANG — bintang kelas (★1–★5) & nama bahasa Inggris
+   ===================================================================== */
+Object.assign(JOBS,{
+  fistKing:{n:'Fist King',spr:'petarung',hp:64,atk:11,def:6,eva:.14,rng:12,grow:[9,1.9,.9],skill:{n:'Thousand Fists',cd:7,k:'multi',hits:7,m:.45},front:2},
+  spearGod:{n:'Spear God',spr:'pendekarTombak',hp:66,atk:11,def:7,eva:.08,rng:16,grow:[9,1.9,1.1],skill:{n:'Heaven Piercer',cd:8,k:'pierce',m:2.3},front:3},
+  iceQueen:{n:'Ice Queen',spr:'penyihirAir',hp:40,atk:11,def:3,eva:.06,rng:52,grow:[6,2,.5],skill:{n:'Absolute Zero',cd:10,k:'aoe',m:1.9},front:0,magic:1},
+  arrowQueen:{n:'Arrow Queen',spr:'ratuPanah',hp:46,atk:12,def:4,eva:.12,rng:66,grow:[6,2.2,.5],skill:{n:'Rain of Arrows',cd:9,k:'multi',hits:5,m:.8},front:1},
+  stormLord:{n:'Storm Lord',spr:'sageAgung',hp:44,atk:12,def:3,eva:.06,rng:54,grow:[6,2.3,.5],skill:{n:'Tempest',cd:10,k:'aoe',m:2.2},front:0,magic:1},
+});
+for(const k of Object.keys(JOBS)) if(!JOB_KEYS.includes(k)) JOB_KEYS.push(k);
+Object.assign(JOB_LINES,{
+  fistKing:['Tinjuku sudah cukup.','Satu pukulan, satu monster.'],spearGod:['Tombakku menembus apa pun.','Jarak adalah milikku.'],
+  iceQueen:['Dingin sekali di sini… cocok.','Membekulah.'],arrowQueen:['Tak satu pun panahku meleset.','Hujan panah akan turun.'],
+  stormLord:['Langit menurut padaku.','Petir, datanglah!'],swordmaster:['Pedang ini telah menebas seribu monster.','Berlututlah di hadapan Raja Pedang.'],
+});
+Object.assign(JOB_EL,{iceQueen:['es'],stormLord:['petir','angin'],arrowQueen:['angin','cahaya'],spearGod:['petir'],fistKing:['tanah']});
+JOBS.swordmaster.n='Sword King'; JOBS.sage.n='Great Sage'; JOBS.sniper.spr='pemanah'; JOBS.alkemis.n='Alchemist';
+const JOB_STAR={farmer:1,cook:1,miner:1,
+  knight:2,mage:2,priest:2,archer:2,thief:2,lancer:2,monk:2,bard:2,cleric:2,hunter:2,alkemis:2,
+  samurai:3,ninja:3,dualblade:3,berserker:3,ranger:3,paladin:3,necro:3,druid:3,summoner:3,axeman:3,hydromancer:3,aeromancer:3,geomancer:3,enchanter:3,beastmaster:3,tamer:3,duelist:3,
+  dragoon:4,sniper:4,darkmage:4,runeKnight:4,weaponMaster:4,monsterHunter:4,fistKing:4,spearGod:4,iceQueen:4,
+  swordmaster:5,arrowQueen:5,sage:5,saint:5,hero:5,stormLord:5};
+for(const k of JOB_KEYS) JOBS[k].star=JOB_STAR[k]||2;
+const STAR_MUL=[1,.85,1,1.12,1.28,1.5];
+// peluang bintang per tingkat party: ★1..★5
+const STAR_W={baru:[38,47,13,2,0],biasa:[18,44,28,9,1],veteran:[6,30,38,20,6],elite:[2,14,38,32,14],solo:[0,0,30,45,25]};
+function starStr(n){ return '★'.repeat(n); }
+function jobTag(k){ const J=JOBS[k]; return `${J.n} ${starStr(J.star)}`; }
+function pickJobStar(tier){ const w=STAR_W[tier]||STAR_W.biasa; let r=rnd()*w.reduce((a,b)=>a+b,0), st=1; for(let i=0;i<5;i++){ r-=w[i]; if(r<0){ st=i+1; break; } }
+  let pool=JOB_KEYS.filter(k=>JOBS[k].star===st&&k!=='hero'); if(!pool.length) pool=JOB_KEYS.filter(k=>k!=='hero'); return pick(pool); }
+// nama skill petualang dalam bahasa Inggris
+const SKILL_EN={knight:'Steel Guard',mage:'Fireball',priest:'Healing Light',archer:'Precise Shot',thief:'Shadow Strike',dualblade:'Blade Dance',lancer:'Piercing Thrust',monk:'Hundred Fists',
+  berserker:'Rampage',paladin:'Holy Prayer',ranger:'Double Arrow',bard:'Battle Song',samurai:'Flash Iai',ninja:'Shadow Shuriken',necro:'Mass Curse',druid:"Nature's Blessing",alkemis:'Potion Bomb',
+  summoner:'Spirit Call',sage:'Meteor',dragoon:'Dragon Lance',swordmaster:"King's Slash",sniper:'Heart Shot',axeman:'Axe Whirl',darkmage:'Black Flame',hunter:'Tracking Arrow',cleric:'Healing Potion',
+  hydromancer:'Tidal Wave',aeromancer:'Mini Tornado',geomancer:'Stone Spear',enchanter:'Shining Weapon',runeKnight:'Rune Blade',beastmaster:'Pack Charge',saint:'Miracle',hero:"Hero's Slash",
+  weaponMaster:'Thousand Weapons',duelist:'Elegant Thrust',miner:'Pickaxe Smash',cook:'Warm Soup',farmer:'Hoe Swing',monsterHunter:"Hunter's Slash",tamer:'Summon Mount'};
+for(const k in SKILL_EN) if(JOBS[k]) JOBS[k].skill.n=SKILL_EN[k];
 
 /* =====================================================================
    TAKHTA JURANG — simulasi kastil
@@ -1072,23 +1123,12 @@ function equipItem(m,it){ if(!it) return 'Barang tidak ada.'; m.eq=m.eq||{}; if(
 function unequip(m,slot){ if(!m.eq||!m.eq[slot]) return; const it=G.inv.find(x=>x.id===m.eq[slot]); if(it) it.on=null; delete m.eq[slot]; }
 function tierOf(n){ G.bahanT=G.bahanT||{}; if(G.bahanT[n]!=null) return G.bahanT[n]; const i=BAHAN.indexOf(n); return i>=0?i:0; }
 function addBahan(n,t){ G.bahan[n]=(G.bahan[n]||0)+1; G.bahanT=G.bahanT||{}; if(t!=null) G.bahanT[n]=t; }
-function forgeCost(it){ return {gold:Math.round(60*(it.lv+1)*(it.r+1)),tier:Math.min(6,it.r+Math.floor(it.lv/4)),n:1+Math.floor(it.lv/2)}; }
-function bahanAvail(t){ return Object.entries(G.bahan).filter(([n,c])=>c>0&&tierOf(n)>=t).reduce((s,[n,c])=>s+c,0); }
-function forgeItem(it){ if(it.lv>=10) return 'Sudah +10.'; const c=forgeCost(it); if(G.gold<c.gold) return `Emas kurang (butuh ${c.gold}).`; if(bahanAvail(c.tier)<c.n) return `Butuh ${c.n} bahan tingkat ${c.tier+1} ke atas.`;
-  G.gold-=c.gold; let need=c.n; for(const [n] of Object.entries(G.bahan).filter(([n,v])=>v>0&&tierOf(n)>=c.tier).sort((a,b)=>tierOf(a[0])-tierOf(b[0]))){ while(need>0&&G.bahan[n]>0){ G.bahan[n]--; need--; } if(!need) break; } it.lv++; return null; }
+function forgeCost(it){ return {gold:Math.round(80*(it.lv+1)*(it.r+1)),mana:Math.round(20*(it.lv+1)*(1+it.r*.5))}; }
+function forgeItem(it){ if(it.lv>=10) return 'Sudah +10.'; const c=forgeCost(it); if(G.gold<c.gold) return `Emas kurang (butuh ${c.gold}).`; if(G.mana<c.mana) return `Mana kurang (butuh ${c.mana}).`;
+  G.gold-=c.gold; G.mana-=c.mana; it.lv++; return null; }
 function sellItem(it){ if(it.on){ const m=G.mons.find(x=>x.id===it.on); if(m) unequip(m,it.s); } G.inv=G.inv.filter(x=>x!==it); G.gold+=itemValue(it); }
 function buyItem(){ const c=250; if(G.gold<c) return `Emas kurang (butuh ${c}).`; G.gold-=c; return genItem(Math.max(1,fameLv()*.6)); }
-function advDrops(p,a,hero){
-  const out=[];
-  if(rnd()<.12){ const b=BAHAN[Math.min(BAHAN.length-1,Math.floor(p.lv/12)+(rnd()<.15?1:0))]; addBahan(b); out.push(b); }
-  // barang bawaan (hasil rampasan dari monster kita) kembali ke kastil
-  const got=[]; for(const e of p.bag||[]){ if(e.k==='eq'){ const it=genItem(e.lv,e.r,{s:e.s,n:e.n,from:e.from}); it.r=e.r; got.push(it.n+' ('+RARITY[it.r]+')'); } else { addBahan(e.n,e.t); got.push(e.n); } }
-  if(got.length){ out.push(got[0]); if(got.length>1||(p.bag||[]).some(e=>e.k!=='mat')) log(`Dari jasad ${p.name}, Mira memungut ${got.slice(0,4).join(', ')}${got.length>4?', …':''} untuk gudang.`,'evo'); } p.bag=[];
-  if(hero||rnd()<Math.min(.07,.025+p.lv*.0004)){ const gear=JOB_GEAR[p.job]; const sl=rnd()<.5?'senjata':rnd()<.7?'zirah':'aksesori'; const idx={senjata:0,zirah:1,aksesori:2}[sl];
-    const nm=gear?pick(gear[idx])+(p.el?' '+ELEM_BY[p.el].n:''):null; const it=genItem(p.lv,hero?3:null,{s:sl,n:nm||undefined,from:`${p.name} (${JOBS[p.job].n})`}); out.push(it.n);
-    if(it.r>=2||hero||rnd()<.3) log(`${p.name} (${JOBS[p.job].n}) menjatuhkan ${it.n} (${RARITY[it.r]})! Mira menyimpannya di gudang.`,'evo'); }
-  if(out.length) say(a.x,a.floor,'+'+out[out.length-1],'#c8f0a0',1.6);
-}
+function advDrops(p){ p.bag=[]; }
 function monAtkEl(m){ for(const ab of m.abil){ const A=ABIL[ab]; if(A&&A.eff==='elemAtk') return A.el; } return SPECIES[m.sp].el||(FIRE_MK.has(SPECIES[m.sp].mk)?'api':ICE_MK.has(SPECIES[m.sp].mk)?'es':''); }
 function monDefEl(m){ const s=SPECIES[m.sp]; return s.el||(FIRE_MK.has(s.mk)?'api':ICE_MK.has(s.mk)?'es':''); }
 function applyStatus(a,st,m,d){ const p=G.people[a.pid];
@@ -1100,7 +1140,7 @@ function applyStatus(a,st,m,d){ const p=G.people[a.pid];
 function floorKabut(f){ return G.mons.some(o=>!o.dead&&o.floor===f&&o.abil.includes('kabut'))?.08:0; }
 function lordStats(){ const L=G.lord; const r=L.race;
   return {hp:Math.round((760+L.lv*72)*(1+G.floors*.08)*(r==='orc'?1.4:1)),atk:(20+L.lv*3)*(r==='oni'?1.4:1),def:(4+L.lv*1.1)*(r==='ksatria'?1.5:1),eva:.04,rng:r==='naga'?40:15}; }
-function advStats(p){ const J=JOBS[p.job]; return {hp:Math.round(J.hp+J.grow[0]*(p.lv-1)+p.eq.hp),atk:J.atk+J.grow[1]*(p.lv-1)+p.eq.atk,def:J.def+J.grow[2]*(p.lv-1)+p.eq.def,eva:J.eva+Math.min(.12,p.lv*.0012),rng:J.rng}; }
+function advStats(p){ const J=JOBS[p.job]; const k=STAR_MUL[J.star||2]; return {hp:Math.round((J.hp+J.grow[0]*(p.lv-1))*k+p.eq.hp),atk:(J.atk+J.grow[1]*(p.lv-1))*k+p.eq.atk,def:(J.def+J.grow[2]*(p.lv-1))*k+p.eq.def,eva:J.eva+Math.min(.12,p.lv*.0012),rng:J.rng}; }
 function monCap(m){ return STAGE_CAP[SPECIES[m.sp].stage]||100; }
 function monNeed(m){ return Math.round(14*Math.pow(m.lv,1.35)); }
 function reviveCost(m){ return Math.round((10+m.lv*2+(SPECIES[m.sp].stage-1)*25)*(G.lord.race==='lich'?.6:1)); }
@@ -1138,11 +1178,11 @@ function newParty(){
   else if(r<.92){ tier='veteran'; size=ri(3,5); lv=L*rand(1.15,1.5); }
   else { tier='elite'; size=ri(4,5); lv=L*rand(1.5,1.9); }
   const jobs=[]; const core=size>=3?['knight','priest',pick(['mage','archer'])]:[];
-  const pickJob=()=>{ let k=pick(JOB_KEYS); if(JOBS[k].rare&&rnd()<.85) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); if((k==='farmer'||k==='cook')&&tier!=='baru'&&rnd()<.7) k=pick(JOB_KEYS.filter(x=>!JOBS[x].rare)); return k; };
+  const pickJob=()=>pickJobStar(tier);
   for(let i=0;i<size;i++) jobs.push(core[i]||pickJob());
   const pa={id:nid(),tier,members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:'',quote:''};
-  for(const j of jobs){ const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pick(['dualblade','knight','mage','lancer','monk','berserker']):j); p.party=pa.id; pa.members.push(p.id); }
-  if(tier==='solo'){ const p=G.people[pa.members[0]]; p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]}`; pa.name=`${p.name} ${p.title}`; }
+  for(const j of jobs){ const p=newPerson(Math.max(1,lv+ri(-3,3)),tier==='solo'?pickJobStar('solo'):j); p.party=pa.id; pa.members.push(p.id); }
+  if(tier==='solo'){ const p=G.people[pa.members[0]]; p.title=`the ${pick(EPI_ADJ)} ${EPI_JOB[p.job]||JOBS[p.job].n}`; pa.name=`${p.name} ${p.title}`; }
   else if(tier==='baru') pa.name=rnd()<.5?'Newcomer Party':`Party ${pick(PARTY_A)} ${pick(PARTY_B)}`;
   else pa.name=`${pick(PARTY_A)} ${pick(PARTY_B)}`;
   G.parties.push(pa); return pa;
@@ -1164,7 +1204,7 @@ function enterDungeon(pa){
   say(lead.x,f,`"${pa.quote}"`,famous?'#ffd36a':'#ffe8c0',3.2);
   const talkers=G.advs.filter(a=>a.party===pa.id).sort(()=>rnd()-.5).slice(0,famous?2:1);
   talkers.forEach((a,i)=>{ const p=G.people[a.pid]; const L_=JOB_LINES[p.job]; if(!L_||rnd()<.35) return; setTimeout0(()=>{ if(G.advs.includes(a)) say(a.x,a.floor,`${p.name}: "${pick(L_)}"`,'#d8e8ff',2.6); },1.8+i*1.6); });
-  log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${JOBS[p.job].n} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
+  log(`${famous?'Party terkenal ':''}${pa.name} masuk${f>0?` lewat titik simpan lantai ${f+1}`:''}: ${mem.map(p=>`${jobTag(p.job)} Lv${p.lv}`).join(', ')} — "${pa.quote}"`,pa.tier==='solo'||pa.tier==='elite'?'warn':'adv');
 }
 function heroTick(){
   const days=(G.t-G.lordSince)/DAY_LEN; G.heroN=G.heroN||0;
@@ -1234,7 +1274,7 @@ function advDie(a,src){
   fxAt('soul',a.x,a.floor,'#c08aff',1);
   say(a.x,a.floor,`+${Math.round(gold)}G`,'#ffd36a',1.4);
   lordGainExp(p.lv*6+10);
-  advDrops(p,a,pa&&pa.hero);
+  p.bag=[];
   let killer='jebakan';
   if(src&&src.kind==='m'){ const m=src.u; m.kills++; if(m.abil.includes('serapJiwa')){ const ms=monStats(m); m.hp=Math.min(ms.hp,m.hp+ms.hp*.3); } m.loy=Math.min(100,m.loy+1); monGainExp(m,p.lv*14+20); killer=`${m.name} (${SPECIES[m.sp].n})`; }
   else if(src&&src.kind==='l'){ G.lord.kills++; killer=`Raja Iblis ${G.lord.name}`; }
@@ -1273,7 +1313,6 @@ function monLoot(m,a){
   if(p.bag.length>12) p.bag.shift();
 }
 function monDie(m,a){
-  monLoot(m,a);
   m.dead=true; m.hp=0; m.reviveAt=G.t+60; m.loy=Math.max(0,m.loy-3); m.fx={};
   fxAt('poof',m.x,m.floor,'#a89ab8',.8);
   if(a){ const p=G.people[a.pid]; if(p){ p.kills++; p.exp+=m.lv*10+20; } }
@@ -1533,8 +1572,8 @@ function openChest(a,pa){
   for(const p of mem){ p.eq.atk+=1+v*1.4; p.eq.def+=.6+v*.9; p.eq.hp+=4+v*6; p.gold+=Math.round(gold/mem.length); }
   if(pa){ pa.loot+=gold; pa.greed=(pa.greed||0)+1+v; }
   G.pop+=1.5+v*1.8; fxAt('chest',SLOT_X(i),f,'#ffd36a',1);
-  say(SLOT_X(i),f,`Peti ${fx.r}!`,'#ffd36a',1.6);
-  if(v>=4||rnd()<.25) log(`${pa?pa.name:G.people[a.pid].name} membuka Peti ${fx.r} di lantai ${f+1} dan mendapat perlengkapan bagus. Mereka makin bersemangat naik!`,'adv');
+  say(SLOT_X(i),f,`Chest ${fx.r}!`,'#ffd36a',1.6);
+  if(v>=4||rnd()<.25) log(`${pa?pa.name:G.people[a.pid].name} membuka Chest ${fx.r} di lantai ${f+1} dan mendapat perlengkapan bagus. Mereka makin bersemangat naik!`,'adv');
   if(G.settings.autoChest&&G.gold>=chestCost(fx.r)) orderPlace(f,i,{t:'chest',r:fx.r});
 }
 function partyTick(pa){
@@ -2953,7 +2992,7 @@ function pBangun(){
   const item=(fx,name,sub,cost,cls)=>`<button class="card" data-buy='${JSON.stringify(fx)}'><canvas class="ic" width="32" height="36" data-fix='${JSON.stringify(fx)}'></canvas><span class="t"><b>${name}</b><span>${sub}</span><span class="cost ${cls||''}">${cost}</span></span></button>`;
   let h=`<p class="note">Pilih barang, lalu ketuk petak kosong di lantai. Mira yang akan memasangnya${tg}.</p>`;
   h+=`<div class="sec"><h3>Lantai</h3><div class="btns"><button class="btn pri" data-act="floor" ${G.floors>=MAX_FLOORS?'disabled':''}>Tambah lantai ke-${G.floors+1} · ${fmt(floorCost())} emas</button></div><p class="note">Kastil bisa ditinggikan sampai 100 lantai. Singgasana selalu di lantai teratas. Tema berganti tiap 10 lantai.</p></div>`;
-  h+=`<div class="sec"><h3>Peti Harta</h3><div class="grid">${CHEST_RANK.map(r=>item({t:'chest',r},`Peti ${r}`,['Recehan','Biasa','Lumayan','Bagus','Langka','Epik','Legenda','Mitos','Dewa'][chestValue(r)],fmt(chestCost(r))+' emas')).join('')}</div>
+  h+=`<div class="sec"><h3>Peti Harta</h3><div class="grid">${CHEST_RANK.map(r=>item({t:'chest',r},`Chest ${r}`,['Recehan','Biasa','Lumayan','Bagus','Langka','Epik','Legenda','Mitos','Dewa'][chestValue(r)],fmt(chestCost(r))+' emas')).join('')}</div>
     <label class="note" style="display:flex;gap:6px;align-items:center;margin-top:6px"><input type="checkbox" id="autoChest" ${G.settings.autoChest?'checked':''}> Isi ulang peti otomatis setelah dijarah</label></div>`;
   for(const [cat,title] of [['jebakan','Jebakan'],['fasilitas','Fasilitas'],['dekor','Dekorasi (Aura Seram)']]){
     h+=`<div class="sec"><h3>${title}</h3><div class="grid">${Object.entries(FIX).filter(([k,v])=>v.cat===cat).map(([k,v])=>item({t:k},v.n,v.d,fmt(v.cost)+' emas')).join('')}</div></div>`; }
@@ -2969,14 +3008,12 @@ function pMonList(){
 }
 /* gudang perlengkapan */
 function pGudang(){
-  const bh=Object.entries(G.bahan).filter(([k,v])=>v>0);
   let h=`<div class="btns"><button class="btn" data-act="tabMon">Monster</button><button class="btn pri">Gudang</button></div>
-  <p class="note">Petualang yang tewas kadang menjatuhkan bahan, dan lebih jarang lagi senjata, zirah, atau aksesori. Pasang perlengkapan dari halaman detail monster.</p>
-  <div class="sec"><h3>Bahan</h3>${bh.length?`<div class="abl">${bh.sort((a,b)=>tierOf(b[0])-tierOf(a[0])).map(([k,v])=>`<div><b>${esc(k)}</b> ×${v}<em>tingkat ${tierOf(k)+1}</em></div>`).join('')}</div>`:'<p class="note">Belum ada bahan.</p>'}</div>
+  <p class="note">Perlengkapan dibeli dari pedagang, lalu ditempa dengan emas dan mana. Pasang dari halaman detail monster.</p>
   <div class="btns"><button class="btn pri" data-act="buyItem">Beli perlengkapan acak · 250 emas</button></div>`;
   const list=G.inv.slice().sort((a,b)=>b.r-a.r||b.lv-a.lv);
   h+=`<div class="sec"><h3>Perlengkapan (${list.length})</h3>${list.length?'':'<p class="note">Gudang masih kosong.</p>'}<div class="abl">${list.map(it=>{ const w=it.on&&G.mons.find(m=>m.id===it.on); const c=forgeCost(it);
-    return `<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}${it.from?` · asal: ${esc(it.from)}`:''}</span><div class="btns" style="margin-top:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.n} bahan tk.${c.tier+1}+</button><button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></div></div>`; }).join('')}</div></div>`;
+    return `<div><b>${itemName(it)}</b> ${rarTag(it.r)}<em>${EQ_SLOT[it.s]}</em>${w?`<em>dipakai ${esc(w.name)}</em>`:''}<br><span class="note">${itemTxt(it)}${it.from?` · asal: ${esc(it.from)}`:''}</span><div class="btns" style="margin-top:4px"><button class="btn" data-forge="${it.id}" ${it.lv>=10?'disabled':''}>Tempa +1 · ${c.gold} emas, ${c.mana} mana</button><button class="btn warn" data-sell="${it.id}">Jual · ${itemValue(it)}</button></div></div>`; }).join('')}</div></div>`;
   return {t:'Gudang Kastil',h};
 }
 /* detail monster */
@@ -2999,7 +3036,6 @@ function pMon(){
   if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
     h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemTxt(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
   h+=`</div>`;
-  h+=dropListHtml(monDropTable(m),'Drop dipungut petualang yang menumbangkan monster ini, lalu kembali ke gudang kalau petualang itu tewas di kastil.');
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
     <label class="note">Lantai <select id="mFloor">${`<option value="-1" ${m.floor<0?'selected':''}>Cadangan</option>`+Array.from({length:G.floors},(_,f)=>`<option value="${f}" ${m.floor===f&&!m.secret?'selected':''} ${floorCount(f)>=FLOOR_CAP&&m.floor!==f?'disabled':''}>L${f+1} (${floorCount(f)}/${FLOOR_CAP})</option>`).join('')}</select></label>
     <label class="note">Strategi <select id="mStrat">${Object.entries(STRAT).map(([k,v])=>`<option value="${k}" ${m.strat===k?'selected':''}>${v}</option>`).join('')}</select></label>
@@ -3023,7 +3059,7 @@ function pGacha(){
 function pAdv(){
   const inside=G.parties.filter(p=>p.state==='in');
   let h=`<div class="sec"><h3>Di dalam kastil (${inside.length})</h3>${inside.length?inside.map(pa=>{ const mem=G.advs.filter(a=>a.party===pa.id);
-    return `<div class="party"><b>${esc(pa.name)}${pa.hero?' <span style="color:var(--gold)">★ Pahlawan</span>':''}</b><span class="note">"${esc(pa.quote)}" · titik simpan L${pa.saveFloor+1}${pa.loot?` · harta ${pa.loot}`:''}</span><div class="mem">${mem.map(a=>{ const p=G.people[a.pid]; const s=advStats(p); return `<span class="link" data-adv="${p.id}" role="button" tabindex="0" style="cursor:pointer;color:var(--bone)">${esc(p.name)}</span> <span>${JOBS[p.job].n} Lv${p.lv} · L${a.floor+1} · ${Math.max(0,Math.round(a.hp/s.hp*100))}%</span>`; }).join(' ')}</div></div>`; }).join(''):'<p class="note">Sepi. Petualang berikutnya sedang dalam perjalanan.</p>'}</div>`;
+    return `<div class="party"><b>${esc(pa.name)}${pa.hero?' <span style="color:var(--gold)">★ Pahlawan</span>':''}</b><span class="note">"${esc(pa.quote)}" · titik simpan L${pa.saveFloor+1}${pa.loot?` · harta ${pa.loot}`:''}</span><div class="mem">${mem.map(a=>{ const p=G.people[a.pid]; const s=advStats(p); return `<span class="link" data-adv="${p.id}" role="button" tabindex="0" style="cursor:pointer;color:var(--bone)">${esc(p.name)}</span> <span>${jobTag(p.job)} Lv${p.lv} · L${a.floor+1} · ${Math.max(0,Math.round(a.hp/s.hp*100))}%</span>`; }).join(' ')}</div></div>`; }).join(''):'<p class="note">Sepi. Petualang berikutnya sedang dalam perjalanan.</p>'}</div>`;
   h+=`<div class="sec"><h3>Pembunuh Raja Iblis</h3>${G.hall.length?`<ul class="log">${G.hall.slice(0,12).map(x=>`<li class="lord">Hari ${x.d}: ${esc(x.lord)} (Lv${x.lv}) tumbang oleh ${esc(x.by)}, pukulan terakhir ${esc(x.hero)}. Bertahan ${Math.round(x.lived/DAY_LEN*10)/10} hari.</li>`).join('')}</ul>`:'<p class="note">Belum ada. Semoga tetap begitu.</p>'}</div>`;
   h+=`<div class="sec"><h3>Catatan kastil</h3><ul class="log">${G.log.slice(0,60).map(l=>`<li class="${l.c}">H${l.d}: ${esc(l.s)}</li>`).join('')}</ul></div>`;
   return {t:'Petualang',h};
@@ -3031,10 +3067,8 @@ function pAdv(){
 function pAdvOne(){
   const p=G.people[UI.advId]; if(!p) return {t:'Petualang',h:'<p class="note">Tidak ditemukan.</p>'};
   const a=G.advs.find(x=>x.pid===p.id); const pa=G.parties.find(x=>x.id===p.party); const s=advStats(p);
-  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${JOBS[p.job].n} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
-  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`
-  +((p.bag||[]).length?`<div class="sec"><h3>Rampasan dibawa (pasti jatuh)</h3><div class="abl">${p.bag.map(e=>`<div><b>${esc(e.n)}</b>${e.k==='eq'?` ${rarTag(e.r)}<em>${EQ_SLOT[e.s]}</em><br><span class="note">${itemTxt(itemPreview(e.s,e.lv,e.r))}${e.from?` · dari ${esc(e.from)}`:''}</span>`:`<em>${e.k==='core'?'inti':'bahan'} · tingkat ${(e.t||0)+1}</em>`}</div>`).join('')}</div></div>`:'')
-  +dropListHtml(advDropTable(p),'Kalau petualang ini tewas di kastil, Mira memungut barangnya ke gudang.');
+  const h=`<div class="mhead"><canvas width="32" height="36" data-adv="${p.id}"></canvas><div class="nm"><b>${esc(p.name)}</b><span>${p.title?esc(p.title)+' · ':''}${jobTag(p.job)} Lv${p.lv}</span><span class="note">${RACE[p.race].nama}${pa?' · '+esc(pa.name):''}</span></div></div>
+  <dl class="kv"><dt>Nyawa</dt><dd>${a?Math.max(0,Math.round(a.hp)):'-'} / ${s.hp}</dd><dt>Serangan</dt><dd>${Math.round(s.atk)}</dd><dt>Pertahanan</dt><dd>${Math.round(s.def)}</dd><dt>Menghindar</dt><dd>${Math.round(s.eva*100)}%</dd><dt>Skill</dt><dd>${JOBS[p.job].skill.n}</dd><dt>Elemen</dt><dd>${p.el?`<b style="color:${ELEM_BY[p.el].c}">${ELEM_BY[p.el].n}</b>`:'Fisik'}</dd><dt>Emas dibawa</dt><dd>${Math.round(p.gold)}</dd><dt>Rampasan</dt><dd>${(p.bag||[]).length?(p.bag||[]).slice(-6).map(e=>esc(e.n)).join(', '):'-'}</dd><dt>Monster dibunuh</dt><dd>${p.kills}</dd><dt>Kunjungan</dt><dd>${p.visits}</dd><dt>Posisi</dt><dd>${a?'Lantai '+(a.floor+1):p.alive?'Di kota':'Tewas'}</dd></dl>`;
   return {t:'Petualang',h};
 }
 /* raja */
@@ -3050,7 +3084,7 @@ function pRaja(){
 /* fasilitas terpasang */
 function pFix(){
   const {f,i}=UI.sel; const fx=G.fix[f]&&G.fix[f][i]; if(!fx) return {t:'Petak',h:'<p class="note">Petak kosong.</p>'};
-  const name=fx.t==='chest'?`Peti ${fx.r}`:FIX[fx.t].n;
+  const name=fx.t==='chest'?`Chest ${fx.r}`:FIX[fx.t].n;
   let h=`<div class="mhead"><canvas width="32" height="36" data-fix='${JSON.stringify(fx)}'></canvas><div class="nm"><b>${name}</b><span class="note">Lantai ${f+1} · petak ${i+1}</span></div></div>`;
   if(fx.t==='rest'){ const here=G.advs.filter(a=>a.floor===f&&a.resting); const saved=f>0?G.parties.filter(p=>p.state!=='gone'&&p.saveFloor===f&&partyMembers(p).length):[];
     h+=`<p class="note">${FIX.rest.d} Biaya ${8+f*4} emas per orang.</p><dl class="kv"><dt>Dipakai</dt><dd>${fx.uses||0} kali</dd><dt>Pemasukan</dt><dd>${fmt(fx.earn||0)} emas</dd><dt>Tamu terakhir</dt><dd>${fx.last?esc(fx.last):'-'}</dd></dl>
@@ -3108,7 +3142,7 @@ function onCanvasTap(hit){
 }
 function startPlacing(fx){
   if(UI.target){ const t=UI.target; UI.target=null; const err=orderPlace(t.f,t.i,fx); if(err) toast(err); else toast('Mira berangkat memasang!'); closePanel(); return; }
-  UI.placing=fx; closePanel(); $('placebar').hidden=false; $('placeTxt').textContent=`Ketuk petak kosong untuk ${fx.t==='chest'?'Peti '+fx.r:FIX[fx.t].n} (${fmt(fixCost(fx))} emas). Bisa beberapa kali.`;
+  UI.placing=fx; closePanel(); $('placebar').hidden=false; $('placeTxt').textContent=`Ketuk petak kosong untuk ${fx.t==='chest'?'Chest '+fx.r:FIX[fx.t].n} (${fmt(fixCost(fx))} emas). Bisa beberapa kali.`;
 }
 function stopPlacing(){ UI.placing=null; $('placebar').hidden=true; }
 /* ---------- pengikat event ---------- */
