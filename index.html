@@ -1355,7 +1355,7 @@ function newParty(){
 function partyMembers(pa){ return pa.members.map(id=>G.people[id]).filter(p=>p&&p.alive); }
 function enterDungeon(pa){
   const mem=partyMembers(pa); if(!mem.length){ pa.state='gone'; return; }
-  pa.state='in'; pa.visits++; G.stats.visits++; pa.loot=0; pa.entered=G.t; pa.retreat=false; pa.disarm={};
+  pa.state='in'; pa.visits++; G.stats.visits++; pa.loot=0; pa.entered=G.t; pa.retreat=false; pa.disarm={}; pa.atk=[];
   const f=Math.min(pa.saveFloor,topF()); const restX=restSlotX(f);
   const famous=pa.visits>=4||pa.wins>0||pa.hero;
   if(pa._mq) pa.quote=pa._mq;
@@ -1430,10 +1430,18 @@ function hitAdv(a,amt,src,opts){
   d=Math.round(d); a.hp-=d; a.lastHit=G.t;
   if(src&&src.kind==='m'&&src.u.abil.includes('pencuri')){ const pp=G.people[a.pid]; if(pp&&pp.gold>0){ const s_=Math.min(3,pp.gold); pp.gold-=s_; G.gold+=s_; } }
   say(a.x,a.floor,String(d),opts.crit?'#ffd040':'#ff8a7a',.9);
-  if(src&&src.kind==='m'){ const m=src.u; m.dmgDone=(m.dmgDone||0)+d; monGainExp(m,d*.6); if(m.abil.includes('haus')){ m.hp=Math.min(monStats(m).hp,m.hp+d*.2); } const X=monX(m); if(X.steal) m.hp=Math.min(monStats(m).hp,m.hp+d*X.steal); a.hitT=G.t; a.hitDir=Math.sign(a.x-m.x)||1; wearEq(m,'atk'); }
+  if(src&&src.kind==='m'){ const m=src.u; m.dmgDone=(m.dmgDone||0)+d; monGainExp(m,d*.6); trackAtk(a,m); if(m.abil.includes('haus')){ m.hp=Math.min(monStats(m).hp,m.hp+d*.2); } const X=monX(m); if(X.steal) m.hp=Math.min(monStats(m).hp,m.hp+d*X.steal); a.hitT=G.t; a.hitDir=Math.sign(a.x-m.x)||1; wearEq(m,'atk'); }
   if(src&&src.kind==='l'&&G.lord.race==='vampir') G.lord.hp=Math.min(lordStats().hp,G.lord.hp+d*.3);
   if(a.hp<=0) advDie(a,src);
   return d;
+}
+function trackAtk(a,m){ const pa=G.parties.find(x=>x.id===a.party); if(!pa||!m) return; const L=pa.atk||(pa.atk=[]); if(!L.includes(m.id)){ L.push(m.id); if(L.length>60) L.shift(); } }
+// EXP kill: penyerang akhir dapat penuh (ditangani di advDie); monster satu lantai (jika dibunuh monster) dan semua monster yang pernah menyerang party ini (walau sudah mati) dapat setengah
+function shareKillExp(a,p,pa,src){
+  const base=p.lv*14+20; const got=new Set(); const killerM=src&&src.kind==='m'?src.u:null; if(killerM) got.add(killerM);
+  const give=(m,k)=>{ if(!m||m.temp||m.gone||got.has(m)) return; got.add(m); const wasDead=m.dead; const X=monX(m); monGainExp(m,base*k*(1+X.exp)); if(wasDead){ m.dead=true; m.hp=0; } };
+  if(killerM) for(const m of G.mons) if(m.floor===a.floor&&!m.secret) give(m,.5);
+  if(pa&&pa.atk) for(const id of pa.atk) give(G.mons.find(x=>x.id===id),.5);
 }
 function advDie(a,src){
   const p=G.people[a.pid]; const pa=G.parties.find(x=>x.id===a.party);
@@ -1447,6 +1455,7 @@ function advDie(a,src){
   let killer='jebakan';
   if(src&&src.kind==='m'){ const m=src.u; m.kills++; if(m.abil.includes('serapJiwa')){ const ms=monStats(m); m.hp=Math.min(ms.hp,m.hp+ms.hp*.3); } m.loy=Math.min(100,m.loy+1); const X=monX(m); monGainExp(m,(p.lv*14+20)*(1+X.exp)); if(X.mana) G.mana+=X.mana; if(X.gold){ const g2=Math.round(gold*X.gold); G.gold+=g2; } killer=`${m.name} (${SPECIES[m.sp].n})`; }
   else if(src&&src.kind==='l'){ G.lord.kills++; killer=`Raja Iblis ${G.lord.name}`; }
+  shareKillExp(a,p,pa,src);
   if(pa){ pa.members=pa.members.filter(id=>id!==p.id); const left=G.advs.filter(x=>x.party===pa.id);
     if(!left.length){ pa.state='gone'; if(pa.pushOn) log(`${pa.name} memilih bertarung sampai akhir… dan tidak ada yang pulang.`,'kill'); log(`${pa.name} musnah di lantai ${a.floor+1}. ${p.name} ${JOBS[p.job].n} Lv${p.lv} adalah yang terakhir tumbang, oleh ${killer}.`,'kill'); }
     else if(p.lv>=20||rnd()<.35) log(`${p.name}${p.title?' '+p.title:''} (${JOBS[p.job].n} Lv${p.lv}) dari ${pa.name} tewas oleh ${killer}.`,'kill'); }
@@ -1590,18 +1599,30 @@ function gachaRoll(minR){
   if(minR!=null) ri_=Math.max(ri_,minR);
   const sid=gachaPick(RARITY[ri_]);
   const m=addMonster(sid); G.stats.gacha++;
-  autoPlace(m);
+  if(!autoSellCfg()[RARITY[SPECIES[m.sp].rar]]) autoPlace(m);
   return m;
 }
+function monSellValue(m){ return Math.max(1,Math.round(monValue(m)*.25)); }
+function autoSellCfg(){ G.settings=G.settings||{}; return G.settings.autoSell||(G.settings.autoSell={}); }
+function sellMon(m,g){ if(g==null) g=monSellValue(m); if(m.eq) for(const sl of Object.keys(m.eq)) unequip(m,sl); if(m.secret) clearSecret(m); G.mons=G.mons.filter(x=>x!==m); G.gold+=g; return g; }
+function eqScore(it){ itFix(it); return itemValue(it)*(it.dur===0?.01:1); }
+function autoEquipMon(m){ m.eq=m.eq||{}; let n=0;
+  for(const sl of Object.keys(EQ_SLOT)){ const cur=m.eq[sl]&&G.inv.find(x=>x.id===m.eq[sl]); const free=G.inv.filter(x=>x.s===sl&&!x.on); if(!free.length) continue;
+    free.sort((a,b)=>eqScore(b)-eqScore(a)); const best=free[0]; if(!cur||eqScore(best)>eqScore(cur)){ equipItem(m,best); n++; } }
+  return n; }
+function autoEquipAll(){ let n=0; const list=G.mons.filter(m=>!m.temp).sort((a,b)=>(SPECIES[b.sp].rar-SPECIES[a.sp].rar)||(b.lv-a.lv)); for(const m of list) n+=autoEquipMon(m); return n; }
 function gacha(n,cur){
   const cost=cur==='gold'?n*350:(n===10?90:n*10);
   if(cur==='gold'?G.gold<cost:G.jiwa<cost) return {err:cur==='gold'?`Emas kurang (butuh ${cost}).`:`Kristal Jiwa kurang (butuh ${cost}).`};
   if(cur==='gold') G.gold-=cost; else G.jiwa-=cost;
-  const out=[]; for(let i=0;i<n;i++) out.push(gachaRoll(n===10&&i===9&&!out.some(m=>SPECIES[m.sp].rar>=2)?2:null));
-  const best=out.reduce((a,m)=>SPECIES[m.sp].rar>SPECIES[a.sp].rar?m:a,out[0]);
+  const all=[]; for(let i=0;i<n;i++) all.push(gachaRoll(n===10&&i===9&&!all.some(m=>SPECIES[m.sp].rar>=2)?2:null));
+  const AS=autoSellCfg(); const out=[], sold=[];
+  for(const m of all){ const s=SPECIES[m.sp]; if(AS[RARITY[s.rar]]) sold.push({sp:m.sp,rar:s.rar,g:sellMon(m)}); else out.push(m); }
+  const best=out.length?out.reduce((a,m)=>SPECIES[m.sp].rar>SPECIES[a.sp].rar?m:a,out[0]):null;
   for(const m of out){ const s=SPECIES[m.sp]; const E=s.el&&ELEM_BY[s.el]; if(E&&(E.rar>=1||s.el==='emas'||s.el==='hampa')) log(`✨ Varian langka! ${m.name} si ${s.n} muncul dari lingkaran pemanggilan.`,'evo'); }
-  if(SPECIES[best.sp].rar>=3) log(`Lingkaran pemanggilan bersinar ${RARITY[SPECIES[best.sp].rar]}! ${best.name} si ${SPECIES[best.sp].n} bergabung.`,'evo');
-  return {out};
+  if(best&&SPECIES[best.sp].rar>=3) log(`Lingkaran pemanggilan bersinar ${RARITY[SPECIES[best.sp].rar]}! ${best.name} si ${SPECIES[best.sp].n} bergabung.`,'evo');
+  if(sold.length) log(`${sold.length} monster hasil panggilan dijual otomatis (+${sold.reduce((a,o)=>a+o.g,0)} emas).`,'sys');
+  return {out,sold,all};
 }
 function floorCount(f){ return G.mons.filter(m=>m.floor===f&&!m.secret).length; }
 const FLOOR_CAP=5;
@@ -1736,7 +1757,7 @@ function triggerTrap(fx,a,p,st,f,sx,pa){
   fx.hits=(fx.hits||0)+1;
   if(D.sleep){ for(const x of near) x.fx.sleep=G.t+D.sleep; say(sx,f,'Zzz…','#d0c0ff',1.4); return; }
   if(D.root){ a.fx.root=G.t+D.root; say(sx,f,'Terjerat!','#c8c0a0',1.2); return; }
-  if(D.slip||D.fall){ if(f>0){ const victims=D.fall?[a]:near; for(const x of victims){ x.floor=f-1; x.x=fend(f-1)-fdir(f-1)*ri(4,20); x.seen={}; if(D.dmg){ const raw=Math.round(advStats(G.people[x.pid]).hp*D.dmg*mult); x.hp-=raw; say(x.x,x.floor,String(raw),'#ff8a7a',.9); if(x.hp<=0) advDie(x,null); } } say(sx,f,D.fall?'Jatuh!':'Terpeleset!','#ffd0a0',1.3); return; } }
+  if(D.slip||D.fall){ if(f>0){ const victims=D.fall?[a]:near; for(const x of victims){ x.floor=f-1; x.x=fend(f-1)-fdir(f-1)*ri(4,20); x.seen=x.seen||{}; { const ti=[...Array(SLOTS).keys()].find(k=>Math.abs(SLOT_X(k)-sx)<1); if(ti!=null) x.seen[f+':'+ti]=1; } if(D.dmg){ const raw=Math.round(advStats(G.people[x.pid]).hp*D.dmg*mult); x.hp-=raw; say(x.x,x.floor,String(raw),'#ff8a7a',.9); if(x.hp<=0) advDie(x,null); } } say(sx,f,D.fall?'Jatuh!':'Terpeleset!','#ffd0a0',1.3); return; } }
   if(D.dmg){ const victims=fx.t==='apiT'?near:[a]; for(const x of victims){ const xs=advStats(G.people[x.pid]); const raw=xs.hp*D.dmg*mult+lv*4; x.hp-=Math.round(raw*(x.fx.sleep>G.t?2:1)); if(x.fx.sleep>G.t){ x.fx.sleep=0; say(x.x,f,'KOMBO!','#ff9ad0',1.2); } say(x.x,f,String(Math.round(raw)),'#ff8a7a',.9); if(D.stun) x.fx.stun=G.t+D.stun; if(D.burn) x.fx.burn=G.t+4; if(x.hp<=0) advDie(x,null); } }
 }
 function openChest(a,pa){
@@ -1932,8 +1953,8 @@ const RUNE={ruby:{n:'Ruby Rune',k:'elDmg',el:'api',v:.05,c:'#ff5a3a'},sapphire:{
   ruin:{n:'Ruin Rune',k:'critD',v:.08,c:'#ff4a6a'},blood:{n:'Blood Rune',k:'steal',v:.02,c:'#c8203a'},wind:{n:'Wind Rune',k:'spd',v:.03,c:'#bff0d0'},ghost:{n:'Ghost Rune',k:'eva',v:.015,c:'#c8c8e8'},
   sage:{n:'Sage Rune',k:'mag',v:.05,c:'#c0a0ff'},mana:{n:'Mana Rune',k:'mana',v:1,c:'#9a7aff'},ward:{n:'Ward Rune',k:'elRes',el:'api',v:.06,c:'#ffa07a'}};
 const RUNE_KEYS=Object.keys(RUNE); const ROMAN=['','I','II','III','IV','V'];
-function runeMod(rn){ const R=RUNE[rn.k]; return {k:R.k,el:R.el,v:R.k==='def'||R.k==='mana'?R.v*rn.g:+(R.v*rn.g).toFixed(3)}; }
-function runeName(rn){ return `${RUNE[rn.k].n} ${ROMAN[rn.g]}`; }
+function runeMod(rn){ const R=RUNE[rn.k]; const q=1+(rn.q||0); return {k:R.k,el:R.el,v:R.k==='def'||R.k==='mana'?+(R.v*rn.g*q).toFixed(2):+(R.v*rn.g*q).toFixed(3)}; }
+function runeName(rn){ return `${RUNE[rn.k].n} ${ROMAN[rn.g]}${rn.q?` +${Math.round(rn.q*100)}%`:''}`; }
 function newRune(g,k){ return {id:nid(),k:k||pick(RUNE_KEYS),g:Math.max(1,Math.min(5,g||1))}; }
 function addRune(g,k){ G.runes=G.runes||[]; const r=newRune(g,k); G.runes.push(r); return r; }
 /* ---------- item ---------- */
@@ -3905,8 +3926,18 @@ function pBangun(){
 }
 /* daftar monster */
 function pMonList(){
-  const list=G.mons.filter(m=>!m.temp).slice().sort((a,b)=>(b.floor-a.floor)||(SPECIES[b.sp].rar-SPECIES[a.sp].rar)||b.lv-a.lv);
-  let h=`<div class="btns"><button class="btn pri">Monster</button><button class="btn" data-act="tabGudang">Gudang (${G.inv.length} barang)</button></div><p class="note">${list.length} monster · ${list.filter(m=>m.floor<0).length} di cadangan · maks ${FLOOR_CAP} per lantai. Ketuk untuk detail.</p><div class="grid">`;
+  const all=G.mons.filter(m=>!m.temp); const fr=UI.mrar==null?null:UI.mrar; const sort=UI.msort||'rar';
+  const cnt=RARITY.map((r,i)=>all.filter(m=>SPECIES[m.sp].rar===i).length);
+  const byRar=(a,b)=>SPECIES[b.sp].rar-SPECIES[a.sp].rar, byLv=(a,b)=>b.lv-a.lv, byFl=(a,b)=>b.floor-a.floor;
+  const CMP={rar:(a,b)=>byRar(a,b)||byLv(a,b)||byFl(a,b),lv:(a,b)=>byLv(a,b)||byRar(a,b)||byFl(a,b),floor:(a,b)=>byFl(a,b)||byRar(a,b)||byLv(a,b)};
+  const list=(fr==null?all.slice():all.filter(m=>SPECIES[m.sp].rar===fr)).sort(CMP[sort]||CMP.rar);
+  let h=`<div class="btns"><button class="btn pri">Monster</button><button class="btn" data-act="tabGudang">Gudang (${G.inv.length} barang)</button></div><p class="note">${all.length} monster · ${all.filter(m=>m.floor<0).length} di cadangan · maks ${FLOOR_CAP} per lantai. Ketuk untuk detail.</p>`;
+  h+=`<div class="btns"><button class="btn${fr==null?' pri':''}" data-act="mrar:-1">Semua (${all.length})</button>${RARITY.map((r,i)=>`<button class="btn${fr===i?' pri':''}" data-act="mrar:${i}">${r} (${cnt[i]})</button>`).join('')}</div>`;
+  h+=`<div class="btns" style="align-items:center"><span class="note">Urut:</span>${[['rar','Rarity'],['lv','Level'],['floor','Lantai']].map(([k,n])=>`<button class="btn${sort===k?' pri':''}" data-act="msort:${k}">${n}</button>`).join('')}<button class="btn" data-act="autoEqAll">Auto pasang semua</button></div>`;
+  if(fr!=null&&cnt[fr]){ const onlyRes=UI.mresOnly!==false; const tg=all.filter(m=>SPECIES[m.sp].rar===fr&&(!onlyRes||m.floor<0)); const gold=tg.reduce((a,m)=>a+monSellValue(m),0);
+    h+=`<div class="party" style="margin-top:6px"><b>Jual semua ${RARITY[fr]}</b><span class="note">${onlyRes?'Hanya yang di cadangan':'Semua ' + RARITY[fr] + ', termasuk yang sedang menjaga lantai'} · ${tg.length} ekor · +${gold} emas. Perlengkapannya kembali ke gudang.</span><div class="btns"><button class="btn" data-act="sellres">Cakupan: ${onlyRes?'hanya cadangan':'semua'}</button>`+
+      (UI.confirmSellAll===fr?`<button class="btn warn" data-act="sellallGo" ${tg.length?'':'disabled'}>Ya, jual ${tg.length} ekor</button><button class="btn" data-act="sellallNo">Batal</button>`:`<button class="btn warn" data-act="sellall" ${tg.length?'':'disabled'}>Jual semua ${RARITY[fr]}</button>`)+`</div></div>`; }
+  h+=`<div class="grid">`;
   for(const m of list){ const s=SPECIES[m.sp];
     h+=`<button class="card" data-mon="${m.id}"><canvas class="ic" width="32" height="36" data-sp="${m.sp}"></canvas><span class="t"><b>${esc(m.name)} ${rarTag(s.rar)}</b><span>${esc(s.n)} · ${stars(s.stage,maxStageOf(m.sp))}</span><span>Lv${m.lv}/${monCap(m)} · ${m.floor<0?'Cadangan':m.secret?`L${m.floor+1} rahasia`:`L${m.floor+1}`}${m.dead?' · <span style="color:var(--blood)">tumbang</span>':''}</span></span></button>`; }
   return {t:'Monster',h:h+'</div>'};
@@ -3950,9 +3981,9 @@ function pMon(){
   if(m.pending) h+=`<div class="party" style="margin-top:6px"><b style="color:var(--soul)">${esc(m.name)} ingin mempelajari ${ABIL[m.pending].n}!</b><span class="note">${ABIL[m.pending].d} Slot penuh: lupakan satu ability di atas untuk mempelajarinya, atau abaikan.</span><div class="btns"><button class="btn" data-act="skipLearn">Abaikan</button></div></div>`;
   const ls=learnset(m.sp); h+=`<div class="sec" style="margin-top:6px"><h3>Bisa dipelajari sebagai ${esc(s.n)}</h3><div class="abl">${ls.map(e=>{ const has=m.abil.includes(e.ab); return `<div style="${has?'':'opacity:.78'}"><b>${ABIL[e.ab].n}</b><em>${has?'sudah dikuasai':m.lv>=e.lv?'tersedia':'Lv'+e.lv}</em><br><span class="note">${ABIL[e.ab].d}</span></div>`; }).join('')}</div>${nx?`<p class="note">Setelah berevolusi menjadi ${esc(nx.n)}, ada ability baru lain yang bisa dipelajari.</p>`:''}</div></div>`;
   m.eq=m.eq||{};
-  h+=`<div class="sec"><h3>Perlengkapan</h3><div class="abl">${Object.entries(EQ_SLOT).map(([s,nm])=>{ const it=m.eq[s]&&G.inv.find(x=>x.id===m.eq[s]); return `<div><b>${nm}:</b> ${it?`${itemName(it)} ${rarTag(it.r)}<br><span class="note">${itemTxt(it)}</span>${modsHtml(it)}`:'<span class="note">kosong</span>'}<div class="btns" style="margin-top:4px"><button class="btn" data-eqs="${s}">${it?'Ganti':'Pasang'}</button>${it?`<button class="btn" data-uneq="${s}">Lepas</button>`:''}</div></div>`; }).join('')}</div>`;
-  if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot).sort((a,b)=>b.r-a.r||b.lv-a.lv);
-    h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemShort(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
+  h+=`<div class="sec"><h3>Perlengkapan</h3><div class="btns" style="margin-bottom:6px"><button class="btn pri" data-act="autoEq">Auto pasang terbaik</button></div><div class="abl">${Object.entries(EQ_SLOT).map(([s,nm])=>{ const it=m.eq[s]&&G.inv.find(x=>x.id===m.eq[s]); return `<div><b>${nm}:</b> ${it?`${itemName(it)} ${rarTag(it.r)}<br><span class="note">${itemTxt(it)}</span>${modsHtml(it)}`:'<span class="note">kosong</span>'}<div class="btns" style="margin-top:4px"><button class="btn" data-eqs="${s}">${it?'Ganti':'Pasang'}</button>${it?`<button class="btn" data-uneq="${s}">Lepas</button>`:''}</div></div>`; }).join('')}</div>`;
+  if(UI.eqSlot){ const opts=G.inv.filter(x=>x.s===UI.eqSlot&&!x.on).sort((a,b)=>b.r-a.r||b.lv-a.lv);
+    h+=`<div class="party" style="margin-top:6px"><b>Pilih ${EQ_SLOT[UI.eqSlot].toLowerCase()} untuk ${esc(m.name)}</b>${opts.length?opts.map(it=>{ const w=it.on&&G.mons.find(x=>x.id===it.on); return `<button class="card" data-eqi="${it.id}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>${itemShort(it)}${w?` · dipakai ${esc(w.name)}`:''}</span></span></button>`; }).join(''):'<span class="note">Tidak ada barang jenis ini yang menganggur di gudang.</span>'}<div class="btns"><button class="btn" data-act="eqCancel">Tutup</button></div></div>`; }
   h+=`</div>`;
   h+=dropListHtml(monDropTable(m),'Drop ini dipungut petualang yang menumbangkan monster ini dan dibawa pulang. Kalau petualang itu tewas, barangnya hilang (tidak masuk gudang kita).');
   h+=`<div class="sec"><h3>Perintah</h3><div class="btns" style="align-items:center">
@@ -3971,7 +4002,9 @@ function pMon(){
 function pGacha(){
   let h=`<p class="note">Lingkaran pemanggilan memanggil monster <b>tahap 1</b> dengan rarity acak dari ${SPECIES_N} jenis yang dikenal di dunia ini. Peluang: N 55% · R 28% · SR 12% · SSR 4,5% · UR 0,5%${G.aura?` · Aura Seram ${G.aura} sedikit menaikkan peluang SSR`:''}.</p>
   <div class="btns"><button class="btn pri" data-g="1j">Panggil 1× · 10 jiwa</button><button class="btn pri" data-g="10j">Panggil 10× · 90 jiwa (min. 1 SR)</button><button class="btn" data-g="1g">Panggil 1× · 350 emas</button></div>`;
-  if(UI.gres&&UI.gres.length){ h+=`<div class="sec"><h3>Hasil</h3><div class="gres">${UI.gres.map(id=>{ const m=G.mons.find(x=>x.id===id); if(!m) return ''; const s=SPECIES[m.sp]; return `<div style="border-color:${RAR_COL[RARITY[s.rar]]}"><canvas width="32" height="36" data-sp="${m.sp}"></canvas>${rarTag(s.rar)}<span>${esc(s.n)}</span></div>`; }).join('')}</div><p class="note">Monster baru langsung ditempatkan di lantai yang masih kosong, atau di cadangan.</p></div>`; }
+  { const AS=autoSellCfg(); h+=`<div class="sec"><h3>Auto jual hasil panggilan</h3><p class="note">Rarity yang dinyalakan langsung dijual begitu muncul (±25% nilai monster) dan tidak masuk kastil. Ketuk untuk menyalakan / mematikan.${AS.SSR||AS.UR?' <b style="color:var(--blood)">Awas: SSR/UR ikut terjual!</b>':''}</p><div class="btns">${RARITY.map((r,i)=>`<button class="btn${AS[r]?' warn':''}" data-act="asell:${i}" aria-pressed="${AS[r]?'true':'false'}">${r} · ${AS[r]?'DIJUAL':'simpan'}</button>`).join('')}</div></div>`; }
+  { const kept=(UI.gres||[]).map(id=>G.mons.find(x=>x.id===id)).filter(Boolean); const sold=UI.gsold||[];
+    if(kept.length||sold.length){ h+=`<div class="sec"><h3>Hasil</h3><div class="gres">${kept.map(m=>{ const s=SPECIES[m.sp]; return `<div style="border-color:${RAR_COL[RARITY[s.rar]]}"><canvas width="32" height="36" data-sp="${m.sp}"></canvas>${rarTag(s.rar)}<span>${esc(s.n)}</span></div>`; }).join('')}${sold.map(o=>`<div style="border-color:${RAR_COL[RARITY[o.rar]]};opacity:.6"><canvas width="32" height="36" data-sp="${o.sp}"></canvas>${rarTag(o.rar)}<span>${esc(SPECIES[o.sp].n)}</span><span class="note">dijual +${o.g}G</span></div>`).join('')}</div>${kept.length?'<p class="note">Monster baru langsung ditempatkan di lantai yang masih kosong, atau di cadangan.</p>':''}</div>`; } }
   return {t:'Pemanggilan',h};
 }
 /* petualang */
@@ -4023,7 +4056,16 @@ function pFix(){
 function act(a,el){
   let err=null;
   const m=UI.monId&&G.mons.find(x=>x.id===UI.monId);
-  if(a==='floor'){ err=buyFloor(); if(!err){ toast(`Lantai ${G.floors} dibangun!`); scrollToFloor(topF()); } }
+  if(a.startsWith('asell:')){ const r=RARITY[+a.slice(6)]; const AS=autoSellCfg(); AS[r]=!AS[r]; toast(AS[r]?`Auto jual ${r} menyala.`:`Auto jual ${r} mati.`); }
+  else if(a.startsWith('mrar:')){ const v=+a.slice(5); UI.mrar=v<0?null:v; UI.confirmSellAll=null; }
+  else if(a.startsWith('msort:')){ UI.msort=a.slice(6); }
+  else if(a==='sellres'){ UI.mresOnly=UI.mresOnly===false; UI.confirmSellAll=null; }
+  else if(a==='sellall'){ UI.confirmSellAll=UI.mrar; }
+  else if(a==='sellallNo'){ UI.confirmSellAll=null; }
+  else if(a==='sellallGo'){ const fr=UI.mrar; const onlyRes=UI.mresOnly!==false; const tg=G.mons.filter(m=>!m.temp&&SPECIES[m.sp].rar===fr&&(!onlyRes||m.floor<0)); let tot=0; for(const m of tg) tot+=sellMon(m); UI.confirmSellAll=null; toast(tg.length?`${tg.length} monster ${RARITY[fr]} terjual +${tot} emas.`:'Tidak ada yang dijual.'); }
+  else if(a==='autoEqAll'){ const n=autoEquipAll(); toast(n?`${n} perlengkapan dipasang otomatis.`:'Tidak ada perlengkapan menganggur yang lebih baik.'); }
+  else if(a==='autoEq'&&m){ const n=autoEquipMon(m); toast(n?`${m.name} memakai ${n} perlengkapan terbaik.`:'Tidak ada perlengkapan menganggur yang lebih baik.'); }
+  else if(a==='floor'){ err=buyFloor(); if(!err){ toast(`Lantai ${G.floors} dibangun!`); scrollToFloor(topF()); } }
   else if(a==='rename'&&m){ const v=$('nmIn').value; const r=askRename(m,v); if(r.msg) toast(r.msg); else { UI.rnReply={id:m.id,ok:r.ok,reply:r.reply,alt:r.alt}; UI.nmDraft=r.ok?null:{id:m.id,v}; if(m.floor>=0) say(m.x,m.floor,r.ok?'♪':'Hmph!',r.ok?'#9fff9a':'#ff9aa8',1.2); if(r.ok) log(`${r.old} setuju dipanggil ${m.name} mulai sekarang.`,'evo'); } }
   else if(a==='takeAlt'&&m&&UI.rnReply&&UI.rnReply.alt){ const old=m.name; acceptAlt(m,UI.rnReply.alt); UI.rnReply={id:m.id,ok:true,reply:'Hihi, nama pilihanku memang paling keren!'}; UI.nmDraft=null; log(`${old} kini bernama ${m.name}, nama pilihannya sendiri.`,'evo'); }
   else if(a==='gift'&&m){ if(G.gold<40) err='Emas kurang.'; else { G.gold-=40; m.loy=Math.min(100,m.loy+12); monGainExp(m,monNeed(m)*.1); toast(`${m.name} senang sekali!`); if(m.floor>=0) say(m.x,m.floor,'♥','#ff7ab0',1.4); } }
@@ -4082,7 +4124,7 @@ function bindUI(){
     if(t.dataset.act) return act(t.dataset.act,t);
     if(t.dataset.buy) return startPlacing(JSON.parse(t.dataset.buy));
     if(t.dataset.mon){ UI.monId=+t.dataset.mon; UI.fuseA=null; UI.sel={k:'m',id:UI.monId}; openPanel('mon'); const m=G.mons.find(x=>x.id===UI.monId); if(m&&m.floor>=0){ RC.follow=false; $('bFollow').setAttribute('aria-pressed','false'); scrollToFloor(m.floor); } return; }
-    if(t.dataset.g){ const n=t.dataset.g.startsWith('10')?10:1; const r=gacha(n,t.dataset.g.endsWith('g')?'gold':'jiwa'); if(r.err) toast(r.err); else { UI.gres=r.out.map(m=>m.id); const best=Math.max(...r.out.map(m=>SPECIES[m.sp].rar)); if(best>=3) miraTip(`Kyaa~ ${RARITY[best]} pertama kita! Yang Mulia beruntung sekali!`,'rar'+best); } renderPanel(); return; }
+    if(t.dataset.g){ const n=t.dataset.g.startsWith('10')?10:1; const r=gacha(n,t.dataset.g.endsWith('g')?'gold':'jiwa'); if(r.err) toast(r.err); else { UI.gres=r.out.map(m=>m.id); UI.gsold=r.sold; const best=Math.max(-1,...r.out.map(m=>SPECIES[m.sp].rar)); if(best>=3) miraTip(`Kyaa~ ${RARITY[best]} pertama kita! Yang Mulia beruntung sekali!`,'rar'+best); } renderPanel(); return; }
     if(t.dataset.fb){ UI.fuseB=+t.dataset.fb; renderPanel(); return; }
     if(t.dataset.guard){ const {f,i}=UI.sel; const m=G.mons.find(x=>x.id===+t.dataset.guard); if(m){ const err=addSecret(f,i,m); toast(err||`${m.name} masuk ke ruang rahasia.`); renderPanel(); } return; }
     if(t.dataset.unguard){ const m=G.mons.find(x=>x.id===+t.dataset.unguard); if(m){ clearSecret(m); m.px=SLOT_X(ri(1,8)); toast(`${m.name} keluar dari ruang rahasia.`); renderPanel(); } return; }
@@ -4132,7 +4174,7 @@ function followCam(dt){
 let lastT=0, acc=0, saveAcc=0, hudAcc=0;
 function frame(ts){
   const real=Math.min(.25,(ts-(lastT||ts))/1000); lastT=ts;
-  acc+=real*UI.speed; let n=0; while(acc>=DT&&n<40){ step(); acc-=DT; n++; } if(n>=40) acc=0;
+  acc+=real*(SCENE_PANELS.includes(UI.panel)?0:UI.speed); let n=0; while(acc>=DT&&n<40){ step(); acc-=DT; n++; } if(n>=40) acc=0;
   { const sh=$('sheet'); RC.padB=sh.hidden?0:sh.offsetHeight*(RC.cv.width/RC.cv.getBoundingClientRect().width); }
   for(let i=EFX.length-1;i>=0;i--){ EFX[i].t-=real*(UI.speed?Math.min(UI.speed,1.5):0); if(EFX[i].t<=0) EFX.splice(i,1); }
   followCam(real); render();
@@ -4242,5 +4284,210 @@ function nbAct(a){ const [k,x,y]=a.split(':'); const nb=nbById(x);
   setInterval(()=>{ if(G&&!G.isNeighbor){ updNbBadge(); if(G.visit) updVisitBar(); else if(!$('visitBar').hidden){ $('visitBar').hidden=true; $('stage').classList.remove('visiting'); } } },1000);
   if(G&&G.visit){ $('stage').classList.add('visiting'); updVisitBar(); }
 })();
+
+
+/* =====================================================================
+   BERITA · PASAR · LELANG · PENEMPA · TETANGGA PINTAR
+   ===================================================================== */
+const SCENE_PANELS=['bpasar','blelang','btempa'];
+const NPQ=[];
+function nwQ(p){ NPQ.push(p); return NPQ.length-1; }
+function nwInit(){ G.news=G.news||[]; G.threats=G.threats||[]; G.newsN=G.newsN||0; }
+function nwNews(id){ return (G.news||[]).find(n=>n.id===+id); }
+function nwUnread(){ return (G.news||[]).filter(n=>!n.read).length; }
+function nwBadge(){ if(typeof document==='undefined'||!G) return; const b=document.querySelector('#nav button[data-p="berita"]'); if(!b) return; const n=nwUnread(); let e=b.querySelector('.badge'); if(n){ if(!e){ e=document.createElement('b'); e.className='badge'; b.appendChild(e); } e.textContent=n; } else if(e) e.remove(); }
+function nwAdd(o){ if(!G||G.isNeighbor) return null; nwInit(); const n=Object.assign({id:++G.newsN,day:G.day,read:false},o); G.news.unshift(n); if(G.news.length>40) G.news.pop(); log('📰 '+n.title,'nb'); nwBadge(); return n; }
+function nwLive(n){ return ['market','auction','smith'].includes(n.type)&&n.exp>=G.day; }
+function nwNpc(lv,job,race){ race=race||pick(ADV_RACES); const {n,sx}=advName(race); const R=RACE[race];
+  return {name:n,race,sx,job,el:'',lv:Math.max(1,Math.round(lv)),title:'',app:{skin:pick(R.skin),hair:pick(R.hair),eye:pick(R.eye),cloth:pick(CLOTH),cloth2:pick(CLOTH),outfit:sx==='f'&&rnd()<.3?'gaun':pick(OUTFITS),style:sx==='f'&&rnd()<.7?pick(['long','tail','bun','braid']):pick(HAIRSTYLES)},eq:{hp:0,atk:0,def:0}}; }
+function nwSnap(p){ return {name:p.name,race:p.race,sx:p.sx,job:p.job,el:p.el||'',lv:p.lv,title:p.title||'',app:Object.assign({},p.app),eq:{hp:0,atk:0,def:0}}; }
+function nwSnapParty(pa){ return pa.members.map(id=>G.people[id]).filter(Boolean).map(nwSnap); }
+function nwGenParty(lv,size){ size=size||ri(4,5); const jobs=['knight','priest',pick(['mage','archer'])]; while(jobs.length<size) jobs.push(pickJobStar('elite'));
+  const members=jobs.map(j=>{ const m=nwNpc(Math.max(1,lv+ri(-3,3)),j); m.el=JOB_EL[j]?pick(JOB_EL[j]):''; return m; });
+  return {name:`${pick(PARTY_A)} ${pick(PARTY_B)}`,members}; }
+function nwItem(lv,minR,opt){ const it=genItem(Math.max(1,lv),minR,opt); G.inv=G.inv.filter(x=>x!==it); return it; }
+function nwAvgLv(ms){ return ms.length?Math.round(ms.reduce((s,m)=>s+m.lv,0)/ms.length):0; }
+function nwStrong(pa){ const L=fameLv(); const mm=partyMembers(pa); if(!mm.length) return false; const av=mm.reduce((s,x)=>s+x.lv,0)/mm.length; return !!(pa.hero||pa.tier==='elite'||pa.tier==='solo'||pa.named||(pa.tier==='veteran'&&av>=L*1.25)||av>=L*1.4); }
+function nwPartyHtml(ms){ return `<div class="grid">${ms.map(m=>`<div class="card"><canvas class="ic" width="32" height="36" data-npq="${nwQ(m)}" style="width:48px;height:54px;image-rendering:pixelated"></canvas><span class="t"><b>${esc(m.name)}</b><span>Role: ${esc(JOBS[m.job]?JOBS[m.job].n:m.job)} ${JOBS[m.job]?starStr(JOBS[m.job].star):''} · Lv${m.lv}</span><span>${esc(raceName(m.race))}${m.title?' · '+esc(m.title):''}</span></span></div>`).join('')}</div>`; }
+
+/* ---- pemicu berita ---- */
+const _nwEnter=enterDungeon;
+enterDungeon=function(pa){ _nwEnter(pa); if(G.isNeighbor||pa.state!=='in') return; pa.snap=nwSnapParty(pa); pa.snapStrong=nwStrong(pa); };
+const _nwAdvDie=advDie;
+advDie=function(a,src){ const pa=G.parties.find(x=>x.id===a.party); _nwAdvDie(a,src);
+  if(G.isNeighbor||!pa||pa._news||pa.state!=='gone'||!pa.snapStrong) return; pa._news=1;
+  const kn=pa.mem&&pa.mem.fallen&&pa.mem.fallen[pa.mem.fallen.length-1]; const ms=pa.snap||[];
+  nwAdd({type:'win',title:`Party kuat ${pa.name} berhasil kamu musnahkan!`,data:{party:pa.name,tier:pa.tier,members:ms,floor:a.floor+1,killer:kn?kn.killer:'?'}}); };
+const _nwLordDie=lordDie;
+lordDie=function(a){ const L=G.lord, own=!G.isNeighbor; const pa=a&&G.parties.find(x=>x.id===a.party); const ms=pa?(pa.snap||nwSnapParty(pa)):[]; const nm=L.name, lv=L.lv, rn=lordRace().n; _nwLordDie(a);
+  if(own) nwAdd({type:'lord',title:`${pa?pa.name:'Seorang petualang'} membunuh Raja Iblis ${nm} (kastilmu)!`,data:{party:pa?pa.name:'?',members:ms,lord:nm,race:rn,lv,dungeon:'Kastilmu'}}); };
+const _nwOLD=nbOnLordDeath;
+nbOnLordDeath=function(nb,snap){ _nwOLD(nb,snap); const k=nb.killerParty||nwGenParty(Math.max(8,snap.lv*1.1+ri(0,8))); nb.killerParty=null;
+  const rn=(LORD_RACE.find(x=>x.id===snap.race)||{n:'Demon'}).n;
+  nwAdd({type:'lord',title:`Party ${k.name} membunuh Raja Iblis ${snap.name} dari ${nb.dname}!`,data:{party:k.name,members:k.members,lord:snap.name,race:rn,lv:snap.lv,dungeon:nb.dname}}); };
+
+/* ---- ancaman party kuat ---- */
+function nwSchedule(){ nwInit(); const nbs=G.nbs||[]; const toNb=nbs.length&&rnd()<.55; const nb=toNb?pick(nbs):null;
+  const lv=nb?nb.w.lord.lv*1.1+ri(3,10):fameLv()*rand(1.4,1.9)+4; const party=nwGenParty(lv); const days=ri(2,4);
+  const th={id:++G.newsN,day:G.day+days,target:nb?nb.id:'me',party}; G.threats.push(th);
+  const tn=nb?nb.dname:'kastilmu';
+  nwAdd({type:'threat',title:`Party kuat ${party.name} akan menyerbu ${tn} dalam ${days} hari`,data:{party:party.name,members:party.members,target:tn,arrive:th.day,mine:!nb}}); }
+function nwSpawn(sp){ const pa={id:nid(),tier:'elite',members:[],state:'town',saveFloor:0,nextVisit:0,visits:0,wins:0,name:sp.name,quote:'',named:1};
+  for(const s of sp.members){ const p=newPerson(s.lv,s.job,s.race); p.name=s.name; p.sx=s.sx; p.app=Object.assign({},s.app); p.el=s.el||''; p.party=pa.id; p.eq.atk+=s.lv*.4; p.eq.hp+=s.lv*3; p.eq.def+=s.lv*.2; pa.members.push(p.id); }
+  G.parties.push(pa); enterDungeon(pa); log(`⚠ ${pa.name} tiba di pintu kastil! Mereka bukan petualang biasa.`,'warn'); }
+function nwRaid(nb,sp){ let def=0; withWorld(nb.w,()=>{ for(const m of G.mons){ if(m.dead||m.temp) continue; const s=monStats(m); def+=Math.sqrt(s.hp*s.atk); } const ls=lordStats(); def+=Math.sqrt(ls.hp*ls.atk)*1.2; });
+  let atk=0; for(const s of sp.members){ const st=advStats(s); atk+=Math.sqrt(st.hp*st.atk)*1.1; }
+  const win=rnd()<clamp(.5+(atk-def)/(atk+def),.08,.92); const ms=sp.members;
+  if(!win){ nwAdd({type:'raid',title:`${nb.dname} menahan serangan party ${sp.name}!`,data:{party:sp.name,members:ms,dungeon:nb.dname,text:`Penghuni ${nb.dname} (Raja Iblis ${nb.w.lord.name}) berhasil memukul mundur ${sp.name}. Pertahanan yang rapi dan monster yang diperlengkapi membuat mereka gagal.`}}); nbRel(nb,0); return; }
+  if(rnd()<.18){ nb.killerParty=sp; withWorld(nb.w,()=>{ const L=G.lord; G.stats.lords++; G.hall.unshift({d:G.day,lord:L.name,lv:L.lv}); if(G.hall.length>20) G.hall.pop(); G.pop*=.6; G.gold*=.85; newLord(false); }); return; }
+  withWorld(nb.w,()=>{ G.gold*=.75; for(const m of G.mons) if(rnd()<.3){ m.dead=true; m.reviveAt=G.t+60; } });
+  nwAdd({type:'raid',title:`Party ${sp.name} menjarah ${nb.dname}!`,data:{party:sp.name,members:ms,dungeon:nb.dname,text:`${sp.name} menerobos ${nb.dname}, menjarah seperempat hartanya dan menjatuhkan sebagian monster. Raja Iblis ${nb.w.lord.name} selamat, tapi terpukul.`}}); }
+function nwResolve(th){ if(th.target==='me'){ nwSpawn(th.party); return; } const nb=nbById(th.target); if(nb) nwRaid(nb,th.party); }
+
+/* ---- pasar, lelang, penempa ---- */
+const NW_PLACE=['Pasar Senja','Pasar Tulang Besi','Pasar Bulan Merah','Lapak Perak','Pasar Gerbang Jurang'];
+const NW_ROLES={senjata:'Pandai Senjata',zirah:'Pandai Zirah',aksesori:'Penjual Aksesori',bahan:'Pengepul Bahan Craft',rune:'Penjual Rune'};
+function nwMakeMarket(){ const L=fameLv(); const lvB=Math.max(1,Math.round(L*.9)); const V=[];
+  const eqStock=(slot)=>{ const st=[]; for(let i=ri(2,3);i>0;i--){ const it=nwItem(lvB+ri(-2,3),rnd()<.25?2:null,{s:slot,preRune:.25}); st.push({k:'eq',it,p:Math.round(itemValue(it)*rand(2.2,3.2)/10)*10}); } return st; };
+  V.push({role:'senjata',label:NW_ROLES.senjata,npc:nwNpc(ri(20,40),'weaponMaster'),stock:eqStock('senjata')});
+  V.push({role:'zirah',label:NW_ROLES.zirah,npc:nwNpc(ri(20,40),'knight'),stock:eqStock('zirah')});
+  V.push({role:'aksesori',label:NW_ROLES.aksesori,npc:nwNpc(ri(20,40),'enchanter'),stock:eqStock('aksesori')});
+  const bs=[]; for(let i=ri(3,4);i>0;i--){ const t=ri(0,Math.min(6,1+Math.floor(L/12))); const q=ri(2,6); bs.push({k:'bahan',n:BAHAN[t],t,q,p:Math.round(q*28*(1+t*1.2)*rand(.85,1.2))}); }
+  V.push({role:'bahan',label:NW_ROLES.bahan,npc:nwNpc(ri(20,40),'miner'),stock:bs});
+  const rs=[]; for(let i=ri(3,4);i>0;i--){ const g=rnd()<.25?2:1; rs.push({k:'rune',r:{k:pick(RUNE_KEYS),g},p:Math.round(300*g*rand(.9,1.2)/10)*10}); }
+  V.push({role:'rune',label:NW_ROLES.rune,npc:nwNpc(ri(20,40),'alkemis'),stock:rs});
+  const place=pick(NW_PLACE); nwAdd({type:'market',title:`${place} sedang buka: bahan, senjata, zirah, dan rune dijual`,exp:G.day+ri(2,3),data:{place,vendors:V}}); }
+function nwMakeAuction(){ const L=fameLv(); const bidders=[]; const add=(title,p,nbId)=>{ const b={i:bidders.length,title,p,nb:nbId==null?null:nbId,name:p?p.name:title}; bidders.push(b); return b; };
+  add('Petualang kaya',nwNpc(L*1.2+ri(5,20),pick(['knight','mage','archer','samurai'])));
+  add('Bangsawan',nwNpc(ri(8,20),pick(['duelist','bard','knight'])));
+  add('Saudagar Elf',nwNpc(ri(15,30),'enchanter','elf')); add('Pedagang Dwarf',nwNpc(ri(15,30),'miner','dwarf')); add('Panglima Orc',nwNpc(ri(20,40),'berserker','orc'));
+  const nbs=(G.nbs||[]).slice(); for(let i=0;i<Math.min(2,nbs.length);i++){ const nb=nbs.splice(ri(0,nbs.length-1),1)[0]; add(`Raja Iblis ${nb.w.lord.name}`,null,nb.id); }
+  const lots=[]; for(let i=0;i<4;i++){ const it=nwItem(L*1.1+8+ri(0,8),i<2?3:2,{preRune:.5}); if(it.r>=3) it.lv=ri(0,3); const val=itemValue(it); const start=Math.round(val*rand(6,9)/10)*10;
+    const riv=bidders.filter(()=>rnd()<.7).map(b=>({i:b.i,max:Math.round(val*rand(6,16)/10)*10})); if(riv.length<2) riv.push({i:ri(0,bidders.length-1),max:Math.round(val*rand(8,14)/10)*10});
+    lots.push({it,start,price:start,leader:null,rivals:riv,sold:0,soldTo:'',msg:''}); }
+  nwAdd({type:'auction',title:'Lelang besar diadakan: perlengkapan langka, bidder kaya dan para Raja Iblis hadir',exp:G.day+ri(2,3),data:{bidders,lots}}); }
+function nwMakeSmith(){ const q=ri(1,5); const npc=nwNpc(ri(25,50),'weaponMaster'); const SK=['Tempaannya kasar tapi jujur','Tempaannya rapi','Tempaannya halus','Penempa berbakat','Maestro penempa'];
+  nwAdd({type:'smith',title:`${npc.name} membuka jasa penempaan untuk semua kalangan`,exp:G.day+ri(3,5),data:{npc,q,skill:SK[q-1]}}); }
+function nwDaily(){ nwInit();
+  for(const th of G.threats.slice()) if(G.day>=th.day){ G.threats=G.threats.filter(x=>x!==th); nwResolve(th); }
+  if(G.day>=3&&G.threats.length<2&&rnd()<.14) nwSchedule();
+  const act=t=>G.news.some(n=>n.type===t&&n.exp>=G.day);
+  if(!act('market')&&rnd()<.1) nwMakeMarket(); if(!act('auction')&&rnd()<.07) nwMakeAuction(); if(!act('smith')&&rnd()<.06) nwMakeSmith(); }
+const _nwDaily=dailyTick;
+dailyTick=function(){ _nwDaily(); if(G.isNeighbor) return; try{ nwDaily(); }catch(e){ console.error(e); } };
+
+/* ---- aksi di pasar / lelang / penempa ---- */
+const NW_TALK={senjata:['Ini baja tempaan terbaik di jurang. Tidak ada yang lebih tajam.','Pedangmu sudah kusam, Yang Mulia? Silakan lihat-lihat.'],zirah:['Zirah ini sudah menyelamatkan seratus nyawa. Sayang pemiliknya lupa membayar.','Pelindung bagus itu investasi.'],aksesori:['Cincin ini berbisik kalau malam. Jangan khawatir, cuma sedikit.','Aksesori kecil, dampak besar.'],bahan:['Bahan segar dari tambang dan sarang monster! Murah, bukan curian.','Tempa sendiri atau bawa ke penempa, terserah. Yang penting bahannya dari aku.'],rune:['Rune ini masih hangat dari tungku. Pasang ke perlengkapan, rasakan bedanya.','Rune bagus jarang. Bawa tiga yang sama, kau bisa menggabungkannya.']};
+function nwTalkLine(v){ const th=(G.threats||[])[0]; if(th&&rnd()<.35){ const tn=th.target==='me'?'kastilmu':(nbById(th.target)||{}).dname||'sebuah dungeon'; return `Kudengar party ${th.party.name} yang kuat akan menyerbu ${tn} sekitar hari ke-${th.day}. Hati-hati.`; } return pick(NW_TALK[v.role]); }
+function nwBuy(n,vi,si){ const v=n.data.vendors[vi]; const s=v&&v.stock[si]; if(!s||s.sold) return 'Sudah terjual.'; if(G.gold<s.p) return `Emas kurang (butuh ${s.p}).`; G.gold-=s.p; s.sold=1;
+  if(s.k==='eq'){ s.it.on=null; G.inv.push(s.it); } else if(s.k==='bahan'){ for(let i=0;i<s.q;i++) addBahan(s.n,s.t); } else { G.runes=G.runes||[]; G.runes.push(newRune(s.r.g,s.r.k)); } return null; }
+function nwNextBid(lot){ return lot.leader==null?lot.price:Math.ceil(lot.price*1.12/10)*10; }
+function nwBid(n,li){ const D=n.data, lot=D.lots[li]; if(!lot||lot.sold) return 'Lot ini sudah ditutup.'; if(lot.leader==='me') return 'Kamu sudah memimpin.'; const nx=nwNextBid(lot); if(G.gold<nx) return `Emas kurang (butuh ${nx}).`;
+  lot.price=nx; lot.leader='me'; lot.msg=`Kamu menawar ${nx} emas.`; const nx2=Math.ceil(lot.price*1.12/10)*10; const rv=lot.rivals.filter(r=>r.max>=nx2&&rnd()<.75);
+  if(rv.length){ const r=pick(rv); lot.price=nx2; lot.leader=r.i; lot.msg+=` ${D.bidders[r.i].title} ${D.bidders[r.i].p?D.bidders[r.i].p.name:''} membalas ${nx2} emas!`; } else lot.msg+=' Tidak ada yang membalas.'; return null; }
+function nwClose(n,li){ const D=n.data, lot=D.lots[li]; if(!lot||lot.sold) return null;
+  if(lot.leader==='me'){ if(G.gold<lot.price) return 'Emas kurang untuk membayar tawaranmu!'; G.gold-=lot.price; lot.it.on=null; G.inv.push(lot.it); lot.sold=1; lot.soldTo='kamu'; lot.msg=`Palu diketuk! ${lot.it.n} jadi milikmu seharga ${lot.price} emas.`; }
+  else { lot.sold=1; const b=lot.leader!=null?D.bidders[lot.leader]:null; lot.soldTo=b?b.title:'tidak ada yang menawar'; lot.msg=b?`Palu diketuk! Terjual ke ${b.title}${b.p?' '+b.p.name:''} seharga ${lot.price} emas.`:'Lot ditarik, tidak ada penawar.'; } return null; }
+const NW_MATT=[0,0,1,1,2,3,4];
+function nwMats(){ return Object.entries(G.bahan||{}).filter(([n,c])=>c>=3).map(([n,c])=>({n,c,t:tierOf(n)})); }
+function nwCraftCost(t,q){ return Math.round((120+t*140)*(.8+.25*q)); }
+function nwCraft(n,slot,mi){ const mats=nwMats(); const m=mats[mi]; if(!slot||!m) return 'Pilih jenis perlengkapan dan bahan.'; const q=n.data.q; const cost=nwCraftCost(m.t,q); if(G.gold<cost) return `Emas kurang (jasa ${cost}).`;
+  G.gold-=cost; G.bahan[m.n]-=3; if(G.bahan[m.n]<=0) delete G.bahan[m.n];
+  let minR=NW_MATT[Math.min(6,m.t)]; if(q>=4&&rnd()<.25) minR=Math.min(4,minR+1);
+  const it=genItem(Math.max(1,Math.round(fameLv()*(.8+.07*q))),minR,{s:slot,from:`Tempaan ${n.data.npc.name}`,preRune:0}); const k=.92+.06*q;
+  for(const f of ['atk','hp','def']) if(it[f]) it[f]=f==='hp'?Math.round(it[f]*k):+(it[f]*k).toFixed(1);
+  UI.smRes=it.id; return null; }
+function nwSocket(n,iid,rid){ const it=G.inv.find(x=>x.id===+iid); const ri_=(G.runes||[]).findIndex(r=>r.id===+rid); if(!it||ri_<0) return 'Pilih barang dan rune.'; itFix(it); if(it.runes.length>=it.sock) return 'Slot rune penuh.';
+  const rn=G.runes[ri_]; const q=n.data.q; const fee=Math.round(120*q*rn.g); if(G.gold<fee) return `Emas kurang (jasa ${fee}).`; G.gold-=fee; G.runes.splice(ri_,1); it.runes.push({k:rn.k,g:rn.g,q:+(.03*q).toFixed(3)}); UI.smRes=it.id; return null; }
+function nwScene(n){ return {market:'bpasar',auction:'blelang',smith:'btempa'}[n.type]; }
+function nwCmd(c,el){ const [k,a,b]=c.split(':'); const n=nwNews(UI.newsId); let err=null;
+  if(k==='open'){ const x=nwNews(a); if(!x) return; x.read=true; UI.newsId=x.id; nwBadge(); openPanel('bdetail'); return; }
+  if(k==='list'){ openPanel('berita'); return; }
+  if(k==='go'){ const x=nwNews(a); if(!x||!nwLive(x)) { toast('Acara itu sudah berakhir.'); return; } UI.newsId=x.id; UI.vend=null; UI.mkTalk=null; UI.sm={}; UI.smRes=null; toast(`Teleport ke ${x.type==='market'?x.data.place:x.type==='auction'?'rumah lelang':'bengkel penempa'}… waktu terhenti.`); openPanel(nwScene(x)); return; }
+  if(k==='leave'){ closePanel(); return; }
+  if(k==='back'){ openPanel('bdetail'); return; }
+  if(!n) return;
+  if(k==='talk'){ const v=n.data.vendors[+a]; UI.vend=+a; UI.mkTalk={vi:+a,line:nwTalkLine(v)}; }
+  else if(k==='shop'){ UI.vend=UI.vend===+a?null:+a; }
+  else if(k==='buy'){ err=nwBuy(n,+a,+b); if(!err) toast('Dibeli! Barang masuk gudang.'); }
+  else if(k==='bid'){ err=nwBid(n,+a); }
+  else if(k==='close'){ err=nwClose(n,+a); }
+  else if(k==='smslot'){ UI.sm=UI.sm||{}; UI.sm.slot=a; }
+  else if(k==='smmat'){ UI.sm=UI.sm||{}; UI.sm.mat=+a; }
+  else if(k==='smgo'){ UI.sm=UI.sm||{}; err=nwCraft(n,UI.sm.slot,UI.sm.mat); if(!err) toast('Selesai ditempa!'); }
+  else if(k==='smitem'){ UI.sm=UI.sm||{}; UI.sm.item=+a; }
+  else if(k==='smrune'){ UI.sm=UI.sm||{}; UI.sm.rune=+a; }
+  else if(k==='smsock'){ UI.sm=UI.sm||{}; err=nwSocket(n,UI.sm.item,UI.sm.rune); if(!err){ toast('Rune terpasang oleh penempa!'); UI.sm.rune=null; } }
+  if(err) toast(err); renderPanel(); }
+const _nwAct=act; act=function(a,el){ if(typeof a==='string'&&a.startsWith('nw:')){ nwCmd(a.slice(3),el); return; } return _nwAct(a,el); };
+
+/* ---- panel ---- */
+const NW_IC={win:'⚔️',threat:'⚠️',raid:'🛡️',market:'🛒',auction:'🔨',smith:'⚒️',lord:'👑'};
+function pBerita(){ NPQ.length=0; nwInit(); const L=G.news; let h=`<p class="note">Kabar dari seluruh jurang. Angka merah di menu = berita belum dibaca.</p>`;
+  if(!L.length) h+=`<p class="note">Belum ada kabar. Tunggu beberapa hari…</p>`;
+  else h+=`<div class="grid1">${L.map(n=>`<button class="card" data-act="nw:open:${n.id}"><span class="t"><b>${NW_IC[n.type]||'📰'} ${esc(n.title)}${n.read?'':' <span class="badge" style="position:static">baru</span>'}</b><span>Hari ${n.day}${['market','auction','smith'].includes(n.type)?(nwLive(n)?` · buka sampai hari ${n.exp}`:' · sudah berakhir'):''}</span></span></button>`).join('')}</div>`;
+  return {t:'Berita',h}; }
+function pBDetail(){ NPQ.length=0; const n=nwNews(UI.newsId); if(!n) return {t:'Berita',h:'<p class="note">Berita tidak ditemukan.</p>'}; const D=n.data;
+  let h=`<div class="btns"><button class="btn" data-act="nw:list">← Semua berita</button></div><p><b>${NW_IC[n.type]||''} ${esc(n.title)}</b><br><span class="note">Hari ${n.day}</span></p>`;
+  if(n.type==='win') h+=`<p class="note">${esc(D.party)} (${esc(D.tier||'elit')}) tumpas di lantai ${D.floor}; pukulan terakhir dari ${esc(D.killer)}. Rata-rata Lv${nwAvgLv(D.members)}.</p>${nwPartyHtml(D.members)}`;
+  else if(n.type==='threat') h+=`<p class="note">${esc(D.party)} (rata-rata Lv${nwAvgLv(D.members)}) dijadwalkan tiba di <b>${esc(D.target)}</b> pada hari ${D.arrive}${G.day>=D.arrive?' (sudah tiba)':` (${D.arrive-G.day} hari lagi)`}.${D.mine?' Siapkan monster, perlengkapan, dan jebakan!':''}</p>${nwPartyHtml(D.members)}`;
+  else if(n.type==='raid') h+=`<p class="note">${esc(D.text)}</p>${nwPartyHtml(D.members)}`;
+  else if(n.type==='lord') h+=`<p class="note">${esc(D.dungeon)} kehilangan penguasanya: Raja Iblis ${esc(D.lord)} sang ${esc(D.race)} (Lv${D.lv}) tumbang oleh party ${esc(D.party)}.</p>${nwPartyHtml(D.members)}`;
+  else { const live=nwLive(n); h+=`<p class="note">${n.type==='market'?'Pedagang membuka lapak di pasar. Waktu berhenti selama kamu di sana dan kamu bisa ngobrol dengan penjual.':n.type==='auction'?'Rumah lelang menawarkan barang langka. Bidder: petualang kaya, bangsawan, ras lain berduit, bahkan Raja Iblis lain. Harganya mahal sekali.':`Penempa ${esc(D.npc.name)} (${esc(D.skill)}) menerima tempa bahan dan pasang rune untuk siapa pun. Kualitas penempa mempengaruhi hasil.`}</p><div class="btns">${live?`<button class="btn pri" data-act="nw:go:${n.id}">Teleport ke sana (waktu berhenti)</button>`:`<span class="note">Acara ini sudah berakhir.</span>`}</div>`; }
+  return {t:'Berita',h}; }
+function nwStockRow(v,s,vi,si){ const btn=`<div class="btns" style="margin-top:4px"><button class="btn" data-act="nw:buy:${vi}:${si}" ${s.sold?'disabled':''}>${s.sold?'Terjual':`Beli · ${s.p} emas`}</button></div>`;
+  if(s.k==='eq') return `<div><b>${itemName(s.it)}</b> ${rarTag(s.it.r)}<br><span class="note">${itemShort(s.it)}</span>${btn}</div>`;
+  if(s.k==='bahan') return `<div><b>${esc(s.n)} ×${s.q}</b><br><span class="note">Bahan craft tingkat ${s.t+1}</span>${btn}</div>`;
+  return `<div><b>${esc(runeName(s.r))}</b><br><span class="note">Rune, dipasang ke slot perlengkapan.</span>${btn}</div>`; }
+function pPasar(){ NPQ.length=0; const n=nwNews(UI.newsId); if(!n) return {t:'Pasar',h:'<p class="note">Berita tidak ditemukan.</p>'}; const D=n.data;
+  let h=`<div class="party"><b>🛒 ${esc(D.place)} · waktu terhenti</b><span class="note">Dunia membeku selama kamu di sini. Emas: <b>${fmt(Math.floor(G.gold))}</b></span></div>`;
+  D.vendors.forEach((v,vi)=>{ const open=UI.vend===vi; h+=`<div class="party" style="margin-top:6px"><div style="display:flex;gap:8px;align-items:center"><canvas class="ic" width="32" height="36" data-npq="${nwQ(v.npc)}" style="width:48px;height:54px;image-rendering:pixelated"></canvas><span class="t"><b>${esc(v.npc.name)}</b><br><span class="note">${esc(v.label)}</span></span></div>`;
+    if(UI.mkTalk&&UI.mkTalk.vi===vi) h+=`<p class="note" style="margin:6px 0">💬 “${esc(UI.mkTalk.line)}”</p>`;
+    h+=`<div class="btns"><button class="btn" data-act="nw:talk:${vi}">Ngobrol</button><button class="btn${open?' pri':''}" data-act="nw:shop:${vi}">${open?'Tutup dagangan':'Lihat dagangan'}</button></div>`;
+    if(open) h+=`<div class="abl">${v.stock.map((s,si)=>nwStockRow(v,s,vi,si)).join('')}</div>`; h+=`</div>`; });
+  return {t:'Pasar',h:h+`<div class="btns" style="margin-top:8px"><button class="btn" data-act="nw:leave">Kembali ke kastil</button></div>`}; }
+function pLelang(){ NPQ.length=0; const n=nwNews(UI.newsId); if(!n) return {t:'Lelang',h:'<p class="note">Berita tidak ditemukan.</p>'}; const D=n.data;
+  let h=`<div class="party"><b>🔨 Rumah Lelang · waktu terhenti</b><span class="note">Emas: <b>${fmt(Math.floor(G.gold))}</b>. Tawar naik 12%. Kalau tak ada yang membalas, ketuk palu untuk membayar dan membawa pulang barangnya.</span></div>`;
+  h+=`<div class="sec"><h3>Hadirin</h3><div class="grid">${D.bidders.map(b=>`<div class="card"><canvas class="ic" width="32" height="36" ${b.nb!=null?`data-nbl="${b.nb}"`:`data-npq="${nwQ(b.p)}"`} style="width:40px;height:45px;image-rendering:pixelated"></canvas><span class="t"><b>${esc(b.p?b.p.name:b.title)}</b><span>${esc(b.title)}</span></span></div>`).join('')}</div></div>`;
+  D.lots.forEach((lot,li)=>{ const lead=lot.leader==='me'?'kamu':lot.leader==null?'belum ada':`${esc(D.bidders[lot.leader].title)}`; const nx=nwNextBid(lot);
+    h+=`<div class="party" style="margin-top:6px"><b>Lot ${li+1}: ${itemName(lot.it)} ${rarTag(lot.it.r)}</b><span class="note">${itemShort(lot.it)}</span><span>Harga: <b>${fmt(lot.price)}</b> emas · Pemimpin: ${lead}</span>${lot.msg?`<span class="note">${esc(lot.msg)}</span>`:''}`;
+    h+=lot.sold?`<span class="note"><b>Ditutup${lot.soldTo?' · '+esc(lot.soldTo):''}</b></span>`:`<div class="btns">${lot.leader==='me'?'':`<button class="btn pri" data-act="nw:bid:${li}">Tawar ${fmt(nx)}</button>`}<button class="btn warn" data-act="nw:close:${li}">Ketuk palu</button></div>`; h+=`</div>`; });
+  return {t:'Lelang',h:h+`<div class="btns" style="margin-top:8px"><button class="btn" data-act="nw:leave">Kembali ke kastil</button></div>`}; }
+function pTempa(){ NPQ.length=0; const n=nwNews(UI.newsId); if(!n) return {t:'Penempa',h:'<p class="note">Berita tidak ditemukan.</p>'}; const D=n.data; const S=UI.sm=UI.sm||{}; const q=D.q;
+  let h=`<div class="party"><div style="display:flex;gap:8px;align-items:center"><canvas class="ic" width="32" height="36" data-npq="${nwQ(D.npc)}" style="width:48px;height:54px;image-rendering:pixelated"></canvas><span class="t"><b>⚒️ ${esc(D.npc.name)} · ${'★'.repeat(q)}</b><br><span class="note">${esc(D.skill)} · waktu terhenti · emas ${fmt(Math.floor(G.gold))}</span></span></div></div>`;
+  const mats=nwMats(); const SL=Object.entries(EQ_SLOT);
+  h+=`<div class="sec"><h3>Tempa perlengkapan</h3><p class="note">Butuh 3 bahan sejenis. Bahan lebih tinggi menghasilkan rarity lebih baik. Kualitas penempa menambah statistik.</p><div class="btns">${SL.map(([s,nm])=>`<button class="btn${S.slot===s?' pri':''}" data-act="nw:smslot:${s}">${nm}</button>`).join('')}</div>`;
+  h+=mats.length?`<div class="grid">${mats.map((m,i)=>`<button class="card${S.mat===i?' pri':''}" data-act="nw:smmat:${i}" style="${S.mat===i?'outline:2px solid var(--gold)':''}"><span class="t"><b>${esc(m.n)} ×${m.c}</b><span>tingkat ${m.t+1} · jasa ${nwCraftCost(m.t,q)} emas</span></span></button>`).join('')}</div>`:`<p class="note">Kamu belum punya 3 bahan sejenis. Beli di pasar atau dapatkan dari monster.</p>`;
+  h+=`<div class="btns"><button class="btn pri" data-act="nw:smgo" ${S.slot&&S.mat!=null&&mats[S.mat]?'':'disabled'}>Tempa</button></div></div>`;
+  const its=G.inv.filter(x=>{ itFix(x); return x.runes.length<x.sock; }); const rs=G.runes||[];
+  h+=`<div class="sec"><h3>Pasang rune oleh penempa</h3><p class="note">Rune yang dipasang penempa mendapat bonus efek +${Math.round(.03*q*100)}%.</p>`;
+  h+=its.length?`<div class="abl">${its.slice(0,30).map(it=>`<button class="card" data-act="nw:smitem:${it.id}" style="${S.item===it.id?'outline:2px solid var(--gold)':''}"><span class="t"><b>${itemName(it)} ${rarTag(it.r)}</b><span>slot rune ${it.runes.length}/${it.sock}</span></span></button>`).join('')}</div>`:`<p class="note">Tidak ada perlengkapan dengan slot rune kosong.</p>`;
+  h+=rs.length?`<div class="abl">${rs.slice(0,30).map(r=>`<button class="card" data-act="nw:smrune:${r.id}" style="${S.rune===r.id?'outline:2px solid var(--gold)':''}"><span class="t"><b>${esc(runeName(r))}</b><span>jasa ${Math.round(120*q*r.g)} emas</span></span></button>`).join('')}</div>`:`<p class="note">Kamu belum punya rune.</p>`;
+  h+=`<div class="btns"><button class="btn pri" data-act="nw:smsock" ${S.item&&S.rune?'':'disabled'}>Pasang rune</button></div></div>`;
+  if(UI.smRes){ const it=G.inv.find(x=>x.id===UI.smRes); if(it) h+=`<div class="party"><b>Hasil: ${itemName(it)} ${rarTag(it.r)}</b><span class="note">${itemShort(it)}</span></div>`; }
+  return {t:'Penempa',h:h+`<div class="btns" style="margin-top:8px"><button class="btn" data-act="nw:leave">Kembali ke kastil</button></div>`}; }
+NB_PANELS.berita=pBerita; NB_PANELS.bdetail=pBDetail; NB_PANELS.bpasar=pPasar; NB_PANELS.blelang=pLelang; NB_PANELS.btempa=pTempa;
+const _nwAR=nbAfterRender; nbAfterRender=function(B){ _nwAR(B); for(const cv of B.querySelectorAll('canvas[data-npq]')){ const p=NPQ[+cv.dataset.npq]; if(p&&JOBS[p.job]) iconSpr(cv,advSpr(p,0)); } NPQ.length=0; };
+(function nwUIInit(){
+  const st=document.createElement('style'); st.textContent=`nav{grid-template-columns:repeat(7,minmax(0,1fr))!important}`; document.head.appendChild(st);
+  const nav=$('nav'); const b=document.createElement('button'); b.dataset.p='berita'; const c=document.createElement('canvas'); c.width=32; c.height=36; b.appendChild(c); b.appendChild(document.createTextNode('Berita')); nav.appendChild(b);
+  paintIcon(c,g=>{ g.fillStyle='#e8dcc0'; g.fillRect(6,8,20,20); g.fillStyle='#8a7a5a'; g.fillRect(6,8,20,3); g.fillStyle='#6a5a3a'; g.fillRect(9,14,14,2); g.fillRect(9,18,14,2); g.fillRect(9,22,9,2); g.fillStyle='#c04a4a'; g.fillRect(20,21,5,5); });
+  b.onclick=()=>{ if(UI.panel==='berita'||UI.panel==='bdetail'){ closePanel(); return; } UI.target=null; openPanel('berita'); };
+  setInterval(()=>{ if(G&&!G.isNeighbor) nwBadge(); },1000); nwBadge();
+})();
+
+/* ---- tetangga lebih pintar: pasang semua monster, urut kuat, auto pasang perlengkapan terbaik ---- */
+function nbSmart(){ if(!G.isNeighbor) return; const ms=G.mons.filter(m=>!m.temp&&!m.secret); if(!ms.length) return; const F=G.floors;
+  const sig=ms.length+'|'+ms.reduce((a,m)=>a+m.lv,0)+'|'+F+'|'+ms.filter(m=>m.floor<0).length; if(G.nbSig===sig) return;
+  const pw=m=>{ const s=monStats(m); return Math.sqrt(s.hp*s.atk); }; const sorted=ms.slice().sort((a,b)=>pw(a)-pw(b)); const per=Math.max(1,Math.min(FLOOR_CAP,Math.ceil(sorted.length/F)));
+  sorted.forEach((m,i)=>{ const f=i>=F*FLOOR_CAP?-1:Math.min(F-1,Math.floor(i/per)); if(m.floor!==f){ m.floor=f; if(f>=0){ m.px=SLOT_X(ri(1,8)); m.x=m.px; } } });
+  G.nbSig=ms.length+'|'+ms.reduce((a,m)=>a+m.lv,0)+'|'+F+'|'+ms.filter(m=>m.floor<0).length; }
+function nbGear(){ if(!G.isNeighbor) return; const free=G.inv.filter(x=>!x.on).length; const nm=G.mons.filter(m=>!m.temp).length;
+  for(let k=0;k<3&&G.inv.filter(x=>!x.on).length<Math.min(8,nm*2);k++){ if(G.gold>=250&&rnd()<.7) buyItem(); else if(rnd()<.3) genItem(Math.max(1,fameLv()*.6),null,{preRune:.15}); }
+  autoEquipAll(); }
+const _nwNbAI=nbAI; nbAI=function(){ _nwNbAI(); nbSmart(); nbGear(); };
+function nbBoost(nb){ withWorld(nb.w,()=>{ if(!G.isNeighbor) return; for(let i=0;i<3;i++) genItem(Math.max(1,fameLv()*.6),null,{preRune:.15}); G.nbSig=null; nbSmart(); autoEquipAll(); }); }
+const _nwGive=nbGiveMon; nbGiveMon=function(nb,m){ const r=_nwGive(nb,m); if(!r) nbBoost(nb); return r; };
+const _nwTrade=nbTrade; nbTrade=function(nb,their,offer){ const r=_nwTrade(nb,their,offer); if(r&&r.ok) nbBoost(nb); return r; };
 
 </script>
